@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
         redirect_script = "<script>if (window.innerWidth <= 768) { window.location.href = 'mobile.html'; }</script>"
         template = template.replace('</head>', lenis_script + '\\n' + redirect_script + '\\n</head>')
 
-    new_json_str = json.dumps(template)
+    new_json_str = json.dumps(template).replace('</', '<\\/')
     new_content = content[:match.start(1)] + new_json_str + content[match.end(1):]
 
     with open(filename, 'w') as f:
