@@ -419,7 +419,7 @@ input,select,textarea,button{font-family:Mulish,sans-serif}
     <!-- ============ BOOK ============ -->
     <div id="view-book" style="display:none" class="view-section">
       <div style="padding:24px 20px 24px">
-        <div>
+        <div id="booking-form-container">
           <div>
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:22px">
               <sc-for list="{{ stepDots }}" as="d" hint-placeholder-count="3">
@@ -428,7 +428,7 @@ input,select,textarea,button{font-family:Mulish,sans-serif}
               <div style="margin-left:auto;font-size:10.5px;letter-spacing:0.2em;text-transform:uppercase;color:#B39C88">{{ stepLabel }}</div>
             </div>
 
-            <div>
+            <div id="booking-step-1" class="booking-step" style="display:block">
               <div>
                 <h2 style="font-family:Marcellus,serif;font-size:26px;font-weight:400;margin:0 0 6px">What are you booking?</h2>
                 <p style="font-size:14.5px;line-height:1.65;color:#B39C88;margin:0 0 20px">Not sure? Choose a first visit and we'll talk it through.</p>
@@ -486,7 +486,7 @@ input,select,textarea,button{font-family:Mulish,sans-serif}
               </div>
             </div>
 
-            <div>
+            <div id="booking-step-2" class="booking-step" style="display:none">
               <div>
                 <h2 style="font-family:Marcellus,serif;font-size:26px;font-weight:400;margin:0 0 6px">When suits you?</h2>
                 <p style="font-size:14.5px;line-height:1.65;color:#B39C88;margin:0 0 22px">Pick anything that works — we'll confirm the exact time today.</p>
@@ -515,7 +515,7 @@ input,select,textarea,button{font-family:Mulish,sans-serif}
               </div>
             </div>
 
-            <div>
+            <div id="booking-step-3" class="booking-step" style="display:none">
               <div>
                 <h2 style="font-family:Marcellus,serif;font-size:26px;font-weight:400;margin:0 0 6px">Where can we reach you?</h2>
                 <p style="font-size:14.5px;line-height:1.65;color:#B39C88;margin:0 0 22px">We only use this to arrange your appointment. No lists, no marketing.</p>
@@ -550,7 +550,7 @@ input,select,textarea,button{font-family:Mulish,sans-serif}
               <div style="font-family:Marcellus,serif;font-size:17px"><span id="display-treatment">Treatment</span></div>
               <div style="font-size:13.5px;color:#B39C88">{{ chosenWhen }}</div>
             </div>
-            <button  style="background:none;border:none;border-bottom:1px solid rgba(179,156,136,0.45);color:#B39C88;font-family:Marcellus,serif;font-size:15px;padding:10px 4px;margin-top:6px;cursor:pointer">Send another request</button>
+            <button onclick="resetBooking()" style="background:none;border:none;border-bottom:1px solid rgba(179,156,136,0.45);color:#B39C88;font-family:Marcellus,serif;font-size:15px;padding:10px 4px;margin-top:6px;cursor:pointer">Send another request</button>
           </div>
         </div>
       </div>
@@ -581,12 +581,12 @@ input,select,textarea,button{font-family:Mulish,sans-serif}
   </div>
 
   <!-- STICKY STEP ACTION (booking only) -->
-  <div>
+  <div id="booking-step-bar" style="display:none;position:fixed;bottom:80px;left:0;right:0;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(to top, #241F1C, transparent);pointer-events:none"><div style="pointer-events:auto;display:flex;gap:12px">
     <div style="flex:none;padding:12px 20px;background:#332C28;border-top:1px solid rgba(232,213,196,0.14);display:flex;align-items:center;gap:12px">
       <div>
-        <button  style="min-height:52px;padding:0 20px;background:transparent;border:1px solid rgba(232,213,196,0.28);border-radius:26px 26px 0 0;color:#E8D5C4;font-family:Marcellus,serif;font-size:16px;cursor:pointer">Back</button>
+        <button onclick="prevStep()" style="min-height:52px;padding:0 20px;background:#3A322E;border:1px solid rgba(232,213,196,0.28);border-radius:26px 26px 0 0;color:#E8D5C4;font-family:Marcellus,serif;font-size:16px;cursor:pointer">Back</button>
       </div>
-      <button  style="{{ nextStyle }}">Next</button>
+      <button id="next-btn" onclick="nextStep()" style="min-height:52px;padding:0 24px;background:#E8D5C4;border:none;border-radius:26px 26px 0 0;color:#3A322E;font-family:Marcellus,serif;font-size:16px;cursor:pointer">Next</button></div></div>
     </div>
   </div>
 
@@ -615,138 +615,10 @@ input,select,textarea,button{font-family:Mulish,sans-serif}
 </div>
 </div>
 
-<script type="text/x-dc" data-dc-script="" data-props="{&quot;$preview&quot;:{&quot;width&quot;:430,&quot;height&quot;:900}}">
-const TREATMENTS = [
-  { name: "First visit — consultation", time: "60 min", price: "from £30" },
-  { name: "Full leg wax", time: "45 min", price: "£38" },
-  { name: "Half leg wax", time: "30 min", price: "£26" },
-  { name: "Underarm wax", time: "15 min", price: "£14" },
-  { name: "Bikini / Hollywood", time: "30–45 min", price: "£28–£42" },
-  { name: "Brow shape & tidy", time: "20 min", price: "£16" }
-];
-const DAYS = ["Any day", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-const TIMES = ["Any time", "Morning", "Midday", "Afternoon"];
-const TABS = [
-  { key: "home", label: "Home" },
-  { key: "treatments", label: "Treatments" },
-  { key: "book", label: "Book" },
-  { key: "studio", label: "Studio" }
-];
-
-class Component extends DCLogic {
-  state = { tab: "home", step: 1, treatment: TREATMENTS[0].name, day: "Any day", time: "Any time", name: "", contact: "", note: "", sent: false };
-
-  go(tab) {
-    if (tab === "book" && !this.state.sent) this.setState({ tab, step: 1 });
-    else this.setState({ tab });
-    this.scrollTop();
-  }
-  scrollTop() {
-    requestAnimationFrame(() => {
-      const el = document.querySelector(".scroll[style*='overflow-y']");
-      if (el) el.scrollTop = 0;
-    });
-  }
-  chip(active) {
-    return "min-height:44px;padding:0 18px;cursor:pointer;font-family:Mulish,sans-serif;font-size:14.5px;border-radius:22px 22px 0 0;" +
-      (active
-        ? "background:#E8D5C4;color:#3A322E;border:1px solid #E8D5C4;font-weight:600;"
-        : "background:transparent;color:#CBB49E;border:1px solid rgba(232,213,196,0.28);");
-  }
-
-  renderVals() {
-    const s = this.state;
-    const pick = (t) => () => this.setState({ tab: "book", step: 2, treatment: t.name, sent: false });
-    const canNext = s.step < 3 ? true : s.name.trim().length > 0 && s.contact.trim().length > 0;
-
-    return {
-      isHome: s.tab === "home", isTreatments: s.tab === "treatments", isBook: s.tab === "book", isStudio: s.tab === "studio",
-      isStep1: s.step === 1, isStep2: s.step === 2, isStep3: s.step === 3,
-      sent: s.sent, notSent: !s.sent,
-      confirmName: s.name.trim() || "Thank you",
-      chosenTreatment: s.treatment,
-      chosenTime: (TREATMENTS.find(t => t.name === s.treatment) || {}).time || "",
-      chosenWhen: s.day + " · " + s.time.toLowerCase(),
-      name: s.name, contact: s.contact, note: s.note,
-      setName: (e) => this.setState({ name: e.target.value }),
-      setContact: (e) => this.setState({ contact: e.target.value }),
-      setNote: (e) => this.setState({ note: e.target.value }),
-
-      popular: TREATMENTS.slice(1, 5).map(t => ({ ...t, pick: pick(t) })),
-      treatments: TREATMENTS.map(t => ({
-        ...t,
-        pick: pick(t),
-        select: () => this.setState({ treatment: t.name }),
-        rowStyle: "border:1px solid " + (s.treatment === t.name ? "#E8D5C4" : "rgba(232,213,196,0.16)") +
-          ";background:" + (s.treatment === t.name ? "#443B36" : "transparent") +
-          ";padding:15px 17px;display:flex;align-items:center;gap:14px;min-height:64px;cursor:pointer;color:#E8D5C4",
-        tickStyle: "flex:none;width:20px;height:20px;border-radius:50%;border:1px solid " +
-          (s.treatment === t.name ? "#E8D5C4" : "rgba(232,213,196,0.3)") +
-          ";background:" + (s.treatment === t.name ? "#E8D5C4" : "transparent")
-      })),
-      days: DAYS.map(d => ({ label: d, style: this.chip(s.day === d), select: () => this.setState({ day: d }) })),
-      times: TIMES.map(t => ({ label: t, style: this.chip(s.time === t), select: () => this.setState({ time: t }) })),
-
-      stepDots: [1, 2, 3].map(n => ({
-        style: "height:3px;width:" + (n === s.step ? "34px" : "18px") + ";background:" +
-          (n <= s.step ? "#E8D5C4" : "rgba(232,213,196,0.25)")
-      })),
-      stepLabel: "Step " + s.step + " of 3",
-      showStepBar: s.tab === "book" && !s.sent,
-      canGoBack: s.step > 1,
-      nextLabel: s.step < 3 ? "Continue" : "Request this visit",
-      nextStyle: "flex:1;min-height:52px;border:none;border-radius:26px 26px 0 0;font-family:Marcellus,serif;font-size:17px;cursor:" +
-        (canNext ? "pointer" : "default") + ";background:" + (canNext ? "#E8D5C4" : "rgba(232,213,196,0.3)") + ";color:#3A322E",
-      next: () => {
-        if (!canNext) return;
-        if (s.step < 3) { this.setState({ step: s.step + 1 }); this.scrollTop(); }
-        else this.setState({ sent: true });
-      },
-      back: () => { this.setState({ step: Math.max(1, s.step - 1) }); this.scrollTop(); },
-      reset: () => this.setState({ sent: false, step: 1, name: "", contact: "", note: "" }),
-      goBook: () => this.setState({ tab: "book", step: 1, sent: false }),
-      goTreatments: () => this.go("treatments"),
-
-      tabs: TABS.map(t => {
-        const on = s.tab === t.key;
-        return {
-          label: t.label,
-          go: () => this.go(t.key),
-          style: "background:none;border:none;cursor:pointer;padding:11px 0 13px;display:flex;flex-direction:column;align-items:center;gap:7px;min-height:60px",
-          markStyle: "width:13px;height:18px;border:1.5px solid " + (on ? "#E8D5C4" : "#B39C88") +
-            ";border-bottom:none;border-radius:13px 13px 0 0;background:" + (on ? "rgba(232,213,196,0.16)" : "transparent"),
-          labelStyle: "font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:" + (on ? "#E8D5C4" : "#B39C88")
-        };
-      })
-    };
-  }
-}
-</script>
 
 
 
-<script>
-function switchTab(tabId) {
-    document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
-    const view = document.getElementById('view-' + tabId);
-    if (view) view.style.display = 'block';
-    
-    document.querySelectorAll('.nav-tab').forEach(el => {
-        const isActive = el.dataset.tab === tabId;
-        const opacity = isActive ? '1' : '0.4';
-        el.querySelector('.nav-mark').style.opacity = opacity;
-        el.querySelector('.nav-label').style.opacity = opacity;
-    });
-}
-function selectTreatment(name) {
-    switchTab('book');
-    // Basic logic for selecting treatment if needed
-}
-function selectTreatmentOption(name) {
-    selectTreatment(name);
-}
-</script>
-\n
+
 <script>
 function switchTab(tabId) {
     document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
@@ -838,4 +710,5 @@ function resetBooking() {
     updateStepView();
 }
 </script>
-\n</body></html>
+
+</body></html>

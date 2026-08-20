@@ -59,7 +59,7 @@ def extract():
         # Strip DC engine tags
         template = re.sub(r'<script src=".*?\.js"></script>', '', template)
         template = re.sub(r'<script src="[0-9a-fA-F-]+"></script>', '', template)
-        template = re.sub(r'<script type="text/x-dc">.*?</script>', '', template, flags=re.DOTALL)
+        template = re.sub(r'<script type="text/x-dc"[^>]*>.*?</script>', '', template, flags=re.DOTALL)
         template = template.replace('<x-dc>', '').replace('</x-dc>', '')
             
         with open(dest_filename, 'w') as f:

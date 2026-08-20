@@ -124,17 +124,18 @@ def build_mobile():
     content = re.sub(r'<sc-for list="\{\{\s*times\s*\}\}".*?>.*?</sc-for>', times_html, content, flags=re.DOTALL)
     
     # Fix form placeholders and buttons
+    # Save the buttons before stripping the camel case tags!
+    content = content.replace('{{ nextLabel }}', 'Next')
+    content = re.sub(r'<button[^>]*\{\{\s*back\s*\}\}[^>]*>.*?</button>', '<button onclick="prevStep()" style="min-height:52px;padding:0 20px;background:#3A322E;border:1px solid rgba(232,213,196,0.28);border-radius:26px 26px 0 0;color:#E8D5C4;font-family:Marcellus,serif;font-size:16px;cursor:pointer">Back</button>', content)
+    content = re.sub(r'<button[^>]*\{\{\s*next\s*\}\}[^>]*>.*?</button>', '<button id="next-btn" onclick="nextStep()" style="min-height:52px;padding:0 24px;background:#E8D5C4;border:none;border-radius:26px 26px 0 0;color:#3A322E;font-family:Marcellus,serif;font-size:16px;cursor:pointer">Next</button></div></div>', content)
+    content = re.sub(r'<button[^>]*\{\{\s*reset\s*\}\}[^>]*>.*?</button>', '<button onclick="resetBooking()" style="background:none;border:none;border-bottom:1px solid rgba(179,156,136,0.45);color:#B39C88;font-family:Marcellus,serif;font-size:15px;padding:10px 4px;margin-top:6px;cursor:pointer">Send another request</button>', content)
+
     content = content.replace('{{ chosenTreatment }}', '<span id="display-treatment">Treatment</span>')
     content = content.replace('{{ chosenTime }}', '<span id="display-time">Any day · any time</span>')
     content = content.replace('value="{{ name }}"', 'id="input-name"')
     content = content.replace('value="{{ contact }}"', 'id="input-contact"')
     content = content.replace('value="{{ note }}"', 'id="input-note"')
     content = re.sub(r'sc-camel-on-[a-z]+="[^"]*"', '', content)
-    
-    content = content.replace('{{ nextLabel }}', 'Next')
-    content = re.sub(r'<button[^>]*\{\{ back \}\}[^>]*>', '<button onclick="prevStep()" style="min-height:52px;padding:0 20px;background:#3A322E;border:1px solid rgba(232,213,196,0.28);border-radius:26px 26px 0 0;color:#E8D5C4;font-family:Marcellus,serif;font-size:16px;cursor:pointer">Back</button>', content)
-    content = re.sub(r'<button[^>]*\{\{ next \}\}[^>]*>', '<button id="next-btn" onclick="nextStep()" style="min-height:52px;padding:0 24px;background:#E8D5C4;border:none;border-radius:26px 26px 0 0;color:#3A322E;font-family:Marcellus,serif;font-size:16px;cursor:pointer">Next</button></div></div>', content)
-    content = re.sub(r'<button[^>]*\{\{ reset \}\}[^>]*>', '<button onclick="resetBooking()" style="background:none;border:none;border-bottom:1px solid rgba(179,156,136,0.45);color:#B39C88;font-family:Marcellus,serif;font-size:15px;padding:10px 4px;margin-top:6px;cursor:pointer">Send another request</button>', content)
     content = content.replace('{{ confirmName }}', '<span id="display-name">Thank you</span>')
     
     content = content.replace('<sc-if style="display:none" value="{{ sent }}"', '<div id="view-sent" style="display:none">')
@@ -254,7 +255,7 @@ function resetBooking() {
 }
 </script>
 '''
-    content = content.replace('</body>', js_logic + '\\n</body>')
+    content = content.replace('</body>', js_logic + '\n</body>')
     content = content.replace('100vh', '100dvh')
 
     with open('mobile.html', 'w') as f:

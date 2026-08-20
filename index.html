@@ -27,30 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     elements.forEach(el => observer.observe(el));
 });
-</script>\n<script>if (window.innerWidth <= 768) { window.location.href = 'mobile.html'; }</script>\n<script src="https://unpkg.com/@studio-freight/lenis@1.0.39/dist/lenis.min.js"></script>
-<style>
-.fade-up { opacity: 0; transform: translateY(20px); transition: all 0.8s ease-out; }
-.fade-up.visible { opacity: 1; transform: translateY(0); }
-</style>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const lenis = new Lenis({ duration: 1.2, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
-    function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
-    requestAnimationFrame(raf);
-    
-    const elements = document.querySelectorAll('h1, h2, p, img, button, .treatment-row');
-    elements.forEach(el => el.classList.add('fade-up'));
-    
-    const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            }
-        });
-    }, { threshold: 0.1 });
-    
-    elements.forEach(el => observer.observe(el));
-});
 </script>\n<script>if (window.innerWidth <= 768) { window.location.href = 'mobile.html'; }</script>\n</head>
 <body>
 
@@ -564,32 +540,7 @@ html{scroll-behavior:smooth}
   </div>
 </div>
 
-<script type="text/x-dc" data-dc-script="" data-props="{}">
-class Component extends DCLogic {
-  state = { sent: false, name: "" };
-  renderVals() {
-    return {
-      sent: this.state.sent,
-      notSent: !this.state.sent,
-      confirmName: this.state.name || "Thank you",
-      treatments: [
-        { name: "First visit — consultation & treatment", time: "60 min", price: "from £30" },
-        { name: "Full leg wax", time: "45 min", price: "£38" },
-        { name: "Half leg wax", time: "30 min", price: "£26" },
-        { name: "Underarm wax", time: "15 min", price: "£14" },
-        { name: "Bikini / Hollywood", time: "30–45 min", price: "£28–£42" },
-        { name: "Brow shape & tidy", time: "20 min", price: "£16" }
-      ],
-      submit: (e) => {
-        e.preventDefault();
-        const name = e.target.elements.name.value.trim();
-        this.setState({ sent: true, name });
-      },
-      reset: () => this.setState({ sent: false, name: "" })
-    };
-  }
-}
-</script>
+
 
 
 </body></html>
