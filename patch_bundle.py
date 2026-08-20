@@ -40,6 +40,7 @@ def process(filename):
         template = template.replace('<sc-if value="{{ isTreatments }}"', '<sc-if style="display:none" value="{{ isTreatments }}"')
         template = template.replace('<sc-if value="{{ isBook }}"', '<sc-if style="display:none" value="{{ isBook }}"')
         template = template.replace('<sc-if value="{{ isStudio }}"', '<sc-if style="display:none" value="{{ isStudio }}"')
+        template = template.replace('100vh', '100dvh')
 
     if "index" in filename:
         lenis_script = '''<script src="https://unpkg.com/@studio-freight/lenis@1.0.39/dist/lenis.min.js"></script>
