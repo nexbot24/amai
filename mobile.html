@@ -296,20 +296,20 @@ input,select,textarea,button{font-family:Mulish,sans-serif}
           <p style="font-size:15.5px;line-height:1.7;color:#CBB49E;margin:0">One quiet room, one practitioner, an appointment that is never rushed.</p>
         </div>
         <div style="padding:26px 20px 0">
-          <button sc-camel-on-click="{{ goBook }}" style="width:100%;min-height:56px;background:#E8D5C4;color:#3A322E;border:none;border-radius:28px 28px 0 0;font-family:Marcellus,serif;font-size:18px;cursor:pointer">Book a visit</button>
+          <button  style="width:100%;min-height:56px;background:#E8D5C4;color:#3A322E;border:none;border-radius:28px 28px 0 0;font-family:Marcellus,serif;font-size:18px;cursor:pointer">Book a visit</button>
         </div>
         <div style="margin:24px 20px 0;border:1px solid rgba(232,213,196,0.16);padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px">
           <div>
             <div style="font-size:10.5px;letter-spacing:0.2em;text-transform:uppercase;color:#B39C88;margin-bottom:5px">Next availability</div>
             <div style="font-family:Marcellus,serif;font-size:17px;color:#E8D5C4">Thursday, 2.30pm</div>
           </div>
-          <button sc-camel-on-click="{{ goBook }}" style="min-height:44px;padding:0 18px;background:transparent;border:1px solid rgba(232,213,196,0.32);border-radius:22px 22px 0 0;color:#E8D5C4;font-family:Marcellus,serif;font-size:15px;cursor:pointer">Take it</button>
+          <button  style="min-height:44px;padding:0 18px;background:transparent;border:1px solid rgba(232,213,196,0.32);border-radius:22px 22px 0 0;color:#E8D5C4;font-family:Marcellus,serif;font-size:15px;cursor:pointer">Take it</button>
         </div>
 
         <div style="margin-top:34px;padding:0 0 0 20px">
           <div style="display:flex;align-items:baseline;justify-content:space-between;padding-right:20px;margin-bottom:14px">
             <div style="font-size:10.5px;letter-spacing:0.24em;text-transform:uppercase;color:#B39C88">Popular treatments</div>
-            <button sc-camel-on-click="{{ goTreatments }}" style="background:none;border:none;color:#CBB49E;font-size:13px;padding:8px 0;cursor:pointer;font-family:Marcellus,serif">All</button>
+            <button  style="background:none;border:none;color:#CBB49E;font-size:13px;padding:8px 0;cursor:pointer;font-family:Marcellus,serif">All</button>
           </div>
           <div class="scroll" style="display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px">
             
@@ -492,17 +492,26 @@ input,select,textarea,button{font-family:Mulish,sans-serif}
                 <p style="font-size:14.5px;line-height:1.65;color:#B39C88;margin:0 0 22px">Pick anything that works — we'll confirm the exact time today.</p>
                 <div style="font-size:10.5px;letter-spacing:0.22em;text-transform:uppercase;color:#B39C88;margin-bottom:12px">Day</div>
                 <div style="display:flex;flex-wrap:wrap;gap:9px;margin-bottom:28px">
-                  <sc-for list="{{ days }}" as="d" hint-placeholder-count="6">
-                    <button sc-camel-on-click="{{ d.select }}" style="{{ d.style }}">{{ d.label }}</button>
-                  </sc-for>
+                  
+    <button type="button" onclick="selectDay(this)" class="day-btn" style="padding:8px 16px;border-radius:20px;border:1px solid #E8D5C4;background:#E8D5C4;color:#3A322E;font-size:14px">Any day</button>
+    <button type="button" onclick="selectDay(this)" class="day-btn" style="padding:8px 16px;border-radius:20px;border:1px solid rgba(232,213,196,0.25);background:transparent;color:#E8D5C4;font-size:14px">Monday</button>
+    <button type="button" onclick="selectDay(this)" class="day-btn" style="padding:8px 16px;border-radius:20px;border:1px solid rgba(232,213,196,0.25);background:transparent;color:#E8D5C4;font-size:14px">Tuesday</button>
+    <button type="button" onclick="selectDay(this)" class="day-btn" style="padding:8px 16px;border-radius:20px;border:1px solid rgba(232,213,196,0.25);background:transparent;color:#E8D5C4;font-size:14px">Wednesday</button>
+    <button type="button" onclick="selectDay(this)" class="day-btn" style="padding:8px 16px;border-radius:20px;border:1px solid rgba(232,213,196,0.25);background:transparent;color:#E8D5C4;font-size:14px">Thursday</button>
+    <button type="button" onclick="selectDay(this)" class="day-btn" style="padding:8px 16px;border-radius:20px;border:1px solid rgba(232,213,196,0.25);background:transparent;color:#E8D5C4;font-size:14px">Friday</button>
+    <button type="button" onclick="selectDay(this)" class="day-btn" style="padding:8px 16px;border-radius:20px;border:1px solid rgba(232,213,196,0.25);background:transparent;color:#E8D5C4;font-size:14px">Saturday</button>
+    
                 </div>
                 <div style="font-size:10.5px;letter-spacing:0.22em;text-transform:uppercase;color:#B39C88;margin-bottom:12px">Time of day</div>
                 <div style="display:flex;flex-wrap:wrap;gap:9px;margin-bottom:26px">
-                  <sc-for list="{{ times }}" as="t" hint-placeholder-count="4">
-                    <button sc-camel-on-click="{{ t.select }}" style="{{ t.style }}">{{ t.label }}</button>
-                  </sc-for>
+                  
+    <button type="button" onclick="selectTime(this)" class="time-btn" style="padding:8px 16px;border-radius:20px;border:1px solid #E8D5C4;background:#E8D5C4;color:#3A322E;font-size:14px">Any time</button>
+    <button type="button" onclick="selectTime(this)" class="time-btn" style="padding:8px 16px;border-radius:20px;border:1px solid rgba(232,213,196,0.25);background:transparent;color:#E8D5C4;font-size:14px">Morning</button>
+    <button type="button" onclick="selectTime(this)" class="time-btn" style="padding:8px 16px;border-radius:20px;border:1px solid rgba(232,213,196,0.25);background:background:transparent;color:#E8D5C4;font-size:14px">Afternoon</button>
+    <button type="button" onclick="selectTime(this)" class="time-btn" style="padding:8px 16px;border-radius:20px;border:1px solid rgba(232,213,196,0.25);background:transparent;color:#E8D5C4;font-size:14px">Evening</button>
+    
                 </div>
-                <div style="border:1px solid rgba(232,213,196,0.16);padding:15px 17px;font-size:13.5px;line-height:1.6;color:#B39C88">Booking <span style="color:#E8D5C4">{{ chosenTreatment }}</span> — about {{ chosenTime }}.</div>
+                <div style="border:1px solid rgba(232,213,196,0.16);padding:15px 17px;font-size:13.5px;line-height:1.6;color:#B39C88">Booking <span style="color:#E8D5C4"><span id="display-treatment">Treatment</span></span> — about <span id="display-time">Any day · any time</span>.</div>
               </div>
             </div>
 
@@ -512,18 +521,18 @@ input,select,textarea,button{font-family:Mulish,sans-serif}
                 <p style="font-size:14.5px;line-height:1.65;color:#B39C88;margin:0 0 22px">We only use this to arrange your appointment. No lists, no marketing.</p>
                 <div style="display:flex;flex-direction:column;gap:18px">
                   <label style="display:flex;flex-direction:column;gap:8px;font-size:10.5px;letter-spacing:0.2em;text-transform:uppercase;color:#B39C88">First name
-                    <input value="{{ name }}" sc-camel-on-change="{{ setName }}" placeholder="Your name" style="background:transparent;border:none;border-bottom:1px solid rgba(232,213,196,0.3);color:#F7F1EA;padding:12px 2px;font-size:16px;letter-spacing:normal;text-transform:none;outline:none" style-focus="border-color:#E8D5C4">
+                    <input id="input-name"  placeholder="Your name" style="background:transparent;border:none;border-bottom:1px solid rgba(232,213,196,0.3);color:#F7F1EA;padding:12px 2px;font-size:16px;letter-spacing:normal;text-transform:none;outline:none" style-focus="border-color:#E8D5C4">
                   </label>
                   <label style="display:flex;flex-direction:column;gap:8px;font-size:10.5px;letter-spacing:0.2em;text-transform:uppercase;color:#B39C88">Phone or email
-                    <input value="{{ contact }}" sc-camel-on-change="{{ setContact }}" placeholder="How to reach you" style="background:transparent;border:none;border-bottom:1px solid rgba(232,213,196,0.3);color:#F7F1EA;padding:12px 2px;font-size:16px;letter-spacing:normal;text-transform:none;outline:none" style-focus="border-color:#E8D5C4">
+                    <input id="input-contact"  placeholder="How to reach you" style="background:transparent;border:none;border-bottom:1px solid rgba(232,213,196,0.3);color:#F7F1EA;padding:12px 2px;font-size:16px;letter-spacing:normal;text-transform:none;outline:none" style-focus="border-color:#E8D5C4">
                   </label>
                   <label style="display:flex;flex-direction:column;gap:8px;font-size:10.5px;letter-spacing:0.2em;text-transform:uppercase;color:#B39C88">Anything we should know
-                    <textarea value="{{ note }}" sc-camel-on-change="{{ setNote }}" rows="3" placeholder="Sensitive skin, first wax, timings…" style="background:transparent;border:1px solid rgba(232,213,196,0.28);color:#F7F1EA;padding:12px 14px;font-size:16px;letter-spacing:normal;text-transform:none;outline:none;resize:none" style-focus="border-color:#E8D5C4"></textarea>
+                    <textarea id="input-note"  rows="3" placeholder="Sensitive skin, first wax, timings…" style="background:transparent;border:1px solid rgba(232,213,196,0.28);color:#F7F1EA;padding:12px 14px;font-size:16px;letter-spacing:normal;text-transform:none;outline:none;resize:none" style-focus="border-color:#E8D5C4"></textarea>
                   </label>
                 </div>
                 <div style="margin-top:22px;background:#443B36;padding:17px 19px;display:flex;flex-direction:column;gap:8px">
                   <div style="font-size:10.5px;letter-spacing:0.22em;text-transform:uppercase;color:#B39C88">Your request</div>
-                  <div style="font-family:Marcellus,serif;font-size:17px;line-height:1.4;color:#E8D5C4">{{ chosenTreatment }}</div>
+                  <div style="font-family:Marcellus,serif;font-size:17px;line-height:1.4;color:#E8D5C4"><span id="display-treatment">Treatment</span></div>
                   <div style="font-size:13.5px;color:#B39C88">{{ chosenWhen }}</div>
                 </div>
               </div>
@@ -534,14 +543,14 @@ input,select,textarea,button{font-family:Mulish,sans-serif}
         <div>
           <div style="padding-top:28px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px">
             <div style="width:44px;height:60px;border:2px solid #E8D5C4;border-bottom:none;border-radius:44px 44px 0 0"></div>
-            <div style="font-family:Marcellus,serif;font-size:26px;line-height:1.3">{{ confirmName }}, it's in our diary.</div>
+            <div style="font-family:Marcellus,serif;font-size:26px;line-height:1.3"><span id="display-name">Thank you</span>, it's in our diary.</div>
             <p style="font-size:15px;line-height:1.7;color:#CBB49E;margin:0">We'll confirm your time today. Until then the hour is pencilled in and held for you.</p>
             <div style="width:100%;margin-top:8px;border:1px solid rgba(232,213,196,0.18);padding:18px;display:flex;flex-direction:column;gap:7px;text-align:left">
               <div style="font-size:10.5px;letter-spacing:0.22em;text-transform:uppercase;color:#B39C88">Requested</div>
-              <div style="font-family:Marcellus,serif;font-size:17px">{{ chosenTreatment }}</div>
+              <div style="font-family:Marcellus,serif;font-size:17px"><span id="display-treatment">Treatment</span></div>
               <div style="font-size:13.5px;color:#B39C88">{{ chosenWhen }}</div>
             </div>
-            <button sc-camel-on-click="{{ reset }}" style="background:none;border:none;border-bottom:1px solid rgba(179,156,136,0.45);color:#B39C88;font-family:Marcellus,serif;font-size:15px;padding:10px 4px;margin-top:6px;cursor:pointer">Send another request</button>
+            <button  style="background:none;border:none;border-bottom:1px solid rgba(179,156,136,0.45);color:#B39C88;font-family:Marcellus,serif;font-size:15px;padding:10px 4px;margin-top:6px;cursor:pointer">Send another request</button>
           </div>
         </div>
       </div>
@@ -575,9 +584,9 @@ input,select,textarea,button{font-family:Mulish,sans-serif}
   <div>
     <div style="flex:none;padding:12px 20px;background:#332C28;border-top:1px solid rgba(232,213,196,0.14);display:flex;align-items:center;gap:12px">
       <div>
-        <button sc-camel-on-click="{{ back }}" style="min-height:52px;padding:0 20px;background:transparent;border:1px solid rgba(232,213,196,0.28);border-radius:26px 26px 0 0;color:#E8D5C4;font-family:Marcellus,serif;font-size:16px;cursor:pointer">Back</button>
+        <button  style="min-height:52px;padding:0 20px;background:transparent;border:1px solid rgba(232,213,196,0.28);border-radius:26px 26px 0 0;color:#E8D5C4;font-family:Marcellus,serif;font-size:16px;cursor:pointer">Back</button>
       </div>
-      <button sc-camel-on-click="{{ next }}" style="{{ nextStyle }}">{{ nextLabel }}</button>
+      <button  style="{{ nextStyle }}">Next</button>
     </div>
   </div>
 
@@ -735,6 +744,98 @@ function selectTreatment(name) {
 }
 function selectTreatmentOption(name) {
     selectTreatment(name);
+}
+</script>
+\n
+<script>
+function switchTab(tabId) {
+    document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
+    const view = document.getElementById('view-' + tabId);
+    if (view) view.style.display = 'block';
+    
+    document.querySelectorAll('.nav-tab').forEach(el => {
+        const isActive = el.dataset.tab === tabId;
+        const opacity = isActive ? '1' : '0.4';
+        el.querySelector('.nav-mark').style.opacity = opacity;
+        el.querySelector('.nav-label').style.opacity = opacity;
+    });
+    
+    const stepBar = document.getElementById('booking-step-bar');
+    if (stepBar) stepBar.style.display = (tabId === 'book' && currentStep < 3 && !isSent) ? 'flex' : 'none';
+}
+
+let currentStep = 1;
+let selectedTreatment = "First visit — consultation & treatment";
+let isSent = false;
+
+function selectTreatment(name) {
+    selectedTreatment = name;
+    document.getElementById('display-treatment').innerText = name;
+    switchTab('book');
+}
+
+function selectTreatmentOption(name) {
+    selectTreatment(name);
+}
+
+function updateStepView() {
+    document.querySelectorAll('.booking-step').forEach(el => el.style.display = 'none');
+    document.getElementById('booking-step-' + currentStep).style.display = 'block';
+    const stepBar = document.getElementById('booking-step-bar');
+    if (stepBar) stepBar.style.display = (currentStep < 3 && !isSent) ? 'flex' : 'none';
+    
+    if (currentStep === 2) {
+        document.getElementById('next-btn').innerText = 'Send request';
+    } else {
+        document.getElementById('next-btn').innerText = 'Next';
+    }
+}
+
+function nextStep() {
+    if (currentStep === 1) {
+        currentStep = 2;
+        updateStepView();
+    } else if (currentStep === 2) {
+        currentStep = 3;
+        isSent = true;
+        const name = document.getElementById('input-name').value || "Thank you";
+        document.getElementById('display-name').innerText = name.split(' ')[0];
+        document.getElementById('booking-form-container').style.display = 'none';
+        document.getElementById('view-sent').style.display = 'block';
+        updateStepView();
+    }
+}
+
+function prevStep() {
+    if (currentStep > 1) {
+        currentStep--;
+        updateStepView();
+    }
+}
+
+function selectDay(btn) {
+    document.querySelectorAll('.day-btn').forEach(b => {
+        b.style.background = 'transparent'; b.style.color = '#E8D5C4'; b.style.borderColor = 'rgba(232,213,196,0.25)';
+    });
+    btn.style.background = '#E8D5C4'; btn.style.color = '#3A322E'; btn.style.borderColor = '#E8D5C4';
+}
+
+function selectTime(btn) {
+    document.querySelectorAll('.time-btn').forEach(b => {
+        b.style.background = 'transparent'; b.style.color = '#E8D5C4'; b.style.borderColor = 'rgba(232,213,196,0.25)';
+    });
+    btn.style.background = '#E8D5C4'; btn.style.color = '#3A322E'; btn.style.borderColor = '#E8D5C4';
+}
+
+function resetBooking() {
+    currentStep = 1;
+    isSent = false;
+    document.getElementById('booking-form-container').style.display = 'block';
+    document.getElementById('view-sent').style.display = 'none';
+    document.getElementById('input-name').value = '';
+    document.getElementById('input-contact').value = '';
+    document.getElementById('input-note').value = '';
+    updateStepView();
 }
 </script>
 \n</body></html>

@@ -92,9 +92,52 @@ def build_mobile():
     content = re.sub(r'<sc-if[^>]*value="\{\{\s*isBook\s*\}\}"[^>]*>', '<div id="view-book" style="display:none" class="view-section">', content)
     content = re.sub(r'<sc-if[^>]*value="\{\{\s*isStudio\s*\}\}"[^>]*>', '<div id="view-studio" style="display:none" class="view-section">', content)
     
-    # Generic replacement for remaining sc-if tags
+    # Fix Booking Steps divs
+    content = re.sub(r'<sc-if[^>]*value="\{\{\s*isStep1\s*\}\}"[^>]*>', '<div id="booking-step-1" class="booking-step" style="display:block">', content)
+    content = re.sub(r'<sc-if[^>]*value="\{\{\s*isStep2\s*\}\}"[^>]*>', '<div id="booking-step-2" class="booking-step" style="display:none">', content)
+    content = re.sub(r'<sc-if[^>]*value="\{\{\s*isStep3\s*\}\}"[^>]*>', '<div id="booking-step-3" class="booking-step" style="display:none">', content)
+    
+    # Replace Generic sc-if tags left over
+    content = re.sub(r'<sc-if[^>]*value="\{\{\s*notSent\s*\}\}"[^>]*>', '<div id="booking-form-container">', content)
+    content = re.sub(r'<sc-if[^>]*value="\{\{\s*showStepBar\s*\}\}"[^>]*>', '<div id="booking-step-bar" style="display:none;position:fixed;bottom:80px;left:0;right:0;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(to top, #241F1C, transparent);pointer-events:none"><div style="pointer-events:auto;display:flex;gap:12px">', content)
+    content = re.sub(r'<sc-if[^>]*value="\{\{\s*canGoBack\s*\}\}"[^>]*>', '<div>', content)
     content = re.sub(r'<sc-if[^>]*>', '<div>', content)
     
+    # Replace days and times loops
+    days_html = '''
+    <button type="button" onclick="selectDay(this)" class="day-btn" style="padding:8px 16px;border-radius:20px;border:1px solid #E8D5C4;background:#E8D5C4;color:#3A322E;font-size:14px">Any day</button>
+    <button type="button" onclick="selectDay(this)" class="day-btn" style="padding:8px 16px;border-radius:20px;border:1px solid rgba(232,213,196,0.25);background:transparent;color:#E8D5C4;font-size:14px">Monday</button>
+    <button type="button" onclick="selectDay(this)" class="day-btn" style="padding:8px 16px;border-radius:20px;border:1px solid rgba(232,213,196,0.25);background:transparent;color:#E8D5C4;font-size:14px">Tuesday</button>
+    <button type="button" onclick="selectDay(this)" class="day-btn" style="padding:8px 16px;border-radius:20px;border:1px solid rgba(232,213,196,0.25);background:transparent;color:#E8D5C4;font-size:14px">Wednesday</button>
+    <button type="button" onclick="selectDay(this)" class="day-btn" style="padding:8px 16px;border-radius:20px;border:1px solid rgba(232,213,196,0.25);background:transparent;color:#E8D5C4;font-size:14px">Thursday</button>
+    <button type="button" onclick="selectDay(this)" class="day-btn" style="padding:8px 16px;border-radius:20px;border:1px solid rgba(232,213,196,0.25);background:transparent;color:#E8D5C4;font-size:14px">Friday</button>
+    <button type="button" onclick="selectDay(this)" class="day-btn" style="padding:8px 16px;border-radius:20px;border:1px solid rgba(232,213,196,0.25);background:transparent;color:#E8D5C4;font-size:14px">Saturday</button>
+    '''
+    content = re.sub(r'<sc-for list="\{\{\s*days\s*\}\}".*?>.*?</sc-for>', days_html, content, flags=re.DOTALL)
+    
+    times_html = '''
+    <button type="button" onclick="selectTime(this)" class="time-btn" style="padding:8px 16px;border-radius:20px;border:1px solid #E8D5C4;background:#E8D5C4;color:#3A322E;font-size:14px">Any time</button>
+    <button type="button" onclick="selectTime(this)" class="time-btn" style="padding:8px 16px;border-radius:20px;border:1px solid rgba(232,213,196,0.25);background:transparent;color:#E8D5C4;font-size:14px">Morning</button>
+    <button type="button" onclick="selectTime(this)" class="time-btn" style="padding:8px 16px;border-radius:20px;border:1px solid rgba(232,213,196,0.25);background:background:transparent;color:#E8D5C4;font-size:14px">Afternoon</button>
+    <button type="button" onclick="selectTime(this)" class="time-btn" style="padding:8px 16px;border-radius:20px;border:1px solid rgba(232,213,196,0.25);background:transparent;color:#E8D5C4;font-size:14px">Evening</button>
+    '''
+    content = re.sub(r'<sc-for list="\{\{\s*times\s*\}\}".*?>.*?</sc-for>', times_html, content, flags=re.DOTALL)
+    
+    # Fix form placeholders and buttons
+    content = content.replace('{{ chosenTreatment }}', '<span id="display-treatment">Treatment</span>')
+    content = content.replace('{{ chosenTime }}', '<span id="display-time">Any day · any time</span>')
+    content = content.replace('value="{{ name }}"', 'id="input-name"')
+    content = content.replace('value="{{ contact }}"', 'id="input-contact"')
+    content = content.replace('value="{{ note }}"', 'id="input-note"')
+    content = re.sub(r'sc-camel-on-[a-z]+="[^"]*"', '', content)
+    
+    content = content.replace('{{ nextLabel }}', 'Next')
+    content = re.sub(r'<button[^>]*\{\{ back \}\}[^>]*>', '<button onclick="prevStep()" style="min-height:52px;padding:0 20px;background:#3A322E;border:1px solid rgba(232,213,196,0.28);border-radius:26px 26px 0 0;color:#E8D5C4;font-family:Marcellus,serif;font-size:16px;cursor:pointer">Back</button>', content)
+    content = re.sub(r'<button[^>]*\{\{ next \}\}[^>]*>', '<button id="next-btn" onclick="nextStep()" style="min-height:52px;padding:0 24px;background:#E8D5C4;border:none;border-radius:26px 26px 0 0;color:#3A322E;font-family:Marcellus,serif;font-size:16px;cursor:pointer">Next</button></div></div>', content)
+    content = re.sub(r'<button[^>]*\{\{ reset \}\}[^>]*>', '<button onclick="resetBooking()" style="background:none;border:none;border-bottom:1px solid rgba(179,156,136,0.45);color:#B39C88;font-family:Marcellus,serif;font-size:15px;padding:10px 4px;margin-top:6px;cursor:pointer">Send another request</button>', content)
+    content = content.replace('{{ confirmName }}', '<span id="display-name">Thank you</span>')
+    
+    content = content.replace('<sc-if style="display:none" value="{{ sent }}"', '<div id="view-sent" style="display:none">')
     # Replace all closing sc-if tags
     content = content.replace('</sc-if>', '</div>')
     
@@ -131,13 +174,83 @@ function switchTab(tabId) {
         el.querySelector('.nav-mark').style.opacity = opacity;
         el.querySelector('.nav-label').style.opacity = opacity;
     });
+    
+    const stepBar = document.getElementById('booking-step-bar');
+    if (stepBar) stepBar.style.display = (tabId === 'book' && currentStep < 3 && !isSent) ? 'flex' : 'none';
 }
+
+let currentStep = 1;
+let selectedTreatment = "First visit — consultation & treatment";
+let isSent = false;
+
 function selectTreatment(name) {
+    selectedTreatment = name;
+    document.getElementById('display-treatment').innerText = name;
     switchTab('book');
-    // Basic logic for selecting treatment if needed
 }
+
 function selectTreatmentOption(name) {
     selectTreatment(name);
+}
+
+function updateStepView() {
+    document.querySelectorAll('.booking-step').forEach(el => el.style.display = 'none');
+    document.getElementById('booking-step-' + currentStep).style.display = 'block';
+    const stepBar = document.getElementById('booking-step-bar');
+    if (stepBar) stepBar.style.display = (currentStep < 3 && !isSent) ? 'flex' : 'none';
+    
+    if (currentStep === 2) {
+        document.getElementById('next-btn').innerText = 'Send request';
+    } else {
+        document.getElementById('next-btn').innerText = 'Next';
+    }
+}
+
+function nextStep() {
+    if (currentStep === 1) {
+        currentStep = 2;
+        updateStepView();
+    } else if (currentStep === 2) {
+        currentStep = 3;
+        isSent = true;
+        const name = document.getElementById('input-name').value || "Thank you";
+        document.getElementById('display-name').innerText = name.split(' ')[0];
+        document.getElementById('booking-form-container').style.display = 'none';
+        document.getElementById('view-sent').style.display = 'block';
+        updateStepView();
+    }
+}
+
+function prevStep() {
+    if (currentStep > 1) {
+        currentStep--;
+        updateStepView();
+    }
+}
+
+function selectDay(btn) {
+    document.querySelectorAll('.day-btn').forEach(b => {
+        b.style.background = 'transparent'; b.style.color = '#E8D5C4'; b.style.borderColor = 'rgba(232,213,196,0.25)';
+    });
+    btn.style.background = '#E8D5C4'; btn.style.color = '#3A322E'; btn.style.borderColor = '#E8D5C4';
+}
+
+function selectTime(btn) {
+    document.querySelectorAll('.time-btn').forEach(b => {
+        b.style.background = 'transparent'; b.style.color = '#E8D5C4'; b.style.borderColor = 'rgba(232,213,196,0.25)';
+    });
+    btn.style.background = '#E8D5C4'; btn.style.color = '#3A322E'; btn.style.borderColor = '#E8D5C4';
+}
+
+function resetBooking() {
+    currentStep = 1;
+    isSent = false;
+    document.getElementById('booking-form-container').style.display = 'block';
+    document.getElementById('view-sent').style.display = 'none';
+    document.getElementById('input-name').value = '';
+    document.getElementById('input-contact').value = '';
+    document.getElementById('input-note').value = '';
+    updateStepView();
 }
 </script>
 '''
