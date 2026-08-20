@@ -734,4 +734,118 @@ function resetBooking() {
 }
 </script>
 
+
+<script>
+function switchTab(tabId) {
+    document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
+    const view = document.getElementById('view-' + tabId);
+    if (view) view.style.display = 'block';
+    
+    document.querySelectorAll('.nav-tab').forEach(el => {
+        const isActive = el.dataset.tab === tabId;
+        const opacity = isActive ? '1' : '0.4';
+        el.querySelector('.nav-mark').style.opacity = opacity;
+        el.querySelector('.nav-label').style.opacity = opacity;
+    });
+    
+    const stepBar = document.getElementById('booking-step-bar');
+    if (stepBar) stepBar.style.display = (tabId === 'book' && currentStep < 3 && !isSent) ? 'flex' : 'none';
+}
+
+let currentStep = 1;
+let selectedTreatment = "First visit — consultation & treatment";
+let isSent = false;
+
+function selectTreatment(name) {
+    selectedTreatment = name;
+    document.getElementById('display-treatment').innerText = name;
+    switchTab('book');
+}
+
+function selectTreatmentOption(name) {
+    selectTreatment(name);
+}
+
+function updateStepView() {
+    document.querySelectorAll('.booking-step').forEach(el => el.style.display = 'none');
+    document.getElementById('booking-step-' + currentStep).style.display = 'block';
+    const stepBar = document.getElementById('booking-step-bar');
+    if (stepBar) stepBar.style.display = (currentStep < 3 && !isSent) ? 'flex' : 'none';
+    
+    if (currentStep === 2) {
+        document.getElementById('next-btn').innerText = 'Send request';
+    } else {
+        document.getElementById('next-btn').innerText = 'Next';
+    }
+    
+    const stepLabel = document.getElementById('display-step');
+    if (stepLabel) stepLabel.innerText = 'Step ' + currentStep + ' of 3';
+    
+    const dots = document.querySelectorAll('.step-dot');
+    dots.forEach((dot, index) => {
+        dot.style.background = (index === currentStep - 1) ? '#E8D5C4' : 'rgba(232,213,196,0.25)';
+    });
+}
+
+function nextStep() {
+    if (currentStep === 1) {
+        currentStep = 2;
+        updateStepView();
+    } else if (currentStep === 2) {
+        currentStep = 3;
+        isSent = true;
+        const name = document.getElementById('input-name').value || "Thank you";
+        document.getElementById('display-name').innerText = name.split(' ')[0];
+        document.getElementById('booking-form-container').style.display = 'none';
+        document.getElementById('view-sent').style.display = 'block';
+        updateStepView();
+    }
+}
+
+function prevStep() {
+    if (currentStep > 1) {
+        currentStep--;
+        updateStepView();
+    }
+}
+
+let selectedDay = "Any day";
+let selectedTime = "Any time";
+
+function selectDay(btn) {
+    document.querySelectorAll('.day-btn').forEach(b => {
+        b.style.background = 'transparent'; b.style.color = '#E8D5C4'; b.style.borderColor = 'rgba(232,213,196,0.25)';
+    });
+    btn.style.background = '#E8D5C4'; btn.style.color = '#3A322E'; btn.style.borderColor = '#E8D5C4';
+    selectedDay = btn.innerText;
+    updateWhen();
+}
+
+function selectTime(btn) {
+    document.querySelectorAll('.time-btn').forEach(b => {
+        b.style.background = 'transparent'; b.style.color = '#E8D5C4'; b.style.borderColor = 'rgba(232,213,196,0.25)';
+    });
+    btn.style.background = '#E8D5C4'; btn.style.color = '#3A322E'; btn.style.borderColor = '#E8D5C4';
+    selectedTime = btn.innerText;
+    updateWhen();
+}
+
+function updateWhen() {
+    const when = selectedDay + ' · ' + selectedTime.toLowerCase();
+    document.querySelectorAll('#display-when').forEach(el => el.innerText = when);
+    document.getElementById('display-time').innerText = when;
+}
+
+function resetBooking() {
+    currentStep = 1;
+    isSent = false;
+    document.getElementById('booking-form-container').style.display = 'block';
+    document.getElementById('view-sent').style.display = 'none';
+    document.getElementById('input-name').value = '';
+    document.getElementById('input-contact').value = '';
+    document.getElementById('input-note').value = '';
+    updateStepView();
+}
+</script>
+
 </body></html>

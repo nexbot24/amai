@@ -99,7 +99,7 @@ def build_mobile():
     
     # Replace Generic sc-if tags left over
     content = re.sub(r'<sc-if[^>]*value="\{\{\s*notSent\s*\}\}"[^>]*>', '<div id="booking-form-container" style="display:contents">', content)
-    content = re.sub(r'<sc-if[^>]*value="\{\{\s*showStepBar\s*\}\}"[^>]*>', '<div id="booking-step-bar" style="display:none;position:fixed;bottom:80px;left:0;right:0;padding:12px 20px;align-items:center;justify-content:space-between;background:linear-gradient(to top, #241F1C, transparent);pointer-events:none"><div style="pointer-events:auto;display:flex;gap:12px">', content)
+    content = re.sub(r'<sc-if[^>]*value="\{\{\s*showStepBar\s*\}\}"[^>]*>', '<div id="booking-step-bar" style="display:none; width:100%; justify-content:center; background:#241F1C">', content)
     content = re.sub(r'<sc-if[^>]*value="\{\{\s*canGoBack\s*\}\}"[^>]*>', '<div style="display:contents">', content)
     content = re.sub(r'<sc-if[^>]*>', '<div style="display:contents">', content)
     
@@ -127,7 +127,7 @@ def build_mobile():
     # Save the buttons before stripping the camel case tags!
     content = content.replace('{{ nextLabel }}', 'Next')
     content = re.sub(r'<button[^>]*\{\{\s*back\s*\}\}[^>]*>.*?</button>', '<button onclick="prevStep()" style="min-height:52px;padding:0 20px;background:#3A322E;border:1px solid rgba(232,213,196,0.28);border-radius:26px 26px 0 0;color:#E8D5C4;font-family:Marcellus,serif;font-size:16px;cursor:pointer">Back</button>', content)
-    content = re.sub(r'<button[^>]*\{\{\s*next\s*\}\}[^>]*>.*?</button>', '<button id="next-btn" onclick="nextStep()" style="min-height:52px;padding:0 24px;background:#E8D5C4;border:none;border-radius:26px 26px 0 0;color:#3A322E;font-family:Marcellus,serif;font-size:16px;cursor:pointer">Next</button></div></div>', content)
+    content = re.sub(r'<button[^>]*\{\{\s*next\s*\}\}[^>]*>.*?</button>', '<button id="next-btn" onclick="nextStep()" style="min-height:52px;padding:0 24px;background:#E8D5C4;border:none;border-radius:26px 26px 0 0;color:#3A322E;font-family:Marcellus,serif;font-size:16px;cursor:pointer">Next</button>', content)
     content = re.sub(r'<button[^>]*\{\{\s*reset\s*\}\}[^>]*>.*?</button>', '<button onclick="resetBooking()" style="background:none;border:none;border-bottom:1px solid rgba(179,156,136,0.45);color:#B39C88;font-family:Marcellus,serif;font-size:15px;padding:10px 4px;margin-top:6px;cursor:pointer">Send another request</button>', content)
 
     content = content.replace('{{ chosenTreatment }}', '<span id="display-treatment">Treatment</span>')
