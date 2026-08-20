@@ -419,13 +419,15 @@ input,select,textarea,button{font-family:Mulish,sans-serif}
     <!-- ============ BOOK ============ -->
     <div id="view-book" style="display:none" class="view-section">
       <div style="padding:24px 20px 24px">
-        <div id="booking-form-container">
+        <div id="booking-form-container" style="display:contents">
           <div>
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:22px">
-              <sc-for list="{{ stepDots }}" as="d" hint-placeholder-count="3">
-                <div style="{{ d.style }}"></div>
-              </sc-for>
-              <div style="margin-left:auto;font-size:10.5px;letter-spacing:0.2em;text-transform:uppercase;color:#B39C88">{{ stepLabel }}</div>
+              
+    <div class="step-dot" style="width:6px;height:6px;border-radius:3px;background:#E8D5C4"></div>
+    <div class="step-dot" style="width:6px;height:6px;border-radius:3px;background:rgba(232,213,196,0.25)"></div>
+    <div class="step-dot" style="width:6px;height:6px;border-radius:3px;background:rgba(232,213,196,0.25)"></div>
+    
+              <div style="margin-left:auto;font-size:10.5px;letter-spacing:0.2em;text-transform:uppercase;color:#B39C88"><span id="display-step">Step 1 of 3</span></div>
             </div>
 
             <div id="booking-step-1" class="booking-step" style="display:block">
@@ -434,52 +436,52 @@ input,select,textarea,button{font-family:Mulish,sans-serif}
                 <p style="font-size:14.5px;line-height:1.65;color:#B39C88;margin:0 0 20px">Not sure? Choose a first visit and we'll talk it through.</p>
                 <div style="display:flex;flex-direction:column;gap:10px">
                   
-                    <div onclick="selectTreatmentOption('First visit — consultation & treatment')" style="{{ t.rowStyle }}">
+                    <div onclick="selectTreatmentOption('First visit — consultation & treatment')" style="border:1px solid rgba(232,213,196,0.16);padding:16px 18px;display:flex;align-items:center;gap:14px;min-height:64px;cursor:pointer">
                       <div style="flex:1">
                         <div style="font-family:Marcellus,serif;font-size:17px;line-height:1.3;margin-bottom:4px">First visit — consultation & treatment</div>
                         <div style="font-size:12.5px;color:#B39C88">60 min · from £30</div>
                       </div>
-                      <div style="{{ t.tickStyle }}"></div>
+                      <div style="width:24px;height:24px;border:1px solid rgba(232,213,196,0.25);border-radius:12px;margin-left:auto"></div>
                     </div>
                   
-                    <div onclick="selectTreatmentOption('Full leg wax')" style="{{ t.rowStyle }}">
+                    <div onclick="selectTreatmentOption('Full leg wax')" style="border:1px solid rgba(232,213,196,0.16);padding:16px 18px;display:flex;align-items:center;gap:14px;min-height:64px;cursor:pointer">
                       <div style="flex:1">
                         <div style="font-family:Marcellus,serif;font-size:17px;line-height:1.3;margin-bottom:4px">Full leg wax</div>
                         <div style="font-size:12.5px;color:#B39C88">45 min · £38</div>
                       </div>
-                      <div style="{{ t.tickStyle }}"></div>
+                      <div style="width:24px;height:24px;border:1px solid rgba(232,213,196,0.25);border-radius:12px;margin-left:auto"></div>
                     </div>
                   
-                    <div onclick="selectTreatmentOption('Half leg wax')" style="{{ t.rowStyle }}">
+                    <div onclick="selectTreatmentOption('Half leg wax')" style="border:1px solid rgba(232,213,196,0.16);padding:16px 18px;display:flex;align-items:center;gap:14px;min-height:64px;cursor:pointer">
                       <div style="flex:1">
                         <div style="font-family:Marcellus,serif;font-size:17px;line-height:1.3;margin-bottom:4px">Half leg wax</div>
                         <div style="font-size:12.5px;color:#B39C88">30 min · £26</div>
                       </div>
-                      <div style="{{ t.tickStyle }}"></div>
+                      <div style="width:24px;height:24px;border:1px solid rgba(232,213,196,0.25);border-radius:12px;margin-left:auto"></div>
                     </div>
                   
-                    <div onclick="selectTreatmentOption('Underarm wax')" style="{{ t.rowStyle }}">
+                    <div onclick="selectTreatmentOption('Underarm wax')" style="border:1px solid rgba(232,213,196,0.16);padding:16px 18px;display:flex;align-items:center;gap:14px;min-height:64px;cursor:pointer">
                       <div style="flex:1">
                         <div style="font-family:Marcellus,serif;font-size:17px;line-height:1.3;margin-bottom:4px">Underarm wax</div>
                         <div style="font-size:12.5px;color:#B39C88">15 min · £14</div>
                       </div>
-                      <div style="{{ t.tickStyle }}"></div>
+                      <div style="width:24px;height:24px;border:1px solid rgba(232,213,196,0.25);border-radius:12px;margin-left:auto"></div>
                     </div>
                   
-                    <div onclick="selectTreatmentOption('Bikini / Hollywood')" style="{{ t.rowStyle }}">
+                    <div onclick="selectTreatmentOption('Bikini / Hollywood')" style="border:1px solid rgba(232,213,196,0.16);padding:16px 18px;display:flex;align-items:center;gap:14px;min-height:64px;cursor:pointer">
                       <div style="flex:1">
                         <div style="font-family:Marcellus,serif;font-size:17px;line-height:1.3;margin-bottom:4px">Bikini / Hollywood</div>
                         <div style="font-size:12.5px;color:#B39C88">30–45 min · £28–£42</div>
                       </div>
-                      <div style="{{ t.tickStyle }}"></div>
+                      <div style="width:24px;height:24px;border:1px solid rgba(232,213,196,0.25);border-radius:12px;margin-left:auto"></div>
                     </div>
                   
-                    <div onclick="selectTreatmentOption('Brow shape & tidy')" style="{{ t.rowStyle }}">
+                    <div onclick="selectTreatmentOption('Brow shape & tidy')" style="border:1px solid rgba(232,213,196,0.16);padding:16px 18px;display:flex;align-items:center;gap:14px;min-height:64px;cursor:pointer">
                       <div style="flex:1">
                         <div style="font-family:Marcellus,serif;font-size:17px;line-height:1.3;margin-bottom:4px">Brow shape & tidy</div>
                         <div style="font-size:12.5px;color:#B39C88">20 min · £16</div>
                       </div>
-                      <div style="{{ t.tickStyle }}"></div>
+                      <div style="width:24px;height:24px;border:1px solid rgba(232,213,196,0.25);border-radius:12px;margin-left:auto"></div>
                     </div>
                   
                 </div>
@@ -533,14 +535,14 @@ input,select,textarea,button{font-family:Mulish,sans-serif}
                 <div style="margin-top:22px;background:#443B36;padding:17px 19px;display:flex;flex-direction:column;gap:8px">
                   <div style="font-size:10.5px;letter-spacing:0.22em;text-transform:uppercase;color:#B39C88">Your request</div>
                   <div style="font-family:Marcellus,serif;font-size:17px;line-height:1.4;color:#E8D5C4"><span id="display-treatment">Treatment</span></div>
-                  <div style="font-size:13.5px;color:#B39C88">{{ chosenWhen }}</div>
+                  <div style="font-size:13.5px;color:#B39C88"><span id="display-when">Any day · any time</span></div>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div>
+        <div style="display:contents">
           <div style="padding-top:28px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px">
             <div style="width:44px;height:60px;border:2px solid #E8D5C4;border-bottom:none;border-radius:44px 44px 0 0"></div>
             <div style="font-family:Marcellus,serif;font-size:26px;line-height:1.3"><span id="display-name">Thank you</span>, it's in our diary.</div>
@@ -548,7 +550,7 @@ input,select,textarea,button{font-family:Mulish,sans-serif}
             <div style="width:100%;margin-top:8px;border:1px solid rgba(232,213,196,0.18);padding:18px;display:flex;flex-direction:column;gap:7px;text-align:left">
               <div style="font-size:10.5px;letter-spacing:0.22em;text-transform:uppercase;color:#B39C88">Requested</div>
               <div style="font-family:Marcellus,serif;font-size:17px"><span id="display-treatment">Treatment</span></div>
-              <div style="font-size:13.5px;color:#B39C88">{{ chosenWhen }}</div>
+              <div style="font-size:13.5px;color:#B39C88"><span id="display-when">Any day · any time</span></div>
             </div>
             <button onclick="resetBooking()" style="background:none;border:none;border-bottom:1px solid rgba(179,156,136,0.45);color:#B39C88;font-family:Marcellus,serif;font-size:15px;padding:10px 4px;margin-top:6px;cursor:pointer">Send another request</button>
           </div>
@@ -581,9 +583,9 @@ input,select,textarea,button{font-family:Mulish,sans-serif}
   </div>
 
   <!-- STICKY STEP ACTION (booking only) -->
-  <div id="booking-step-bar" style="display:none;position:fixed;bottom:80px;left:0;right:0;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(to top, #241F1C, transparent);pointer-events:none"><div style="pointer-events:auto;display:flex;gap:12px">
+  <div id="booking-step-bar" style="display:none;position:fixed;bottom:80px;left:0;right:0;padding:12px 20px;align-items:center;justify-content:space-between;background:linear-gradient(to top, #241F1C, transparent);pointer-events:none"><div style="pointer-events:auto;display:flex;gap:12px">
     <div style="flex:none;padding:12px 20px;background:#332C28;border-top:1px solid rgba(232,213,196,0.14);display:flex;align-items:center;gap:12px">
-      <div>
+      <div style="display:contents">
         <button onclick="prevStep()" style="min-height:52px;padding:0 20px;background:#3A322E;border:1px solid rgba(232,213,196,0.28);border-radius:26px 26px 0 0;color:#E8D5C4;font-family:Marcellus,serif;font-size:16px;cursor:pointer">Back</button>
       </div>
       <button id="next-btn" onclick="nextStep()" style="min-height:52px;padding:0 24px;background:#E8D5C4;border:none;border-radius:26px 26px 0 0;color:#3A322E;font-family:Marcellus,serif;font-size:16px;cursor:pointer">Next</button></div></div>
@@ -661,6 +663,14 @@ function updateStepView() {
     } else {
         document.getElementById('next-btn').innerText = 'Next';
     }
+    
+    const stepLabel = document.getElementById('display-step');
+    if (stepLabel) stepLabel.innerText = 'Step ' + currentStep + ' of 3';
+    
+    const dots = document.querySelectorAll('.step-dot');
+    dots.forEach((dot, index) => {
+        dot.style.background = (index === currentStep - 1) ? '#E8D5C4' : 'rgba(232,213,196,0.25)';
+    });
 }
 
 function nextStep() {
@@ -685,11 +695,16 @@ function prevStep() {
     }
 }
 
+let selectedDay = "Any day";
+let selectedTime = "Any time";
+
 function selectDay(btn) {
     document.querySelectorAll('.day-btn').forEach(b => {
         b.style.background = 'transparent'; b.style.color = '#E8D5C4'; b.style.borderColor = 'rgba(232,213,196,0.25)';
     });
     btn.style.background = '#E8D5C4'; btn.style.color = '#3A322E'; btn.style.borderColor = '#E8D5C4';
+    selectedDay = btn.innerText;
+    updateWhen();
 }
 
 function selectTime(btn) {
@@ -697,6 +712,14 @@ function selectTime(btn) {
         b.style.background = 'transparent'; b.style.color = '#E8D5C4'; b.style.borderColor = 'rgba(232,213,196,0.25)';
     });
     btn.style.background = '#E8D5C4'; btn.style.color = '#3A322E'; btn.style.borderColor = '#E8D5C4';
+    selectedTime = btn.innerText;
+    updateWhen();
+}
+
+function updateWhen() {
+    const when = selectedDay + ' · ' + selectedTime.toLowerCase();
+    document.querySelectorAll('#display-when').forEach(el => el.innerText = when);
+    document.getElementById('display-time').innerText = when;
 }
 
 function resetBooking() {

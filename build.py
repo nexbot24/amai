@@ -98,10 +98,10 @@ def build_mobile():
     content = re.sub(r'<sc-if[^>]*value="\{\{\s*isStep3\s*\}\}"[^>]*>', '<div id="booking-step-3" class="booking-step" style="display:none">', content)
     
     # Replace Generic sc-if tags left over
-    content = re.sub(r'<sc-if[^>]*value="\{\{\s*notSent\s*\}\}"[^>]*>', '<div id="booking-form-container">', content)
-    content = re.sub(r'<sc-if[^>]*value="\{\{\s*showStepBar\s*\}\}"[^>]*>', '<div id="booking-step-bar" style="display:none;position:fixed;bottom:80px;left:0;right:0;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(to top, #241F1C, transparent);pointer-events:none"><div style="pointer-events:auto;display:flex;gap:12px">', content)
-    content = re.sub(r'<sc-if[^>]*value="\{\{\s*canGoBack\s*\}\}"[^>]*>', '<div>', content)
-    content = re.sub(r'<sc-if[^>]*>', '<div>', content)
+    content = re.sub(r'<sc-if[^>]*value="\{\{\s*notSent\s*\}\}"[^>]*>', '<div id="booking-form-container" style="display:contents">', content)
+    content = re.sub(r'<sc-if[^>]*value="\{\{\s*showStepBar\s*\}\}"[^>]*>', '<div id="booking-step-bar" style="display:none;position:fixed;bottom:80px;left:0;right:0;padding:12px 20px;align-items:center;justify-content:space-between;background:linear-gradient(to top, #241F1C, transparent);pointer-events:none"><div style="pointer-events:auto;display:flex;gap:12px">', content)
+    content = re.sub(r'<sc-if[^>]*value="\{\{\s*canGoBack\s*\}\}"[^>]*>', '<div style="display:contents">', content)
+    content = re.sub(r'<sc-if[^>]*>', '<div style="display:contents">', content)
     
     # Replace days and times loops
     days_html = '''
@@ -137,6 +137,19 @@ def build_mobile():
     content = content.replace('value="{{ note }}"', 'id="input-note"')
     content = re.sub(r'sc-camel-on-[a-z]+="[^"]*"', '', content)
     content = content.replace('{{ confirmName }}', '<span id="display-name">Thank you</span>')
+    content = content.replace('{{ chosenWhen }}', '<span id="display-when">Any day · any time</span>')
+    content = content.replace('{{ stepLabel }}', '<span id="display-step">Step 1 of 3</span>')
+    
+    # Replace stepDots loop
+    step_dots_html = '''
+    <div class="step-dot" style="width:6px;height:6px;border-radius:3px;background:#E8D5C4"></div>
+    <div class="step-dot" style="width:6px;height:6px;border-radius:3px;background:rgba(232,213,196,0.25)"></div>
+    <div class="step-dot" style="width:6px;height:6px;border-radius:3px;background:rgba(232,213,196,0.25)"></div>
+    '''
+    content = re.sub(r'<sc-for list="\{\{\s*stepDots\s*\}\}".*?>.*?</sc-for>', step_dots_html, content, flags=re.DOTALL)
+    
+    content = content.replace('{{ t.rowStyle }}', 'border:1px solid rgba(232,213,196,0.16);padding:16px 18px;display:flex;align-items:center;gap:14px;min-height:64px;cursor:pointer')
+    content = content.replace('{{ t.tickStyle }}', 'width:24px;height:24px;border:1px solid rgba(232,213,196,0.25);border-radius:12px;margin-left:auto')
     
     content = content.replace('<sc-if style="display:none" value="{{ sent }}"', '<div id="view-sent" style="display:none">')
     # Replace all closing sc-if tags
@@ -205,6 +218,14 @@ function updateStepView() {
     } else {
         document.getElementById('next-btn').innerText = 'Next';
     }
+    
+    const stepLabel = document.getElementById('display-step');
+    if (stepLabel) stepLabel.innerText = 'Step ' + currentStep + ' of 3';
+    
+    const dots = document.querySelectorAll('.step-dot');
+    dots.forEach((dot, index) => {
+        dot.style.background = (index === currentStep - 1) ? '#E8D5C4' : 'rgba(232,213,196,0.25)';
+    });
 }
 
 function nextStep() {
@@ -229,11 +250,16 @@ function prevStep() {
     }
 }
 
+let selectedDay = "Any day";
+let selectedTime = "Any time";
+
 function selectDay(btn) {
     document.querySelectorAll('.day-btn').forEach(b => {
         b.style.background = 'transparent'; b.style.color = '#E8D5C4'; b.style.borderColor = 'rgba(232,213,196,0.25)';
     });
     btn.style.background = '#E8D5C4'; btn.style.color = '#3A322E'; btn.style.borderColor = '#E8D5C4';
+    selectedDay = btn.innerText;
+    updateWhen();
 }
 
 function selectTime(btn) {
@@ -241,6 +267,14 @@ function selectTime(btn) {
         b.style.background = 'transparent'; b.style.color = '#E8D5C4'; b.style.borderColor = 'rgba(232,213,196,0.25)';
     });
     btn.style.background = '#E8D5C4'; btn.style.color = '#3A322E'; btn.style.borderColor = '#E8D5C4';
+    selectedTime = btn.innerText;
+    updateWhen();
+}
+
+function updateWhen() {
+    const when = selectedDay + ' · ' + selectedTime.toLowerCase();
+    document.querySelectorAll('#display-when').forEach(el => el.innerText = when);
+    document.getElementById('display-time').innerText = when;
 }
 
 function resetBooking() {
