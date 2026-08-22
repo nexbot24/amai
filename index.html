@@ -406,29 +406,39 @@ div[id]{scroll-margin-top:84px}
     </div>
     <div style="display:grid;grid-template-columns:320px 1fr;gap:56px">
       <div style="display:flex;flex-direction:column;gap:8px">
-        <sc-for list="{{ groups }}" as="g" hint-placeholder-count="3">
-          <button  style="{{ g.tabStyle }}">
-            <span style="font-family:Marcellus,serif;font-size:22px;line-height:1.25">{{ g.title }}</span>
-            <span style="{{ g.blurbStyle }}">{{ g.blurb }}</span>
+        
+          <button  style="width:100%;text-align:left;background:none;border:none;border-left:1px solid #3A322E;padding:12px 24px;cursor:pointer;color:#241F1C;display:flex;flex-direction:column;gap:6px">
+            <span style="font-family:Marcellus,serif;font-size:22px;line-height:1.25">First visits</span>
+            <span style="font-size:14.5px;line-height:1.6;color:#5C5148">Consultation, patch test, and extra time.</span>
           </button>
-        </sc-for>
+        
+          <button  style="width:100%;text-align:left;background:none;border:none;border-left:1px solid rgba(232,213,196,0.5);padding:12px 24px;cursor:pointer;color:#5C5148;display:flex;flex-direction:column;gap:6px">
+            <span style="font-family:Marcellus,serif;font-size:22px;line-height:1.25">Body waxing</span>
+            <span style="font-size:14.5px;line-height:1.6;color:#8F8276">Legs, arms, back and chest.</span>
+          </button>
+        
+          <button  style="width:100%;text-align:left;background:none;border:none;border-left:1px solid rgba(232,213,196,0.5);padding:12px 24px;cursor:pointer;color:#5C5148;display:flex;flex-direction:column;gap:6px">
+            <span style="font-family:Marcellus,serif;font-size:22px;line-height:1.25">Intimate & face</span>
+            <span style="font-size:14.5px;line-height:1.6;color:#8F8276">Bikini, hollywood, brows and lip.</span>
+          </button>
+        
       </div>
       <div style="display:flex;flex-direction:column">
-        <h3 style="font-family:Marcellus,serif;font-size:28px;font-weight:400;margin:0 0 10px">{{ activeHeading }}</h3>
-        <p style="font-size:15px;line-height:1.7;color:#5C5148;margin:0 0 30px;max-width:560px">{{ activeCopy }}</p>
+        <h3 style="font-family:Marcellus,serif;font-size:28px;font-weight:400;margin:0 0 10px">First visits</h3>
+        <p style="font-size:15px;line-height:1.7;color:#5C5148;margin:0 0 30px;max-width:560px">Your first appointment includes a full consultation and patch test. We book extra time for this at no extra cost, so you can ask questions and we can get to know your skin.</p>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <sc-for list="{{ activeItems }}" as="t" hint-placeholder-count="6">
+          
             <div style="background:#EFE5D8;padding:16px 20px;display:flex;flex-direction:column;gap:5px">
-              <span style="font-family:Marcellus,serif;font-size:18px;line-height:1.3">{{ t.name }}</span>
+              <span style="font-family:Marcellus,serif;font-size:18px;line-height:1.3">First visit — consultation & treatment</span>
               <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px">
-                <span style="font-size:12.5px;color:#6E5B49">{{ t.time }}</span>
-                <span style="font-size:15px;font-weight:500">{{ t.price }}</span>
+                <span style="font-size:12.5px;color:#6E5B49">60 min</span>
+                <span style="font-size:15px;font-weight:500">from £30</span>
               </div>
             </div>
-          </sc-for>
+          
         </div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:24px;margin-top:32px">
-          <span style="font-size:13.5px;color:#6E5B49">{{ activeFootnote }}</span>
+          <span style="font-size:13.5px;color:#6E5B49">We use premium hot wax for sensitive areas.</span>
           <a href="#book" style="color:#3A322E;background:#E8D5C4;padding:14px 32px;font-family:Marcellus,serif;font-size:16px;border-radius:24px 24px 0 0;white-space:nowrap" style-hover="background:#3A322E;color:#F7F1EA">Book a visit</a>
         </div>
       </div>
@@ -456,15 +466,31 @@ div[id]{scroll-margin-top:84px}
         <a href="#book" style="display:inline-block;color:#3A322E;background:#E8D5C4;padding:15px 34px;font-family:Marcellus,serif;font-size:16px;border-radius:25px 25px 0 0" style-hover="background:#F7F1EA">Book a visit</a>
       </div>
       <div style="display:flex;flex-direction:column">
-        <sc-for list="{{ reasons }}" as="r" hint-placeholder-count="5">
+        
           <div style="display:grid;grid-template-columns:56px 1fr;gap:24px;padding:24px 0;border-top:1px solid rgba(232,213,196,0.2)">
-            <span style="font-family:Marcellus,serif;font-size:22px;color:#B39C88;line-height:1.3">{{ r.n }}</span>
+            <span style="font-family:Marcellus,serif;font-size:22px;color:#B39C88;line-height:1.3">1</span>
             <div>
-              <div style="font-family:Marcellus,serif;font-size:23px;margin-bottom:8px">{{ r.title }}</div>
-              <p style="font-size:14.5px;line-height:1.7;color:#CBB49E;margin:0;max-width:460px">{{ r.copy }}</p>
+              <div style="font-family:Marcellus,serif;font-size:23px;margin-bottom:8px">No double dipping</div>
+              <p style="font-size:14.5px;line-height:1.7;color:#CBB49E;margin:0;max-width:460px">We never re-dip the spatula. It's a fresh one every time for complete hygiene.</p>
             </div>
           </div>
-        </sc-for>
+        
+          <div style="display:grid;grid-template-columns:56px 1fr;gap:24px;padding:24px 0;border-top:1px solid rgba(232,213,196,0.2)">
+            <span style="font-family:Marcellus,serif;font-size:22px;color:#B39C88;line-height:1.3">2</span>
+            <div>
+              <div style="font-family:Marcellus,serif;font-size:23px;margin-bottom:8px">Premium hot wax</div>
+              <p style="font-size:14.5px;line-height:1.7;color:#CBB49E;margin:0;max-width:460px">We use advanced hot wax for sensitive areas, which shrink-wraps the hair without gripping the skin.</p>
+            </div>
+          </div>
+        
+          <div style="display:grid;grid-template-columns:56px 1fr;gap:24px;padding:24px 0;border-top:1px solid rgba(232,213,196,0.2)">
+            <span style="font-family:Marcellus,serif;font-size:22px;color:#B39C88;line-height:1.3">3</span>
+            <div>
+              <div style="font-family:Marcellus,serif;font-size:23px;margin-bottom:8px">Expert therapists</div>
+              <p style="font-size:14.5px;line-height:1.7;color:#CBB49E;margin:0;max-width:460px">Our team specializes exclusively in waxing. No nails, no lashes, just exceptional waxing.</p>
+            </div>
+          </div>
+        
       </div>
     </div>
   </div>
@@ -517,15 +543,31 @@ div[id]{scroll-margin-top:84px}
       <h2 style="font-family:Marcellus,serif;font-size:38px;font-weight:400;line-height:1.22;margin:0 0 22px">Choose your hour. It's yours from there.</h2>
       <p style="font-size:15.5px;line-height:1.75;color:#CBB49E;margin:0 0 32px">Four taps, under a minute. You'll see the hours that are genuinely free, and a £10 refundable deposit holds the room the moment you confirm.</p>
       <div style="display:flex;flex-direction:column">
-        <sc-for list="{{ steps }}" as="s" hint-placeholder-count="3">
-          <div style="{{ s.rowStyle }}">
-            <span style="{{ s.numStyle }}">{{ s.n }}</span>
+        
+          <div style="display:grid;grid-template-columns:40px 1fr;gap:18px;padding:24px 0;border-top:1px solid rgba(232,213,196,0.2)">
+            <span style="width:40px;height:40px;border-radius:20px;background:#332C28;color:#B39C88;display:flex;align-items:center;justify-content:center;font-family:Marcellus,serif;font-size:18px">1</span>
             <div>
-              <div style="{{ s.titleStyle }}">{{ s.title }}</div>
-              <div style="font-size:13px;color:#B39C88;margin-top:4px">{{ s.value }}</div>
+              <div style="{{ s.titleStyle }}">Choose treatment</div>
+              <div style="font-size:13px;color:#B39C88;margin-top:4px">Full leg wax</div>
             </div>
           </div>
-        </sc-for>
+        
+          <div style="display:grid;grid-template-columns:40px 1fr;gap:18px;padding:24px 0;border-top:1px solid rgba(232,213,196,0.2)">
+            <span style="width:40px;height:40px;border-radius:20px;border:1px solid rgba(232,213,196,0.25);color:#B39C88;display:flex;align-items:center;justify-content:center;font-family:Marcellus,serif;font-size:18px">2</span>
+            <div>
+              <div style="{{ s.titleStyle }}">Pick a time</div>
+              <div style="font-size:13px;color:#B39C88;margin-top:4px">Tomorrow, 2:00 PM</div>
+            </div>
+          </div>
+        
+          <div style="display:grid;grid-template-columns:40px 1fr;gap:18px;padding:24px 0;border-top:1px solid rgba(232,213,196,0.2)">
+            <span style="width:40px;height:40px;border-radius:20px;border:1px solid rgba(232,213,196,0.25);color:#B39C88;display:flex;align-items:center;justify-content:center;font-family:Marcellus,serif;font-size:18px">3</span>
+            <div>
+              <div style="{{ s.titleStyle }}">Confirm</div>
+              <div style="font-size:13px;color:#B39C88;margin-top:4px">£10 deposit</div>
+            </div>
+          </div>
+        
       </div>
       <div style="margin-top:38px;padding-top:26px;border-top:1px solid rgba(232,213,196,0.16);font-size:13.5px;line-height:1.8;color:#B39C88">
         Prefer to talk? <a href="tel:+442000000000" style="color:#E8D5C4;border-bottom:1px solid rgba(232,213,196,0.4)">020 0000 0000</a><br>
@@ -537,9 +579,15 @@ div[id]{scroll-margin-top:84px}
       <div style="display:contents">
         <div style="display:flex;flex-direction:column;flex:1">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:30px">
-            <sc-for list="{{ bars }}" as="b" hint-placeholder-count="3">
-              <div style="{{ b.style }}"></div>
-            </sc-for>
+            
+              <div style="flex:1;height:3px;border-radius:1.5px;background:#E8D5C4"></div>
+            
+              <div style="flex:1;height:3px;border-radius:1.5px;background:rgba(232,213,196,0.18)"></div>
+            
+              <div style="flex:1;height:3px;border-radius:1.5px;background:rgba(232,213,196,0.18)"></div>
+            
+              <div style="flex:1;height:3px;border-radius:1.5px;background:rgba(232,213,196,0.18)"></div>
+            
             <span style="margin-left:auto;font-size:10.5px;letter-spacing:0.22em;text-transform:uppercase;color:#B39C88">Step 1 of 4</span>
           </div>
 
@@ -549,14 +597,21 @@ div[id]{scroll-margin-top:84px}
               <p style="font-size:14.5px;line-height:1.7;color:#CBB49E;margin:0 0 18px">Not sure? Choose a first visit and we'll talk it through before anything begins.</p>
               <input value=""  placeholder="Search treatments" style="width:100%;background:transparent;border:1px solid rgba(232,213,196,0.3);color:#F7F1EA;padding:13px 16px;font-family:Mulish,sans-serif;font-size:15px;outline:none;border-radius:0;margin-bottom:14px" style-focus="border-color:#E8D5C4">
               <div class="pick" style="display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto;padding-right:4px">
-                <sc-for list="{{ bookable }}" as="t" hint-placeholder-count="8">
-                  <button  style="{{ t.style }}">
-                    <span style="flex:1;text-align:left;font-family:Marcellus,serif;font-size:17px">{{ t.name }}</span>
-                    <span style="font-size:12.5px;color:#B39C88">{{ t.time }}</span>
-                    <span style="font-size:14.5px;font-weight:600;min-width:78px;text-align:right">{{ t.price }}</span>
-                    <span style="{{ t.tick }}"></span>
+                
+                  <button  style="border:1px solid rgba(232,213,196,0.2);padding:14px 18px;display:flex;align-items:center;gap:12px;cursor:pointer">
+                    <span style="flex:1;text-align:left;font-family:Marcellus,serif;font-size:17px">Full leg wax</span>
+                    <span style="font-size:12.5px;color:#B39C88">45 min</span>
+                    <span style="font-size:14.5px;font-weight:600;min-width:78px;text-align:right">£38</span>
+                    <span style="width:20px;height:20px;border:1px solid rgba(232,213,196,0.3);border-radius:10px;margin-left:14px"></span>
                   </button>
-                </sc-for>
+                
+                  <button  style="border:1px solid rgba(232,213,196,0.2);padding:14px 18px;display:flex;align-items:center;gap:12px;cursor:pointer">
+                    <span style="flex:1;text-align:left;font-family:Marcellus,serif;font-size:17px">Half leg wax</span>
+                    <span style="font-size:12.5px;color:#B39C88">30 min</span>
+                    <span style="font-size:14.5px;font-weight:600;min-width:78px;text-align:right">£26</span>
+                    <span style="width:20px;height:20px;border:1px solid rgba(232,213,196,0.3);border-radius:10px;margin-left:14px"></span>
+                  </button>
+                
                 <div style="display:contents">
                   <div style="padding:18px 2px;font-size:14px;color:#B39C88">No treatment by that name. <span style="color:#E8D5C4">Clear the search</span> to see everything, or tell us in the notes at the next step.</div>
                 </div>
@@ -574,21 +629,89 @@ div[id]{scroll-margin-top:84px}
                 <button  style="background:transparent;border:1px solid rgba(232,213,196,0.28);color:#E8D5C4;width:38px;height:38px;cursor:pointer;font-size:15px">→</button>
               </div>
               <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:8px">
-                <sc-for list="{{ weekdays }}" as="w" hint-placeholder-count="7">
-                  <div style="text-align:center;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#B39C88;padding-bottom:4px">{{ w }}</div>
-                </sc-for>
+                
+                  <div style="text-align:center;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#B39C88;padding-bottom:4px">M</div>
+                
+                  <div style="text-align:center;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#B39C88;padding-bottom:4px">T</div>
+                
+                  <div style="text-align:center;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#B39C88;padding-bottom:4px">W</div>
+                
+                  <div style="text-align:center;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#B39C88;padding-bottom:4px">T</div>
+                
+                  <div style="text-align:center;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#B39C88;padding-bottom:4px">F</div>
+                
+                  <div style="text-align:center;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#B39C88;padding-bottom:4px">S</div>
+                
+                  <div style="text-align:center;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#B39C88;padding-bottom:4px">S</div>
+                
               </div>
               <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">
-                <sc-for list="{{ cells }}" as="c" hint-placeholder-count="35">
-                  <button  style="{{ c.style }}">{{ c.label }}</button>
-                </sc-for>
+                
+                  <button  style="aspect-ratio:1;border:1px solid rgba(232,213,196,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#E8D5C4;background:transparent">1</button>
+                
+                  <button  style="aspect-ratio:1;border:1px solid rgba(232,213,196,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#E8D5C4;background:transparent">2</button>
+                
+                  <button  style="aspect-ratio:1;border:1px solid rgba(232,213,196,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#E8D5C4;background:transparent">3</button>
+                
+                  <button  style="aspect-ratio:1;border:1px solid rgba(232,213,196,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#E8D5C4;background:transparent">4</button>
+                
+                  <button  style="aspect-ratio:1;border:1px solid rgba(232,213,196,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#E8D5C4;background:transparent">5</button>
+                
+                  <button  style="aspect-ratio:1;border:1px solid rgba(232,213,196,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#E8D5C4;background:transparent">6</button>
+                
+                  <button  style="aspect-ratio:1;border:1px solid rgba(232,213,196,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#E8D5C4;background:transparent">7</button>
+                
+                  <button  style="aspect-ratio:1;border:1px solid rgba(232,213,196,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#E8D5C4;background:transparent">8</button>
+                
+                  <button  style="aspect-ratio:1;border:1px solid rgba(232,213,196,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#E8D5C4;background:transparent">9</button>
+                
+                  <button  style="aspect-ratio:1;border:1px solid rgba(232,213,196,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#E8D5C4;background:transparent">10</button>
+                
+                  <button  style="aspect-ratio:1;border:1px solid rgba(232,213,196,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#E8D5C4;background:transparent">11</button>
+                
+                  <button  style="aspect-ratio:1;border:1px solid rgba(232,213,196,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#E8D5C4;background:transparent">12</button>
+                
+                  <button  style="aspect-ratio:1;border:1px solid rgba(232,213,196,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#E8D5C4;background:transparent">13</button>
+                
+                  <button  style="aspect-ratio:1;border:1px solid rgba(232,213,196,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#E8D5C4;background:transparent">14</button>
+                
+                  <button  style="aspect-ratio:1;border:1px solid rgba(232,213,196,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#E8D5C4;background:transparent">15</button>
+                
+                  <button  style="aspect-ratio:1;border:1px solid rgba(232,213,196,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#E8D5C4;background:transparent">16</button>
+                
+                  <button  style="aspect-ratio:1;border:1px solid rgba(232,213,196,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#E8D5C4;background:transparent">17</button>
+                
+                  <button  style="aspect-ratio:1;border:1px solid rgba(232,213,196,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#E8D5C4;background:transparent">18</button>
+                
+                  <button  style="aspect-ratio:1;border:1px solid rgba(232,213,196,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#E8D5C4;background:transparent">19</button>
+                
+                  <button  style="aspect-ratio:1;border:1px solid rgba(232,213,196,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#E8D5C4;background:transparent">20</button>
+                
+                  <button  style="aspect-ratio:1;border:1px solid rgba(232,213,196,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#E8D5C4;background:transparent">21</button>
+                
+                  <button  style="aspect-ratio:1;border:1px solid rgba(232,213,196,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#E8D5C4;background:transparent">22</button>
+                
+                  <button  style="aspect-ratio:1;border:1px solid rgba(232,213,196,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#E8D5C4;background:transparent">23</button>
+                
+                  <button  style="aspect-ratio:1;border:1px solid rgba(232,213,196,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#E8D5C4;background:transparent">24</button>
+                
+                  <button  style="aspect-ratio:1;border:1px solid rgba(232,213,196,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#E8D5C4;background:transparent">25</button>
+                
+                  <button  style="aspect-ratio:1;border:1px solid rgba(232,213,196,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#E8D5C4;background:transparent">26</button>
+                
+                  <button  style="aspect-ratio:1;border:1px solid rgba(232,213,196,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#E8D5C4;background:transparent">27</button>
+                
+                  <button  style="aspect-ratio:1;border:1px solid rgba(232,213,196,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#E8D5C4;background:transparent">28</button>
+                
               </div>
               <div style="margin-top:26px">
                 <div style="font-size:10.5px;letter-spacing:0.22em;text-transform:uppercase;color:#B39C88;margin-bottom:12px">{{ slotsLabel }}</div>
                 <div style="display:flex;flex-wrap:wrap;gap:8px">
-                  <sc-for list="{{ slots }}" as="s" hint-placeholder-count="6">
-                    <button  style="{{ s.style }}">{{ s.label }}</button>
-                  </sc-for>
+                  
+                    <button  style="padding:10px 16px;border:1px solid rgba(232,213,196,0.2);border-radius:4px;font-size:14px;cursor:pointer;color:#E8D5C4;background:transparent">9:00 AM</button>
+                  
+                    <button  style="padding:10px 16px;border:1px solid rgba(232,213,196,0.2);border-radius:4px;font-size:14px;cursor:pointer;color:#E8D5C4;background:transparent">10:00 AM</button>
+                  
                 </div>
               </div>
             </div>

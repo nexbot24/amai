@@ -51,6 +51,65 @@ document.addEventListener('DOMContentLoaded', () => {
     redirect_script = "<script>if (window.innerWidth <= 768) { window.location.href = 'mobile.html'; }</script>"
     content = content.replace('</head>', lenis_script + '\\n' + redirect_script + '\\n</head>')
     
+    # Template engine for sc-for loops
+    context = {
+        'groups': [
+            {'title': 'First visits', 'blurb': 'Consultation, patch test, and extra time.', 'tabStyle': 'width:100%;text-align:left;background:none;border:none;border-left:1px solid #3A322E;padding:12px 24px;cursor:pointer;color:#241F1C;display:flex;flex-direction:column;gap:6px', 'blurbStyle': 'font-size:14.5px;line-height:1.6;color:#5C5148'},
+            {'title': 'Body waxing', 'blurb': 'Legs, arms, back and chest.', 'tabStyle': 'width:100%;text-align:left;background:none;border:none;border-left:1px solid rgba(232,213,196,0.5);padding:12px 24px;cursor:pointer;color:#5C5148;display:flex;flex-direction:column;gap:6px', 'blurbStyle': 'font-size:14.5px;line-height:1.6;color:#8F8276'},
+            {'title': 'Intimate & face', 'blurb': 'Bikini, hollywood, brows and lip.', 'tabStyle': 'width:100%;text-align:left;background:none;border:none;border-left:1px solid rgba(232,213,196,0.5);padding:12px 24px;cursor:pointer;color:#5C5148;display:flex;flex-direction:column;gap:6px', 'blurbStyle': 'font-size:14.5px;line-height:1.6;color:#8F8276'}
+        ],
+        'activeItems': [
+            {'name': 'First visit — consultation & treatment', 'price': 'from £30', 'time': '60 min'},
+        ],
+        'reasons': [
+            {'n': '1', 'title': 'No double dipping', 'copy': "We never re-dip the spatula. It's a fresh one every time for complete hygiene."},
+            {'n': '2', 'title': 'Premium hot wax', 'copy': 'We use advanced hot wax for sensitive areas, which shrink-wraps the hair without gripping the skin.'},
+            {'n': '3', 'title': 'Expert therapists', 'copy': 'Our team specializes exclusively in waxing. No nails, no lashes, just exceptional waxing.'}
+        ],
+        'steps': [
+            {'n': '1', 'title': 'Choose treatment', 'value': 'Full leg wax', 'rowStyle': 'display:grid;grid-template-columns:40px 1fr;gap:18px;padding:24px 0;border-top:1px solid rgba(232,213,196,0.2)', 'numStyle': 'width:40px;height:40px;border-radius:20px;background:#332C28;color:#B39C88;display:flex;align-items:center;justify-content:center;font-family:Marcellus,serif;font-size:18px'},
+            {'n': '2', 'title': 'Pick a time', 'value': 'Tomorrow, 2:00 PM', 'rowStyle': 'display:grid;grid-template-columns:40px 1fr;gap:18px;padding:24px 0;border-top:1px solid rgba(232,213,196,0.2)', 'numStyle': 'width:40px;height:40px;border-radius:20px;border:1px solid rgba(232,213,196,0.25);color:#B39C88;display:flex;align-items:center;justify-content:center;font-family:Marcellus,serif;font-size:18px'},
+            {'n': '3', 'title': 'Confirm', 'value': '£10 deposit', 'rowStyle': 'display:grid;grid-template-columns:40px 1fr;gap:18px;padding:24px 0;border-top:1px solid rgba(232,213,196,0.2)', 'numStyle': 'width:40px;height:40px;border-radius:20px;border:1px solid rgba(232,213,196,0.25);color:#B39C88;display:flex;align-items:center;justify-content:center;font-family:Marcellus,serif;font-size:18px'}
+        ],
+        'bars': [
+            {'style': 'flex:1;height:3px;border-radius:1.5px;background:#E8D5C4'},
+            {'style': 'flex:1;height:3px;border-radius:1.5px;background:rgba(232,213,196,0.18)'},
+            {'style': 'flex:1;height:3px;border-radius:1.5px;background:rgba(232,213,196,0.18)'},
+            {'style': 'flex:1;height:3px;border-radius:1.5px;background:rgba(232,213,196,0.18)'}
+        ],
+        'bookable': [
+            {'name': 'Full leg wax', 'time': '45 min', 'price': '£38', 'style': 'border:1px solid rgba(232,213,196,0.2);padding:14px 18px;display:flex;align-items:center;gap:12px;cursor:pointer', 'tick': 'width:20px;height:20px;border:1px solid rgba(232,213,196,0.3);border-radius:10px;margin-left:14px'},
+            {'name': 'Half leg wax', 'time': '30 min', 'price': '£26', 'style': 'border:1px solid rgba(232,213,196,0.2);padding:14px 18px;display:flex;align-items:center;gap:12px;cursor:pointer', 'tick': 'width:20px;height:20px;border:1px solid rgba(232,213,196,0.3);border-radius:10px;margin-left:14px'},
+        ],
+        'weekdays': ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
+        'cells': [{'label': str(i), 'style': 'aspect-ratio:1;border:1px solid rgba(232,213,196,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#E8D5C4;background:transparent'} for i in range(1, 29)],
+        'slots': [{'label': '9:00 AM', 'style': 'padding:10px 16px;border:1px solid rgba(232,213,196,0.2);border-radius:4px;font-size:14px;cursor:pointer;color:#E8D5C4;background:transparent'}, {'label': '10:00 AM', 'style': 'padding:10px 16px;border:1px solid rgba(232,213,196,0.2);border-radius:4px;font-size:14px;cursor:pointer;color:#E8D5C4;background:transparent'}]
+    }
+    
+    pattern = re.compile(r'<sc-for\s+list="\{\{\s*(\w+)\s*\}\}"\s+as="(\w+)"[^>]*>(.*?)</sc-for>', re.DOTALL)
+    def replacer(match):
+        list_name = match.group(1)
+        item_name = match.group(2)
+        inner_html = match.group(3)
+        items = context.get(list_name, [])
+        out = ""
+        for item in items:
+            rendered = inner_html
+            if isinstance(item, dict):
+                for k, v in item.items():
+                    rendered = rendered.replace(f'{{{{ {item_name}.{k} }}}}', str(v))
+            else:
+                rendered = rendered.replace(f'{{{{ {item_name} }}}}', str(item))
+            out += rendered
+        return out
+        
+    while pattern.search(content):
+        content = pattern.sub(replacer, content)
+        
+    content = content.replace('{{ activeHeading }}', 'First visits')
+    content = content.replace('{{ activeCopy }}', 'Your first appointment includes a full consultation and patch test. We book extra time for this at no extra cost, so you can ask questions and we can get to know your skin.')
+    content = content.replace('{{ activeFootnote }}', 'We use premium hot wax for sensitive areas.')
+    
     # Fix booking steps and tags in index.html
     content = re.sub(r'<sc-if[^>]*value="\{\{\s*isStep1\s*\}\}"[^>]*>', '<div id="booking-step-1" class="booking-step" style="display:block">', content)
     content = re.sub(r'<sc-if[^>]*value="\{\{\s*isStep2\s*\}\}"[^>]*>', '<div id="booking-step-2" class="booking-step" style="display:none">', content)
