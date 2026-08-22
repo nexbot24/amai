@@ -54,12 +54,18 @@ document.addEventListener('DOMContentLoaded', () => {
     # Template engine for sc-for loops
     context = {
         'groups': [
-            {'title': 'First visits', 'blurb': 'Consultation, patch test, and extra time.', 'tabStyle': 'width:100%;text-align:left;background:none;border:none;border-left:1px solid #3A322E;padding:12px 24px;cursor:pointer;color:#241F1C;display:flex;flex-direction:column;gap:6px', 'blurbStyle': 'font-size:14.5px;line-height:1.6;color:#5C5148'},
-            {'title': 'Body waxing', 'blurb': 'Legs, arms, back and chest.', 'tabStyle': 'width:100%;text-align:left;background:none;border:none;border-left:1px solid rgba(232,213,196,0.5);padding:12px 24px;cursor:pointer;color:#5C5148;display:flex;flex-direction:column;gap:6px', 'blurbStyle': 'font-size:14.5px;line-height:1.6;color:#8F8276'},
-            {'title': 'Intimate & face', 'blurb': 'Bikini, hollywood, brows and lip.', 'tabStyle': 'width:100%;text-align:left;background:none;border:none;border-left:1px solid rgba(232,213,196,0.5);padding:12px 24px;cursor:pointer;color:#5C5148;display:flex;flex-direction:column;gap:6px', 'blurbStyle': 'font-size:14.5px;line-height:1.6;color:#8F8276'}
+            {'title': 'Waxing', 'blurb': 'Professional waxing delivered with care, precision and comfort.', 'tabStyle': 'width:100%;text-align:left;background:#443B36;border:none;padding:24px 28px;cursor:pointer;color:#E8D5C4;display:flex;flex-direction:column;gap:12px', 'blurbStyle': 'font-size:14.5px;line-height:1.6;color:#B39C88'},
+            {'title': 'Intimate Care', 'blurb': 'Thoughtful intimate beauty support focused on confidence, sensitivity and aftercare.', 'tabStyle': 'width:100%;text-align:left;background:#EBE3D8;border:none;padding:24px 28px;cursor:pointer;color:#241F1C;display:flex;flex-direction:column;gap:12px', 'blurbStyle': 'font-size:14.5px;line-height:1.6;color:#5C5148'},
+            {'title': 'Skin, Body & Wellness', 'blurb': 'Future skin, body and wellness treatments created to elevate your self-care.', 'tabStyle': 'width:100%;text-align:left;background:#EBE3D8;border:none;padding:24px 28px;cursor:pointer;color:#241F1C;display:flex;flex-direction:column;gap:12px', 'blurbStyle': 'font-size:14.5px;line-height:1.6;color:#5C5148'}
         ],
         'activeItems': [
             {'name': 'First visit — consultation & treatment', 'price': 'from £30', 'time': '60 min'},
+            {'name': 'Full leg wax', 'price': '£38', 'time': '45 min'},
+            {'name': 'Half leg wax', 'price': '£26', 'time': '30 min'},
+            {'name': 'Underarm wax', 'price': '£14', 'time': '15 min'},
+            {'name': 'Arm wax', 'price': '£22', 'time': '25 min'},
+            {'name': 'Facial waxing', 'price': 'from £12', 'time': '15 min'},
+            {'name': 'Brow shape & tidy', 'price': '£16', 'time': '20 min'},
         ],
         'reasons': [
             {'n': '1', 'title': 'No double dipping', 'copy': "We never re-dip the spatula. It's a fresh one every time for complete hygiene."},
@@ -78,8 +84,11 @@ document.addEventListener('DOMContentLoaded', () => {
             {'style': 'flex:1;height:3px;border-radius:1.5px;background:rgba(232,213,196,0.18)'}
         ],
         'bookable': [
-            {'name': 'Full leg wax', 'time': '45 min', 'price': '£38', 'style': 'border:1px solid rgba(232,213,196,0.2);padding:14px 18px;display:flex;align-items:center;gap:12px;cursor:pointer', 'tick': 'width:20px;height:20px;border:1px solid rgba(232,213,196,0.3);border-radius:10px;margin-left:14px'},
-            {'name': 'Half leg wax', 'time': '30 min', 'price': '£26', 'style': 'border:1px solid rgba(232,213,196,0.2);padding:14px 18px;display:flex;align-items:center;gap:12px;cursor:pointer', 'tick': 'width:20px;height:20px;border:1px solid rgba(232,213,196,0.3);border-radius:10px;margin-left:14px'},
+            {'name': 'First visit — consultation & treatment', 'time': '60 min', 'price': 'from £30', 'style': 'background:transparent;border:1px solid rgba(232,213,196,0.3);color:#F7F1EA;padding:16px 20px;display:flex;align-items:center;gap:12px;cursor:pointer', 'tick': 'width:18px;height:18px;border:none;background:#E8D5C4;border-radius:9px;margin-left:14px'},
+            {'name': 'Full leg wax', 'time': '45 min', 'price': '£38', 'style': 'background:transparent;border:1px solid rgba(232,213,196,0.12);color:#B39C88;padding:16px 20px;display:flex;align-items:center;gap:12px;cursor:pointer', 'tick': 'width:18px;height:18px;border:1px solid rgba(232,213,196,0.25);border-radius:9px;margin-left:14px'},
+            {'name': 'Half leg wax', 'time': '30 min', 'price': '£26', 'style': 'background:transparent;border:1px solid rgba(232,213,196,0.12);color:#B39C88;padding:16px 20px;display:flex;align-items:center;gap:12px;cursor:pointer', 'tick': 'width:18px;height:18px;border:1px solid rgba(232,213,196,0.25);border-radius:9px;margin-left:14px'},
+            {'name': 'Underarm wax', 'time': '15 min', 'price': '£14', 'style': 'background:transparent;border:1px solid rgba(232,213,196,0.12);color:#B39C88;padding:16px 20px;display:flex;align-items:center;gap:12px;cursor:pointer', 'tick': 'width:18px;height:18px;border:1px solid rgba(232,213,196,0.25);border-radius:9px;margin-left:14px'},
+            {'name': 'Arm wax', 'time': '25 min', 'price': '£22', 'style': 'background:transparent;border:1px solid rgba(232,213,196,0.12);color:#B39C88;padding:16px 20px;display:flex;align-items:center;gap:12px;cursor:pointer', 'tick': 'width:18px;height:18px;border:1px solid rgba(232,213,196,0.25);border-radius:9px;margin-left:14px'},
         ],
         'weekdays': ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
         'cells': [{'label': str(i), 'style': 'aspect-ratio:1;border:1px solid rgba(232,213,196,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;color:#E8D5C4;background:transparent'} for i in range(1, 29)],
@@ -106,8 +115,8 @@ document.addEventListener('DOMContentLoaded', () => {
     while pattern.search(content):
         content = pattern.sub(replacer, content)
         
-    content = content.replace('{{ activeHeading }}', 'First visits')
-    content = content.replace('{{ activeCopy }}', 'Your first appointment includes a full consultation and patch test. We book extra time for this at no extra cost, so you can ask questions and we can get to know your skin.')
+    content = content.replace('{{ activeHeading }}', 'Professional waxing, elevated.')
+    content = content.replace('{{ activeCopy }}', 'Every appointment focuses on comfort, hygiene, detail and results — helping you leave feeling smooth, confident and cared for.')
     content = content.replace('{{ activeFootnote }}', 'We use premium hot wax for sensitive areas.')
     
     # Fix booking steps and tags in index.html
@@ -134,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
     content = content.replace('{{ treatmentPrice }}', '£30')
     content = content.replace('{{ nameLabel }}', 'Your name')
     content = content.replace('{{ balance }}', '£20')
-    content = content.replace('{{ nextLabel }}', 'Next')
+    content = content.replace('{{ nextLabel }}', 'Continue')
     content = content.replace('{{ confirmName }}', 'Thank you')
     
     content = re.sub(r'sc-camel-on-[a-z]+="[^"]*"', '', content)
