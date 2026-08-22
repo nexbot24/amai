@@ -28,17 +28,12 @@ def build_index():
     content = content.replace('<sc-if value="{{ sent }}"', '<sc-if style="display:none" id="sent-message" value="{{ sent }}"')
     content = content.replace('assets/c7902623-1ddf-461c-8032-6e8901b5005f.jpg', 'images/wax-pot.jpg')
     
-    lenis_script = '''<script src="https://unpkg.com/@studio-freight/lenis@1.0.39/dist/lenis.min.js"></script>
-<style>
+    lenis_script = '''<style>
 .fade-up { opacity: 0; transform: translateY(20px); transition: all 0.8s ease-out; }
 .fade-up.visible { opacity: 1; transform: translateY(0); }
 </style>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const lenis = new Lenis({ duration: 1.2, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
-    function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
-    requestAnimationFrame(raf);
-    
     const elements = document.querySelectorAll('h1, h2, p, img, button, .treatment-row');
     elements.forEach(el => el.classList.add('fade-up'));
     
@@ -55,6 +50,35 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>'''
     redirect_script = "<script>if (window.innerWidth <= 768) { window.location.href = 'mobile.html'; }</script>"
     content = content.replace('</head>', lenis_script + '\\n' + redirect_script + '\\n</head>')
+    
+    # Fix booking steps and tags in index.html
+    content = re.sub(r'<sc-if[^>]*value="\{\{\s*isStep1\s*\}\}"[^>]*>', '<div id="booking-step-1" class="booking-step" style="display:block">', content)
+    content = re.sub(r'<sc-if[^>]*value="\{\{\s*isStep2\s*\}\}"[^>]*>', '<div id="booking-step-2" class="booking-step" style="display:none">', content)
+    content = re.sub(r'<sc-if[^>]*value="\{\{\s*isStep3\s*\}\}"[^>]*>', '<div id="booking-step-3" class="booking-step" style="display:none">', content)
+    content = re.sub(r'<sc-if[^>]*value="\{\{\s*isStep4\s*\}\}"[^>]*>', '<div id="booking-step-4" class="booking-step" style="display:none">', content)
+    
+    content = re.sub(r'<sc-if[^>]*value="\{\{\s*notSent\s*\}\}"[^>]*>', '<div style="display:contents">', content)
+    content = re.sub(r'<sc-if[^>]*value="\{\{\s*canGoBack\s*\}\}"[^>]*>', '<div style="display:contents">', content)
+    content = re.sub(r'<sc-if[^>]*>', '<div style="display:contents">', content)
+    content = content.replace('</sc-if>', '</div>')
+    
+    content = content.replace('{{ query }}', '')
+    content = content.replace('{{ stepLabel }}', 'Step 1 of 4')
+    content = content.replace('{{ helper }}', '')
+    content = content.replace('{{ note }}', '')
+    content = content.replace('{{ treatment }}', 'Treatment')
+    content = content.replace('{{ whenLabel }}', 'Any day · any time')
+    content = content.replace('{{ payApple }}', '')
+    content = content.replace('{{ cardNum }}', '')
+    content = content.replace('{{ cardExp }}', '')
+    content = content.replace('{{ cardCvc }}', '')
+    content = content.replace('{{ treatmentPrice }}', '£30')
+    content = content.replace('{{ nameLabel }}', 'Your name')
+    content = content.replace('{{ balance }}', '£20')
+    content = content.replace('{{ nextLabel }}', 'Next')
+    content = content.replace('{{ confirmName }}', 'Thank you')
+    
+    content = re.sub(r'sc-camel-on-[a-z]+="[^"]*"', '', content)
     
     with open('index.html', 'w') as f:
         f.write(content)
