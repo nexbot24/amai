@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en-GB"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Amai Studio</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Amai Studio">
+<meta name="theme-color" content="#241F1C">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%233A322E'/%3E%3Ctext x='90' y='118' font-family='Georgia,serif' font-size='86' fill='%23E8D5C4' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Amai%20Studio%22%2C%22short_name%22%3A%22Amai%22%2C%22display%22%3A%22standalone%22%2C%22orientation%22%3A%22portrait%22%2C%22background_color%22%3A%22%23241F1C%22%2C%22theme_color%22%3A%22%23241F1C%22%2C%22start_url%22%3A%22.%22%7D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Mulish:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>/* latin-ext */
+
+/* latin */
+
+/* cyrillic-ext */
+
+/* cyrillic */
+
+/* vietnamese */
+
+/* latin-ext */
+
+/* latin */
+
+/* cyrillic-ext */
+
+/* cyrillic */
+
+/* vietnamese */
+
+/* latin-ext */
+
+/* latin */
+
+/* cyrillic-ext */
+
+/* cyrillic */
+
+/* vietnamese */
+
+/* latin-ext */
+
+/* latin */
+
+/* cyrillic-ext */
+
+/* cyrillic */
+
+/* vietnamese */
+
+/* latin-ext */
+
+/* latin */
+
+/* cyrillic-ext */
+
+/* cyrillic */
+
+/* vietnamese */
+
+/* latin-ext */
+
+/* latin */
+
+</style>
+<style>
+*,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{margin:0;font-family:Mulish,sans-serif;color:#241F1C;background:#1A1614;display:flex;align-items:center;justify-content:center}
+button{font-family:Mulish,sans-serif;cursor:pointer;color:#241F1C}
+.serif{font-family:Marcellus,serif;font-weight:400}
+.lbl{font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:#6E5B49}
+.lbl-d{font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:#B39C88}
+.scroll{overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+
+/* device */
+.ipad{width:834px;height:1194px;max-width:100vw;max-height:100vh;background:#EFE9E1;display:grid;grid-template-rows:auto 1fr auto;overflow:hidden;position:relative}
+
+/* rail */
+.rail{background:#241F1C;display:flex;align-items:center;justify-content:space-between;padding:10px 18px calc(10px + env(safe-area-inset-bottom));gap:8px}
+.tab{flex:1;min-height:62px;border:none;background:none;color:#8A7361;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;border-radius:14px;position:relative}
+.tab .g{width:22px;height:22px;border:1.5px solid currentColor;border-radius:6px}
+.tab.on{background:#3A322E;color:#E8D5C4}
+.tab:active{opacity:.7}
+
+/* panes */
+.pane{display:flex;flex-direction:column;min-height:0}
+.col{min-height:0;display:flex;flex-direction:column}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 22px calc(16px);border-bottom:1px solid #DED0C0;background:#F7F1EA;padding-top:calc(16px + env(safe-area-inset-top))}
+.body{padding:18px 22px 34px}
+.aside-inline{padding:0 22px 4px}
+
+.card{background:#F7F1EA;border:1px solid #E0D2C2;padding:18px 20px}
+.btn{display:inline-flex;align-items:center;justify-content:center;border:none;font-family:Marcellus,serif;font-size:16px;min-height:48px;padding:0 24px;border-radius:24px 24px 0 0;background:#3A322E;color:#F7F1EA}
+.btn:active{background:#241F1C}
+.btn-l{background:#E8D5C4;color:#3A322E}
+.btn-o{background:transparent;color:#241F1C;border:1px solid #C9B8A4}
+.btn-sm{min-height:42px;font-size:15px;padding:0 18px;border-radius:21px 21px 0 0}
+.field{width:100%;background:#F7F1EA;border:1px solid #DED0C0;padding:13px 14px;font-size:16px;font-family:Mulish,sans-serif;outline:none;color:#241F1C}
+.field::placeholder{color:#8A7361;opacity:1}
+.field:focus{border-color:#8A7361}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;padding:5px 11px;border:1px solid #C9B8A4;color:#6E5B49;white-space:nowrap}
+.pill.on{background:#3A322E;border-color:#3A322E;color:#E8D5C4}
+.pill.warn{background:#E8D5C4;border-color:#C9B8A4;color:#3A322E}
+.hide{display:none!important}
+
+/* day schedule */
+.slotline{display:grid;grid-template-columns:66px 1fr;gap:14px;align-items:stretch}
+.appt{border-left:3px solid #3A322E;background:#F7F1EA;border-top:1px solid #E0D2C2;border-right:1px solid #E0D2C2;border-bottom:1px solid #E0D2C2;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:64px;color:#241F1C;width:100%}
+.appt.done{border-left-color:#B39C88;background:#EFE5D8;color:#6E5B49;opacity:1}
+.appt.now{border-left-color:#E8D5C4;background:#3A322E;color:#E8D5C4}
+.free{border:1px dashed #D6C4B2;min-height:64px;display:flex;align-items:center;justify-content:space-between;padding:12px 14px;color:#8A7361;font-size:13.5px;background:transparent;width:100%}
+
+/* week grid */
+.week{display:grid;grid-template-columns:50px repeat(4,1fr);gap:4px}
+.wcell{min-height:38px;border:1px solid #E5D8C9;background:#F7F1EA;font-size:11px;display:flex;align-items:center;justify-content:center;color:#6E5B49}
+.wcell.full{background:#3A322E;border-color:#3A322E;color:#E8D5C4;font-size:10.5px;padding:0 4px;text-align:center;line-height:1.25}
+.wcell.shut{background:#EFE5D8;border-color:#EFE5D8;color:#C9B8A4}
+
+.sheetwrap{position:absolute;inset:0;background:rgba(26,22,20,.55);display:flex;align-items:flex-end;justify-content:center;z-index:40}
+.sheet{background:#EFE9E1;width:100%;max-height:88%;border-top:1px solid #DED0C0;padding:26px 30px 30px;overflow-y:auto}
+.grab{width:44px;height:4px;border-radius:2px;background:#C9B8A4;margin:0 auto 20px}
+.kv{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-top:1px solid #E0D2C2;font-size:15px}
+.chip{min-height:44px;padding:0 16px;font-size:15px;background:transparent;border:1px solid #DED0C0;color:#241F1C}
+.chip[aria-pressed="true"]{background:#3A322E;color:#F7F1EA;border-color:#3A322E}
+@media (max-width:860px),(max-height:1220px){ .ipad{width:100vw;height:100vh} }
+@media (display-mode:standalone){ .ipad{width:100vw;height:100vh} #install{display:none!important} }
+</style>
+</head>
+<body>
+
+<div class="ipad">
+  <!-- HEADER -->
+  <div class="topbar">
+    <div style="display:flex;align-items:baseline;gap:14px;min-width:0">
+      <span class="serif" id="ttl" style="font-size:26px;white-space:nowrap"></span>
+      <span id="sub" style="font-size:13px;color:#6E5B49;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="pill" id="clock"></span>
+      <button class="btn btn-l btn-sm" id="quick">Add booking</button>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="pane scroll">
+    <div class="aside-inline" id="aside"></div>
+    <div class="body" id="view"></div>
+  </div>
+
+  <!-- TABS -->
+  <div class="rail" id="tabs"></div>
+
+  <div id="host"></div>
+
+  <div id="install" class="hide" style="position:absolute;left:22px;right:22px;bottom:104px;background:#241F1C;color:#E8D5C4;padding:18px 22px;display:flex;align-items:center;gap:18px;z-index:30">
+    <div style="width:34px;height:46px;border:1.4px solid #E8D5C4;border-bottom:none;border-radius:999px 999px 0 0;flex:none"></div>
+    <div style="flex:1;min-width:0">
+      <div class="serif" style="font-size:19px;margin-bottom:4px">Keep Amai Studio on your home screen.</div>
+      <div style="font-size:13px;line-height:1.6;color:#B39C88" id="install-how">Tap Share, then <strong style="font-weight:600;color:#E8D5C4">Add to Home Screen</strong> — it opens full screen, without the browser bars.</div>
+    </div>
+    <button class="btn btn-sm" id="install-go" style="background:#E8D5C4;color:#3A322E;flex:none">Add</button>
+    <button id="install-no" style="background:none;border:none;color:#8A7361;font-size:13px;flex:none">Not now</button>
+  </div>
+</div>
+
+
+
+<script>
+var $=function(i){return document.getElementById(i);};
+var TIMES=["9.00","10.00","11.00","12.00","13.00","14.00","15.00","16.00","17.00"];
+var SERVICES=[
+  {n:"First visit — consultation & treatment",d:60,p:30},{n:"Full leg wax",d:45,p:38},
+  {n:"Half leg wax",d:30,p:26},{n:"Underarm wax",d:15,p:14},{n:"Arm wax",d:25,p:22},
+  {n:"Facial waxing",d:15,p:12},{n:"Brow shape & tidy",d:20,p:16},{n:"Bikini wax",d:30,p:28},
+  {n:"Brazilian wax",d:40,p:36},{n:"Hollywood wax",d:45,p:42},{n:"Maintenance visit",d:30,p:24}
+];
+function d0(){ var d=new Date(); d.setHours(0,0,0,0); return d; }
+function shift(base,n){ var d=new Date(base); d.setDate(d.getDate()+n); return d; }
+function iso(d){ return d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate(); }
+function parseKey(k){ var p=k.split("-"); return new Date(+p[0],+p[1],+p[2]); }
+function open(d){ return d.getDay()!==0&&d.getDay()!==1; }
+function nextOpen(n){ var d=shift(d0(),n); while(!open(d)) d=shift(d,1); return d; }
+function back(n){ var d=d0(), c=0; while(c<n){ d=shift(d,-1); if(open(d)) c++; } return d; }
+function longDate(d){ return d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}); }
+function shortDate(d){ return d.toLocaleDateString("en-GB",{day:"numeric",month:"short"}); }
+function money(n){ return "£"+n; }
+
+var KEY="amai_studio_v2";
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY))||null; }catch(e){ return null; } }
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
+
+function seed(){
+  var t=nextOpen(0), t2=nextOpen(1), t3=nextOpen(2);
+  return {
+    view:"today", dayKey:iso(t), locked:false,
+    clients:[
+      {id:1,name:"Nadia Rahman",phone:"07700 900123",since:"Jan 2026",stamps:4,plan:"Hollywood, every 5 weeks",notes:"Sensitive on legs — patch tested Feb.",visits:5,spend:158},
+      {id:2,name:"Priya Shah",phone:"07700 900456",since:"Mar 2026",stamps:2,plan:null,notes:"First Brazilian was Mar — prefers 10.00.",visits:2,spend:64},
+      {id:3,name:"Hannah Doyle",phone:"07700 900789",since:"Feb 2026",stamps:9,plan:"Bikini, every 5 weeks",notes:"Runs 5 mins late, always.",visits:9,spend:286},
+      {id:4,name:"Leila Osman",phone:"07700 900321",since:"Apr 2026",stamps:1,plan:null,notes:"New — consultation only so far.",visits:1,spend:30},
+      {id:5,name:"Chloe Baptiste",phone:"07700 900654",since:"Jan 2026",stamps:6,plan:null,notes:"Waxes brows every visit, add 20 min.",visits:6,spend:214}
+    ],
+    appts:[
+      {id:11,c:1,s:"Hollywood wax",t:"10.00",dur:45,p:42,dep:10,day:iso(t),st:"done"},
+      {id:12,c:5,s:"Full leg wax",t:"11.00",dur:45,p:38,dep:10,day:iso(t),st:"done"},
+      {id:13,c:2,s:"Brazilian wax",t:"13.00",dur:40,p:36,dep:10,day:iso(t),st:"due"},
+      {id:14,c:3,s:"Bikini wax",t:"15.00",dur:30,p:28,dep:10,day:iso(t),st:"due"},
+      {id:15,c:4,s:"Brow shape & tidy",t:"16.00",dur:20,p:16,dep:10,day:iso(t),st:"due"},
+      {id:16,c:3,s:"Hollywood wax",t:"10.00",dur:45,p:42,dep:10,day:iso(t2),st:"due"},
+      {id:17,c:1,s:"Brow shape & tidy",t:"14.00",dur:20,p:16,dep:10,day:iso(t2),st:"due"},
+      {id:18,c:5,s:"Underarm wax",t:"9.00",dur:15,p:14,dep:10,day:iso(t3),st:"due"},
+      {id:19,c:2,s:"Half leg wax",t:"12.00",dur:30,p:26,dep:10,day:iso(t3),st:"due"},
+      {id:20,c:1,s:"Brow shape & tidy",t:"10.00",dur:20,p:16,dep:10,day:iso(back(1)),st:"done"},
+      {id:21,c:3,s:"Bikini wax",t:"12.00",dur:30,p:28,dep:10,day:iso(back(1)),st:"done"},
+      {id:22,c:5,s:"Hollywood wax",t:"15.00",dur:45,p:42,dep:10,day:iso(back(1)),st:"done"},
+      {id:23,c:2,s:"Underarm wax",t:"11.00",dur:15,p:14,dep:10,day:iso(back(2)),st:"done"},
+      {id:24,c:4,s:"Facial waxing",t:"14.00",dur:15,p:12,dep:10,day:iso(back(2)),st:"done"},
+      {id:25,c:3,s:"Full leg wax",t:"9.00",dur:45,p:38,dep:10,day:iso(back(3)),st:"done"},
+      {id:26,c:1,s:"Hollywood wax",t:"13.00",dur:45,p:42,dep:10,day:iso(back(3)),st:"done"},
+      {id:27,c:5,s:"Brow shape & tidy",t:"16.00",dur:20,p:16,dep:10,day:iso(back(4)),st:"done"},
+      {id:28,c:2,s:"Brazilian wax",t:"10.00",dur:40,p:36,dep:10,day:iso(back(4)),st:"done"},
+      {id:29,c:4,s:"Bikini wax",t:"15.00",dur:30,p:28,dep:10,day:iso(back(5)),st:"done"}
+    ],
+    requests:[
+      {id:31,name:"Sara Whitfield",phone:"07700 900222",s:"First visit — consultation & treatment",want:"Any afternoon this week",note:"Never waxed before, a bit nervous."},
+      {id:32,name:"Priya Shah",phone:"07700 900456",s:"Brazilian wax",want:"Saturday morning",note:""}
+    ],
+    closed:{}
+  };
+}
+var S=load()||seed();
+if(!S.clients) S=seed();
+
+/* ---------- helpers ---------- */
+function client(id){ return S.clients.filter(function(c){ return c.id===id; })[0]; }
+function dayAppts(k){ return S.appts.filter(function(a){ return a.day===k; }).sort(function(a,b){ return parseFloat(a.t)-parseFloat(b.t); }); }
+function takings(k){ return dayAppts(k).reduce(function(s,a){ return s+a.p; },0); }
+function nowSlot(){ var h=new Date().getHours(); return h+".00"; }
+
+var TABS=[["today","Today"],["week","Week"],["clients","Clients"],["requests","Inbox"],["money","Takings"],["settings","Studio"]];
+function tabs(){
+  var box=$("tabs"); box.innerHTML="";
+  TABS.forEach(function(t){
+    var b=document.createElement("button");
+    b.className="tab"+(S.view===t[0]?" on":"");
+    var badge=(t[0]==="requests"&&S.requests.length)?'<span style="position:absolute;top:8px;left:50%;margin-left:6px;background:#E8D5C4;color:#3A322E;font-size:9px;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center">'+S.requests.length+'</span>':"";
+    b.innerHTML='<div class="g" style="'+(t[0]==="today"?"border-radius:50%":t[0]==="clients"?"border-radius:11px 11px 4px 4px":"")+'"></div>'+t[1]+badge;
+    b.onclick=function(){ S.view=t[0]; save(); render(); };
+    box.appendChild(b);
+  });
+}
+
+/* ---------- views ---------- */
+var V={};
+
+V.today=function(){
+  var d=parseKey(S.dayKey), list=dayAppts(S.dayKey), now=nowSlot();
+  var rows=TIMES.map(function(tm){
+    var a=list.filter(function(x){ return x.t===tm; })[0];
+    if(!a) return '<div class="slotline"><div class="lbl" style="padding-top:22px">'+tm+'</div>'+
+      '<button class="free" data-fill="'+tm+'"><span>Free</span><span style="font-size:19px;color:#C9B8A4">+</span></button></div>';
+    var c=client(a.c);
+    var cls="appt"+(a.st==="done"?" done":(a.t===now?" now":""));
+    return '<div class="slotline"><div class="lbl" style="padding-top:22px">'+tm+'</div>'+
+      '<button class="'+cls+'" data-appt="'+a.id+'" style="text-align:left">'+
+        '<span style="display:flex;flex-direction:column;gap:3px;min-width:0">'+
+          '<span class="serif" style="font-size:18px">'+c.name+'</span>'+
+          '<span style="font-size:13px;opacity:.75">'+a.s+' · '+a.dur+' min</span></span>'+
+        '<span style="display:flex;align-items:center;gap:10px;flex:none">'+
+          (c.stamps>=9?'<span class="pill warn">Reward due</span>':'')+
+          (a.st==="done"?'<span class="pill">Paid</span>':'<span style="font-size:15px;font-weight:600">'+money(a.p-a.dep)+'</span>')+
+        '</span></button></div>';
+  }).join("");
+  return '<div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:18px">'+
+    '<div style="display:flex;gap:8px">'+
+      '<button class="btn btn-o btn-sm" data-day="-1">←</button>'+
+      '<button class="btn btn-o btn-sm" data-day="today">Today</button>'+
+      '<button class="btn btn-o btn-sm" data-day="1">→</button></div>'+
+    '<div style="display:flex;gap:10px;align-items:center">'+
+      '<span class="pill">'+list.length+' booked</span>'+
+      '<span class="pill">'+money(takings(S.dayKey))+' expected</span>'+
+      '<button class="btn btn-o btn-sm" id="closeday">'+(S.closed[S.dayKey]?"Reopen day":"Close day")+'</button></div>'+
+  '</div>'+
+  (S.closed[S.dayKey]?'<div class="card" style="margin-bottom:14px;border-color:#8A7361"><strong style="font-weight:600">This day is closed.</strong> Clients can\'t book it, and anyone already in the diary needs a call.</div>':'')+
+  '<div style="display:flex;flex-direction:column;gap:8px">'+rows+'</div>';
+};
+
+V.week=function(){
+  var start=d0(), days=[];
+  for(var i=0;i<14&&days.length<4;i++){ var d=shift(start,i); if(open(d)) days.push(d); }
+  var headRow='<div class="wcell" style="border:none;background:none"></div>'+days.map(function(d){
+    return '<button class="wcell" data-jump="'+iso(d)+'" style="flex-direction:column;gap:2px;min-height:46px;font-size:11px">'+
+      '<span class="serif" style="font-size:14px;color:#241F1C">'+d.toLocaleDateString("en-GB",{weekday:"short"})+'</span>'+shortDate(d)+'</button>';
+  }).join("");
+  var body=TIMES.map(function(tm){
+    return '<div class="wcell" style="border:none;background:none;justify-content:flex-end;padding-right:6px">'+tm+'</div>'+
+      days.map(function(d){
+        var k=iso(d);
+        if(S.closed[k]) return '<div class="wcell shut">closed</div>';
+        var a=dayAppts(k).filter(function(x){ return x.t===tm; })[0];
+        if(!a) return '<button class="wcell" data-new="'+k+'|'+tm+'">+</button>';
+        return '<button class="wcell full" data-appt="'+a.id+'">'+client(a.c).name.split(" ")[0]+'<br>'+a.s.split(" ")[0]+'</button>';
+      }).join("");
+  }).join("");
+  var load=days.map(function(d){ return dayAppts(iso(d)).length; });
+  return '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px">'+
+    '<span style="font-size:14px;color:#5C5148">Next four open days · '+load.reduce(function(a,b){return a+b;},0)+' appointments</span>'+
+    '<span class="pill">'+Math.round(load.reduce(function(a,b){return a+b;},0)/(days.length*TIMES.length)*100)+'% full</span></div>'+
+    '<div class="week">'+headRow+body+'</div>';
+};
+
+V.clients=function(){
+  return '<input class="field" id="csearch" placeholder="Search clients" style="margin-bottom:14px">'+
+    '<div id="clist" style="display:flex;flex-direction:column;gap:8px">'+clientRows("")+'</div>';
+};
+function clientRows(q){
+  q=q.toLowerCase();
+  var list=S.clients.filter(function(c){ return !q||c.name.toLowerCase().indexOf(q)>-1||c.phone.indexOf(q)>-1; });
+  if(!list.length) return '<p style="font-size:14px;color:#6E5B49">No client by that name. <strong style="font-weight:600">Add booking</strong> creates one.</p>';
+  return list.map(function(c){
+    return '<button class="card" data-client="'+c.id+'" style="display:flex;align-items:center;justify-content:space-between;gap:14px;text-align:left;min-height:74px">'+
+      '<span style="display:flex;flex-direction:column;gap:3px">'+
+        '<span class="serif" style="font-size:19px">'+c.name+'</span>'+
+        '<span style="font-size:13px;color:#6E5B49">'+c.phone+' · '+c.visits+' visits · since '+c.since+'</span></span>'+
+      '<span style="display:flex;gap:8px;align-items:center">'+
+        (c.plan?'<span class="pill on">Plan</span>':'')+
+        '<span class="pill'+(c.stamps>=9?' warn':'')+'">'+c.stamps+'/10</span></span></button>';
+  }).join("");
+}
+
+V.requests=function(){
+  if(!S.requests.length) return '<div class="card"><div class="serif" style="font-size:20px;margin-bottom:6px">Nothing waiting.</div><p style="font-size:14px;color:#5C5148;margin:0">New enquiries and booking requests land here.</p></div>';
+  return '<div style="display:flex;flex-direction:column;gap:10px">'+S.requests.map(function(r){
+    return '<div class="card">'+
+      '<div style="display:flex;justify-content:space-between;gap:14px;margin-bottom:10px">'+
+        '<span class="serif" style="font-size:20px">'+r.name+'</span>'+
+        '<span style="font-size:13px;color:#6E5B49">'+r.phone+'</span></div>'+
+      '<div style="font-size:15px;margin-bottom:4px">'+r.s+'</div>'+
+      '<div style="font-size:13.5px;color:#6E5B49;margin-bottom:'+(r.note?'8px':'16px')+'">Wants: '+r.want+'</div>'+
+      (r.note?'<div style="font-size:13.5px;line-height:1.6;color:#5C5148;border-left:2px solid #C9B8A4;padding-left:12px;margin-bottom:16px">'+r.note+'</div>':'')+
+      '<div style="display:flex;gap:10px;flex-wrap:wrap">'+
+        '<button class="btn btn-sm" data-offer="'+r.id+'">Offer a time</button>'+
+        '<button class="btn btn-o btn-sm" data-call="'+r.phone+'">Call</button>'+
+        '<button class="btn btn-o btn-sm" data-dismiss="'+r.id+'">Dismiss</button></div></div>';
+  }).join("")+'</div>';
+};
+
+V.money=function(){
+  var days=[]; for(var i=0;i<10&&days.length<5;i++){ var d=shift(d0(),-i); if(open(d)) days.push(d); }
+  days.reverse();
+  var max=Math.max.apply(null,days.map(function(d){ return takings(iso(d))||1; }));
+  var week=days.reduce(function(s,d){ return s+takings(iso(d)); },0);
+  var done=S.appts.filter(function(a){ return a.st==="done"; });
+  return '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px">'+
+    '<div class="card"><div class="lbl" style="margin-bottom:8px">Today</div><div class="serif" style="font-size:28px">'+money(takings(S.dayKey))+'</div></div>'+
+    '<div class="card"><div class="lbl" style="margin-bottom:8px">Last five open days</div><div class="serif" style="font-size:28px">'+money(week)+'</div></div>'+
+    '<div class="card"><div class="lbl" style="margin-bottom:8px">Average visit</div><div class="serif" style="font-size:28px">'+money(Math.round(week/Math.max(1,days.reduce(function(s,d){return s+dayAppts(iso(d)).length;},0))))+'</div></div>'+
+  '</div>'+
+  '<div class="card" style="margin-bottom:14px"><div class="lbl" style="margin-bottom:16px">Daily takings</div>'+
+    '<div style="display:flex;align-items:flex-end;gap:14px;height:150px">'+days.map(function(d){
+      var v=takings(iso(d));
+      return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;height:100%;justify-content:flex-end">'+
+        '<span style="font-size:12px;color:#6E5B49">'+money(v)+'</span>'+
+        '<div style="width:100%;background:#3A322E;height:'+Math.round((v/max)*100)+'%"></div>'+
+        '<span style="font-size:11px;color:#6E5B49">'+shortDate(d)+'</span></div>';
+    }).join("")+'</div></div>'+
+  '<div class="card"><div class="lbl" style="margin-bottom:12px">Deposits taken</div>'+
+    '<div class="kv"><span style="color:#6E5B49">Appointments completed</span><span>'+done.length+'</span></div>'+
+    '<div class="kv"><span style="color:#6E5B49">Deposits banked</span><span>'+money(done.length*10)+'</span></div>'+
+    '<div class="kv" style="border-bottom:1px solid #E0D2C2"><span style="color:#6E5B49">Balance taken in studio</span><span>'+money(done.reduce(function(s,a){ return s+(a.p-a.dep); },0))+'</span></div></div>';
+};
+
+V.settings=function(){
+  var days=["Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start">'+
+    '<div class="card"><div class="lbl" style="margin-bottom:14px">Opening hours</div>'+
+      days.map(function(d){ return '<div class="kv"><span style="color:#6E5B49">'+d+'</span><span>9.00 – 18.00</span></div>'; }).join("")+
+      '<div class="kv" style="border-bottom:1px solid #E0D2C2;color:#8A7361"><span>Sunday &amp; Monday</span><span>Closed</span></div></div>'+
+    '<div style="display:flex;flex-direction:column;gap:10px">'+
+      '<div class="card"><div class="lbl" style="margin-bottom:14px">Deposit</div>'+
+        '<div class="kv"><span style="color:#6E5B49">Amount</span><span>£10</span></div>'+
+        '<div class="kv"><span style="color:#6E5B49">Refund window</span><span>24 hours</span></div>'+
+        '<div class="kv" style="border-bottom:1px solid #E0D2C2"><span style="color:#6E5B49">Applied to</span><span>Every booking</span></div></div>'+
+      '<div class="card"><div class="lbl" style="margin-bottom:14px">Loyalty</div>'+
+        '<div class="kv"><span style="color:#6E5B49">5 stamps</span><span>25% off a visit</span></div>'+
+        '<div class="kv" style="border-bottom:1px solid #E0D2C2"><span style="color:#6E5B49">10 stamps</span><span>Visit free</span></div></div>'+
+      '<div class="card"><div class="lbl" style="margin-bottom:14px">Services</div>'+
+        '<div style="font-size:14px;color:#5C5148;line-height:1.7">'+SERVICES.length+' services · '+money(12)+' to '+money(42)+'</div></div>'+
+    '</div></div>';
+};
+
+/* ---------- aside ---------- */
+function aside(){
+  if(S.view==="week"||S.view==="money"||S.view==="requests") return "";
+  if(S.view==="clients"||S.view==="settings"){
+    var busiest=S.clients.slice().sort(function(a,b){ return b.visits-a.visits; })[0];
+    var due=S.clients.filter(function(c){ return c.stamps>=9; });
+    return '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding-top:18px">'+
+      '<div class="card"><div class="lbl" style="margin-bottom:6px">On the books</div><div class="serif" style="font-size:22px">'+S.clients.length+'</div>'+
+      '<div style="font-size:12.5px;color:#6E5B49;margin-top:3px">'+S.clients.filter(function(c){ return c.plan; }).length+' on a subscription</div></div>'+
+      '<div class="card"><div class="lbl" style="margin-bottom:6px">Rewards due</div><div class="serif" style="font-size:22px">'+due.length+'</div>'+
+      '<div style="font-size:12.5px;color:#6E5B49;margin-top:3px">'+(due.length?due.map(function(c){ return c.name.split(" ")[0]; }).join(", "):"None this month")+'</div></div>'+
+      '<div class="card"><div class="lbl" style="margin-bottom:6px">Most loyal</div><div class="serif" style="font-size:18px;line-height:1.25">'+busiest.name+'</div>'+
+      '<div style="font-size:12.5px;color:#6E5B49;margin-top:3px">'+busiest.visits+' visits · '+money(busiest.spend)+'</div></div></div>';
+  }
+  var list=dayAppts(S.dayKey), next=list.filter(function(a){ return a.st!=="done"; })[0];
+  return '<div style="padding-top:18px">'+
+    (next?
+      (function(){ var c=client(next.c);
+        return '<div class="card" style="background:#3A322E;border-color:#3A322E;color:#E8D5C4;padding:22px 24px;display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center">'+
+          '<div style="min-width:0">'+
+            '<div class="lbl-d" style="margin-bottom:9px">Up next · '+next.t+' · '+next.dur+' min</div>'+
+            '<div class="serif" style="font-size:26px;margin-bottom:4px">'+c.name+'</div>'+
+            '<div style="font-size:14px;color:#CBB49E">'+next.s+'</div>'+
+            (c.notes?'<div style="font-size:13.5px;line-height:1.6;color:#E8D5C4;border-left:2px solid #8A7361;padding-left:12px;margin-top:12px">'+c.notes+'</div>':'')+
+          '</div>'+
+          '<div style="display:flex;flex-direction:column;gap:8px;flex:none">'+
+            '<button class="btn btn-l btn-sm" data-arrive="'+next.id+'">Mark arrived</button>'+
+            '<button class="btn btn-sm" data-appt="'+next.id+'" style="background:transparent;border:1px solid rgba(232,213,196,.4);color:#E8D5C4">Open</button></div></div>';
+      })()
+      :'<div class="card"><div class="serif" style="font-size:20px;margin-bottom:4px">Nothing left today.</div><div style="font-size:13.5px;color:#6E5B49">'+list.length+' seen · '+money(takings(S.dayKey))+' taken.</div></div>')+
+  '</div>';
+}
+
+/* ---------- sheets ---------- */
+function closeSheet(){ $("host").innerHTML=""; }
+function sheet(html){
+  $("host").innerHTML='<div class="sheetwrap" id="sw"><div class="sheet"><div class="grab"></div>'+html+'</div></div>';
+  $("sw").onclick=function(e){ if(e.target===this) closeSheet(); };
+}
+var draft={};
+function timeChips(dayKey,sel){
+  return TIMES.map(function(t){
+    var taken=dayAppts(dayKey).some(function(a){ return a.t===t&&a.id!==draft.id; });
+    return '<button class="chip" data-time="'+t+'" aria-pressed="'+(sel===t)+'"'+(taken?' disabled style="opacity:.4;text-decoration:line-through"':'')+'>'+t+'</button>';
+  }).join("");
+}
+function apptSheet(a){
+  var c=client(a.c);
+  sheet('<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:20px">'+
+    '<div><div class="lbl" style="margin-bottom:10px">'+longDate(parseKey(a.day))+' · '+a.t+'</div>'+
+    '<div class="serif" style="font-size:30px;margin-bottom:4px">'+c.name+'</div>'+
+    '<div style="font-size:15px;color:#5C5148">'+a.s+' · '+a.dur+' min · '+money(a.p)+'</div></div>'+
+    '<div style="display:flex;gap:8px"><span class="pill'+(c.stamps>=9?' warn':'')+'">'+c.stamps+'/10 stamps</span>'+
+    (c.plan?'<span class="pill on">On a plan</span>':'')+'</div></div>'+
+    (c.notes?'<div class="card" style="margin-bottom:18px"><div class="lbl" style="margin-bottom:8px">Notes</div><div style="font-size:14.5px;line-height:1.7">'+c.notes+'</div></div>':'')+
+    '<div class="kv"><span style="color:#6E5B49">Deposit paid</span><span>'+money(a.dep)+'</span></div>'+
+    '<div class="kv"><span style="color:#6E5B49">Due in studio</span><span>'+money(a.p-a.dep)+'</span></div>'+
+    '<div class="kv" style="border-bottom:1px solid #E0D2C2"><span style="color:#6E5B49">Phone</span><span>'+c.phone+'</span></div>'+
+    '<div class="lbl" style="margin:22px 0 10px">Move to another time on '+shortDate(parseKey(a.day))+'</div>'+
+    '<div style="display:flex;flex-wrap:wrap;gap:8px" id="chips">'+timeChips(a.day,a.t)+'</div>'+
+    '<div style="display:flex;gap:10px;margin-top:24px;flex-wrap:wrap">'+
+      (a.st==="done"?'<button class="btn btn-o btn-sm" data-undone="'+a.id+'">Mark unpaid</button>':'<button class="btn btn-sm" data-arrive="'+a.id+'">Mark arrived &amp; paid</button>')+
+      '<button class="btn btn-o btn-sm" data-call="'+c.phone+'">Call</button>'+
+      '<button class="btn btn-o btn-sm" data-cancelappt="'+a.id+'">Cancel visit</button>'+
+      '<button class="btn btn-o btn-sm" id="sclose" style="margin-left:auto">Close</button></div>');
+  draft={id:a.id,time:a.t};
+  bindSheet();
+  $("sclose").onclick=closeSheet;
+}
+function newSheet(dayKey,time){
+  draft={id:null,day:dayKey,time:time||"",cid:S.clients[0].id,svc:0};
+  sheet('<div class="lbl" style="margin-bottom:10px">New booking</div>'+
+    '<div class="serif" style="font-size:28px;margin-bottom:20px">'+longDate(parseKey(dayKey))+'</div>'+
+    '<div class="lbl" style="margin-bottom:10px">Client</div>'+
+    '<select class="field" id="n-client" style="margin-bottom:18px">'+
+      S.clients.map(function(c){ return '<option value="'+c.id+'">'+c.name+' · '+c.phone+'</option>'; }).join("")+
+      '<option value="new">+ New client</option></select>'+
+    '<div id="newfields" class="hide" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px">'+
+      '<input class="field" id="n-name" placeholder="Name"><input class="field" id="n-phone" placeholder="Phone"></div>'+
+    '<div class="lbl" style="margin-bottom:10px">Treatment</div>'+
+    '<select class="field" id="n-svc" style="margin-bottom:18px">'+
+      SERVICES.map(function(s,i){ return '<option value="'+i+'">'+s.n+' · '+s.d+' min · '+money(s.p)+'</option>'; }).join("")+'</select>'+
+    '<div class="lbl" style="margin-bottom:10px">Time</div>'+
+    '<div style="display:flex;flex-wrap:wrap;gap:8px" id="chips">'+timeChips(dayKey,draft.time)+'</div>'+
+    '<div style="display:flex;gap:10px;margin-top:24px">'+
+      '<button class="btn btn-o btn-sm" id="sclose">Cancel</button>'+
+      '<button class="btn btn-sm" id="ssave" style="flex:1">Add to the diary</button></div>');
+  bindSheet();
+  $("sclose").onclick=closeSheet;
+  $("n-client").onchange=function(){ $("newfields").className=this.value==="new"?"":"hide"; };
+  $("ssave").onclick=function(){
+    if(!draft.time) return;
+    var sel=$("n-client").value, cid;
+    if(sel==="new"){
+      var nm=$("n-name").value.trim()||"New client";
+      cid=Date.now();
+      S.clients.push({id:cid,name:nm,phone:$("n-phone").value.trim(),since:new Date().toLocaleDateString("en-GB",{month:"short",year:"numeric"}),stamps:0,plan:null,notes:"",visits:0,spend:0});
+    } else cid=+sel;
+    var sv=SERVICES[+$("n-svc").value];
+    S.appts.push({id:Date.now()+1,c:cid,s:sv.n,t:draft.time,dur:sv.d,p:sv.p,dep:10,day:dayKey,st:"due"});
+    save(); closeSheet(); render();
+  };
+}
+function clientSheet(c){
+  var hist=S.appts.filter(function(a){ return a.c===c.id; });
+  sheet('<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:20px">'+
+    '<div><div class="lbl" style="margin-bottom:10px">Client since '+c.since+'</div>'+
+    '<div class="serif" style="font-size:30px;margin-bottom:4px">'+c.name+'</div>'+
+    '<div style="font-size:15px;color:#5C5148">'+c.phone+'</div></div>'+
+    '<span class="pill'+(c.stamps>=9?' warn':'')+'">'+c.stamps+'/10 stamps</span></div>'+
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px">'+
+      '<div class="card"><div class="lbl" style="margin-bottom:6px">Visits</div><div class="serif" style="font-size:24px">'+c.visits+'</div></div>'+
+      '<div class="card"><div class="lbl" style="margin-bottom:6px">Spent</div><div class="serif" style="font-size:24px">'+money(c.spend)+'</div></div>'+
+      '<div class="card"><div class="lbl" style="margin-bottom:6px">Plan</div><div class="serif" style="font-size:16px;line-height:1.35">'+(c.plan||"None")+'</div></div></div>'+
+    '<div class="lbl" style="margin-bottom:8px">Notes for treatment</div>'+
+    '<textarea class="field" id="cnotes" rows="3" style="margin-bottom:8px;resize:vertical">'+c.notes+'</textarea>'+
+    '<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px"><button class="btn btn-o btn-sm" id="savenotes">Save notes</button>'+
+    '<span id="notesaved" style="font-size:13px;color:#6E5B49"></span></div>'+
+    '<div class="lbl" style="margin-bottom:8px">In the diary</div>'+
+    (hist.length?hist.map(function(a){
+      return '<div class="kv"><span>'+shortDate(parseKey(a.day))+' · '+a.t+' · '+a.s+'</span><span style="color:#6E5B49">'+money(a.p)+'</span></div>';
+    }).join(""):'<div style="font-size:14px;color:#6E5B49">Nothing booked.</div>')+
+    '<div style="display:flex;gap:10px;margin-top:22px;flex-wrap:wrap">'+
+      '<button class="btn btn-sm" data-bookfor="'+c.id+'">Book them in</button>'+
+      '<button class="btn btn-o btn-sm" data-call="'+c.phone+'">Call</button>'+
+      '<button class="btn btn-o btn-sm" data-stamp="'+c.id+'">Add a stamp</button>'+
+      '<button class="btn btn-o btn-sm" id="sclose" style="margin-left:auto">Close</button></div>');
+  $("sclose").onclick=closeSheet;
+  $("savenotes").onclick=function(){ c.notes=$("cnotes").value.trim(); save(); $("notesaved").textContent="Saved."; render(); };
+  bindSheet();
+}
+function bindSheet(){
+  [].forEach.call(document.querySelectorAll("[data-time]"),function(b){
+    b.onclick=function(){
+      if(b.disabled) return;
+      draft.time=b.dataset.time;
+      [].forEach.call(document.querySelectorAll("[data-time]"),function(x){ x.setAttribute("aria-pressed",String(x.dataset.time===draft.time)); });
+      if(draft.id){ S.appts.forEach(function(a){ if(a.id===draft.id) a.t=draft.time; }); save(); render(); }
+    };
+  });
+  wire(document);
+}
+
+/* ---------- wiring ---------- */
+function wire(scope){
+  var q=function(s){ return [].slice.call(scope.querySelectorAll(s)); };
+  q("[data-appt]").forEach(function(b){ b.onclick=function(){ var a=S.appts.filter(function(x){ return x.id===+b.dataset.appt; })[0]; if(a) apptSheet(a); }; });
+  q("[data-client]").forEach(function(b){ b.onclick=function(){ clientSheet(client(+b.dataset.client)); }; });
+  q("[data-fill]").forEach(function(b){ b.onclick=function(){ newSheet(S.dayKey,b.dataset.fill); }; });
+  q("[data-new]").forEach(function(b){ b.onclick=function(){ var p=b.dataset.new.split("|"); newSheet(p[0],p[1]); }; });
+  q("[data-jump]").forEach(function(b){ b.onclick=function(){ S.dayKey=b.dataset.jump; S.view="today"; save(); render(); }; });
+  q("[data-day]").forEach(function(b){ b.onclick=function(){
+    if(b.dataset.day==="today"){ S.dayKey=iso(nextOpen(0)); }
+    else { var d=shift(parseKey(S.dayKey),+b.dataset.day); while(!open(d)) d=shift(d,+b.dataset.day); S.dayKey=iso(d); }
+    save(); render(); }; });
+  q("[data-arrive]").forEach(function(b){ b.onclick=function(){
+    var a=S.appts.filter(function(x){ return x.id===+b.dataset.arrive; })[0];
+    a.st="done"; var c=client(a.c); c.stamps=Math.min(10,c.stamps+1); c.visits++; c.spend+=a.p;
+    save(); closeSheet(); render(); }; });
+  q("[data-undone]").forEach(function(b){ b.onclick=function(){
+    var a=S.appts.filter(function(x){ return x.id===+b.dataset.undone; })[0];
+    a.st="due"; var c=client(a.c); c.stamps=Math.max(0,c.stamps-1); c.visits=Math.max(0,c.visits-1); c.spend=Math.max(0,c.spend-a.p);
+    save(); closeSheet(); render(); }; });
+  q("[data-cancelappt]").forEach(function(b){ b.onclick=function(){
+    S.appts=S.appts.filter(function(x){ return x.id!==+b.dataset.cancelappt; }); save(); closeSheet(); render(); }; });
+  q("[data-stamp]").forEach(function(b){ b.onclick=function(){ var c=client(+b.dataset.stamp); c.stamps=Math.min(10,c.stamps+1); save(); clientSheet(c); }; });
+  q("[data-bookfor]").forEach(function(b){ b.onclick=function(){ closeSheet(); newSheet(S.dayKey,""); setTimeout(function(){ $("n-client").value=b.dataset.bookfor; },0); }; });
+  q("[data-dismiss]").forEach(function(b){ b.onclick=function(){ S.requests=S.requests.filter(function(r){ return r.id!==+b.dataset.dismiss; }); save(); render(); }; });
+  q("[data-offer]").forEach(function(b){ b.onclick=function(){
+    var r=S.requests.filter(function(x){ return x.id===+b.dataset.offer; })[0];
+    S.requests=S.requests.filter(function(x){ return x.id!==r.id; });
+    var exists=S.clients.filter(function(c){ return c.phone===r.phone; })[0];
+    if(!exists){ S.clients.push({id:Date.now(),name:r.name,phone:r.phone,since:new Date().toLocaleDateString("en-GB",{month:"short",year:"numeric"}),stamps:0,plan:null,notes:r.note,visits:0,spend:0}); }
+    save(); newSheet(iso(nextOpen(1)),"");
+    setTimeout(function(){
+      var c=S.clients.filter(function(x){ return x.phone===r.phone; })[0];
+      if(c&&$("n-client")) $("n-client").value=c.id;
+      var i=SERVICES.map(function(s){ return s.n; }).indexOf(r.s);
+      if(i>-1&&$("n-svc")) $("n-svc").value=i;
+    },0);
+  }; });
+  q("[data-call]").forEach(function(b){ b.onclick=function(){ location.href="tel:"+b.dataset.call.replace(/\s/g,""); }; });
+  q("[data-tab]").forEach(function(b){ b.onclick=function(){ S.view=b.dataset.tab; save(); render(); }; });
+  if(scope.getElementById&&scope.getElementById("closeday")) scope.getElementById("closeday").onclick=function(){
+    if(S.closed[S.dayKey]) delete S.closed[S.dayKey]; else S.closed[S.dayKey]=true; save(); render(); };
+  if(scope.getElementById&&scope.getElementById("csearch")) scope.getElementById("csearch").oninput=function(){
+    $("clist").innerHTML=clientRows(this.value); wire(document); };
+}
+
+/* ---------- render ---------- */
+var TITLES={today:"Diary",week:"The week",clients:"Clients",requests:"Inbox",money:"Takings",settings:"Studio"};
+function render(){
+  tabs();
+  $("ttl").textContent=TITLES[S.view];
+  $("sub").textContent = S.view==="today" ? longDate(parseKey(S.dayKey))
+    : S.view==="clients" ? S.clients.length+" on the books"
+    : S.view==="requests" ? S.requests.length+" waiting"
+    : S.view==="money" ? "Deposits and balances" : "";
+  $("view").innerHTML=V[S.view]();
+  $("aside").innerHTML=aside();
+  wire(document);
+}
+function tick(){
+  var n=new Date();
+  $("clock").textContent=n.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});
+}
+$("quick").onclick=function(){ newSheet(S.dayKey,""); };
+$("clock").onclick=function(){ closeSheet(); S.view="today"; S.dayKey=iso(nextOpen(0)); save(); render(); };
+tick(); setInterval(tick,20000);
+render();
+
+/* add to home screen */
+(function(){
+  var standalone = window.navigator.standalone || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
+  var dismissed = false;
+  try{ dismissed = localStorage.getItem("amai_studio_install")==="off"; }catch(e){}
+  if(standalone||dismissed) return;
+  var deferred=null;
+  window.addEventListener("beforeinstallprompt",function(e){
+    e.preventDefault(); deferred=e;
+    $("install-how").textContent="Install it as an app — it opens full screen, without the browser bars.";
+  });
+  setTimeout(function(){ $("install").className=""; },1200);
+  $("install-go").onclick=function(){
+    if(deferred){ deferred.prompt(); deferred=null; $("install").className="hide"; return; }
+    $("install-how").innerHTML='Tap the <strong style="font-weight:600;color:#E8D5C4">Share</strong> icon in Safari, scroll down, then choose <strong style="font-weight:600;color:#E8D5C4">Add to Home Screen</strong>.';
+    $("install-go").className="hide";
+  };
+  $("install-no").onclick=function(){
+    $("install").className="hide";
+    try{ localStorage.setItem("amai_studio_install","off"); }catch(e){}
+  };
+})();
+</script>
+
+
+</body></html>
