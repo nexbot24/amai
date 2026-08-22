@@ -38,7 +38,7 @@ def extract():
                 with open(out_name, 'wb') as f:
                     f.write(base64.b64decode(data_str))
 
-    process_manifest('/Users/jd/Downloads/Amai Landing (standalone).html')
+    process_manifest('/Users/jd/Downloads/Amai Landing (standalone)-2.html')
     process_manifest('/Users/jd/Downloads/Amai Mobile (standalone).html')
 
     def process_file(source_filename, dest_filename):
@@ -65,7 +65,7 @@ def extract():
         with open(dest_filename, 'w') as f:
             f.write(template)
 
-    process_file('/Users/jd/Downloads/Amai Landing (standalone).html', 'index.html')
+    process_file('/Users/jd/Downloads/Amai Landing (standalone)-2.html', 'index.html')
     process_file('/Users/jd/Downloads/Amai Mobile (standalone).html', 'mobile.html')
 
 if __name__ == '__main__':
