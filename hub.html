@@ -146,6 +146,14 @@ button{font-family:Mulish,sans-serif}
 
 <template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#3A322E"/><text x="50" y="62" font-family="serif" font-size="34" fill="#E8D5C4" text-anchor="middle">A</text></svg></template>
 
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const supabaseUrl = 'https://tphyrmweauzfletdlqvi.supabase.co';
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwaHlybXdlYXV6ZmxldGRscXZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0NTIxOTQsImV4cCI6MjEwMzAyODE5NH0.Z_utKsxYquCoL2LfTjjL8QFB1tnLJZW9j3El7Sykk8o';
+  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+</script>
+
 <script>
 var $=function(id){return document.getElementById(id);};
 var TREATMENTS=[
