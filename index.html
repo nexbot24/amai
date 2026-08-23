@@ -118,14 +118,6 @@ section[id]{scroll-margin-top:84px}
   const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 </script>
 
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-  const supabaseUrl = 'https://tphyrmweauzfletdlqvi.supabase.co';
-  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwaHlybXdlYXV6ZmxldGRscXZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0NTIxOTQsImV4cCI6MjEwMzAyODE5NH0.Z_utKsxYquCoL2LfTjjL8QFB1tnLJZW9j3El7Sykk8o';
-  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-</script>
-
 </head>
 <body>
 
@@ -590,7 +582,6 @@ function showStep(){
   renderTracker(); syncNext();
 }
 
-async 
 async function confirm(how){
   var name=$("f-name").value.trim()||"Thank you";
   var email = $("f-contact").value.trim();
