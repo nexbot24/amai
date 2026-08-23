@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About — Amai</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Mulish:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;font-family:Mulish,sans-serif;color:#241F1C;background:#F7F1EA}
+html{scroll-behavior:smooth}
+a{color:#E8D5C4;text-decoration:none}
+.wrap{max-width:1120px;margin:0 auto;padding:100px 40px}
+.lbl{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#8A7361}
+.h2{font-family:Marcellus,serif;font-size:40px;font-weight:400;line-height:1.2;margin:0}
+.btn{display:inline-flex;align-items:center;justify-content:center;border:none;cursor:pointer;font-family:Marcellus,serif;font-size:16px;padding:15px 34px;border-radius:25px 25px 0 0;background:#E8D5C4;color:#3A322E}
+.btn:hover{background:#F7F1EA}
+.ghost{background:transparent;color:#E8D5C4;border:1px solid rgba(232,213,196,.45)}
+.ghost:hover{border-color:#E8D5C4}
+.ph{background:#EFE5D8;background-image:repeating-linear-gradient(45deg,rgba(138,115,97,.13) 0 1px,transparent 1px 9px);display:flex;align-items:flex-end;padding:16px;font-family:monospace;font-size:10.5px;color:#6E5B49}
+.drop::first-letter{font-family:Marcellus,serif;font-size:70px;line-height:.8;float:left;padding:5px 13px 0 0;color:#3A322E}
+@media (max-width:860px){
+  .wrap{padding:64px 22px}
+  .h2{font-size:30px}
+  .split,.split3,.two{grid-template-columns:1fr!important}
+  .nav-links{display:none!important}
+  .hero-title{font-size:44px!important}
+  .tall{min-height:300px!important}
+  .pad-in{padding:56px 22px!important}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV (shared with the landing page) -->
+<div style="position:sticky;top:0;z-index:10;background:#3A322E;border-bottom:1px solid rgba(232,213,196,.14)">
+  <div style="max-width:1120px;margin:0 auto;padding:22px 40px;display:flex;align-items:center;justify-content:space-between">
+    <a href="amai-website.html" style="display:flex;align-items:center;gap:16px">
+      <div style="width:15px;height:21px;border:1.5px solid #E8D5C4;border-bottom:none;border-radius:999px 999px 0 0"></div>
+      <div style="width:1px;height:22px;background:rgba(232,213,196,.3)"></div>
+      <div style="font-family:Marcellus,serif;font-size:19px;letter-spacing:.3em;color:#E8D5C4">AMAI</div>
+    </a>
+    <div class="nav-links" style="display:flex;align-items:center;gap:32px;font-size:12px;letter-spacing:.18em;text-transform:uppercase">
+      <a href="about.html" style="color:#CBB49E">About</a>
+      <a href="services.html" style="color:#CBB49E">Treatments</a>
+      <a href="index.html#studio" style="color:#CBB49E">How it works</a>
+      <a href="contact.html" style="color:#CBB49E">Contact</a>
+      <a href="hub.html" style="color:#CBB49E">Login</a>
+      <a href="index.html#book" style="color:#3A322E;background:#E8D5C4;padding:12px 26px;border-radius:20px 20px 0 0;font-family:Marcellus,serif;font-size:15px;letter-spacing:.02em;text-transform:none">Book a visit</a>
+    </div>
+  </div>
+</div>
+
+<!-- OPENING: statement over a full-bleed image band -->
+<div style="background:#3A322E;color:#E8D5C4;position:relative">
+  <div class="wrap" style="padding-top:110px;padding-bottom:0">
+    <div class="lbl" style="color:#B39C88;margin-bottom:30px">About Amai</div>
+    <h1 class="hero-title" style="font-family:Marcellus,serif;font-weight:400;font-size:76px;line-height:1.05;margin:0 0 40px;max-width:15ch">Care Beyond Appearance</h1>
+    <p style="font-family:Marcellus,serif;font-size:26px;line-height:1.5;margin:0 0 72px;max-width:26ch;color:#F7F1EA">AMAI is a luxury beauty studio focused on considered treatments, privacy and long-term care.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;height:280px">
+    <div style="overflow:hidden"><img src="images/wax-pot.jpg" alt="Warm wax poured from a spatula" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+    <div style="overflow:hidden"><img src="images/wax-drip.jpg" alt="Wax beads on a stone dish" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+    <div style="background:#241F1C;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px">
+      <div style="width:26px;height:36px;border:1.5px solid #B39C88;border-bottom:none;border-radius:999px 999px 0 0"></div>
+      <span class="lbl" style="color:#8A7361">Care, unhurried.</span>
+    </div>
+  </div>
+</div>
+
+<!-- TWO BELIEFS: the remaining opening copy, set as a pair -->
+<div style="background:#F7F1EA">
+  <div class="wrap two" style="display:grid;grid-template-columns:1fr 1fr;gap:72px;padding-bottom:0">
+    <div style="border-top:1px solid #C9B8A4;padding-top:28px">
+      <div class="lbl" style="margin-bottom:18px">What we believe</div>
+      <p style="font-size:16.5px;line-height:1.85;color:#5C5148;margin:0">We believe self-care is not only about outward appearance, but also about confidence, comfort and feeling good within yourself. AMAI's approach is centred around making you feel well cared for, comfortable and confident in your own skin.</p>
+    </div>
+    <div style="border-top:1px solid #C9B8A4;padding-top:28px">
+      <div class="lbl" style="margin-bottom:18px">How we work</div>
+      <p style="font-size:16.5px;line-height:1.85;color:#5C5148;margin:0">At AMAI, every treatment is carried out with purpose, attention to detail and respect for the individual.</p>
+    </div>
+  </div>
+</div>
+
+<!-- THE VISION: roadmap -->
+<div style="background:#F7F1EA">
+  <div class="wrap">
+    <div class="split" style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:end;margin-bottom:52px">
+      <div>
+        <div class="lbl" style="margin-bottom:22px">The vision</div>
+        <h2 class="h2" style="max-width:16ch">More than a treatment. A brand of self-care.</h2>
+      </div>
+      <p style="font-size:15.5px;line-height:1.8;color:#5C5148;margin:0;max-width:52ch">AMAI begins with professional waxing — precise, private, discreet — and expands into skin, body and intimate care. Each treatment is designed with the same care as the first appointment.</p>
+    </div>
+    <div class="split3" style="display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid #C9B8A4">
+      <div style="padding:26px 26px 0 0;position:relative">
+        <div style="position:absolute;top:-4.5px;left:0;width:8px;height:8px;background:#3A322E;border-radius:50%"></div>
+        <div class="lbl" style="margin-bottom:14px">01</div>
+        <div style="font-family:Marcellus,serif;font-size:26px;margin-bottom:9px">Waxing</div>
+        <div class="lbl" style="color:#6E5B49;line-height:1.7">Current signature service</div>
+      </div>
+      <div style="padding:26px 26px 0;position:relative;border-left:1px solid #E0D2C2">
+        <div style="position:absolute;top:-4.5px;left:-4px;width:8px;height:8px;background:#B39C88;border-radius:50%"></div>
+        <div class="lbl" style="margin-bottom:14px">02</div>
+        <div style="font-family:Marcellus,serif;font-size:26px;margin-bottom:9px">Intimate Care</div>
+        <div class="lbl" style="color:#6E5B49;line-height:1.7">Sensitivity-first</div>
+      </div>
+      <div style="padding:26px 0 0 26px;position:relative;border-left:1px solid #E0D2C2">
+        <div style="position:absolute;top:-4.5px;left:-4px;width:8px;height:8px;background:#F7F1EA;border:1px solid #B39C88;border-radius:50%"></div>
+        <div class="lbl" style="margin-bottom:14px">03</div>
+        <div style="font-family:Marcellus,serif;font-size:26px;margin-bottom:9px">Body Treatments</div>
+        <div class="lbl" style="color:#6E5B49;line-height:1.7">Coming soon</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PHILOSOPHY: essay against a full-height image -->
+<div style="background:#E8D5C4;color:#241F1C">
+  <div class="split" style="display:grid;grid-template-columns:1fr 1.15fr;align-items:stretch">
+    <div class="ph tall" style="min-height:560px">linen, beeswax &amp; lavender · warm daylight</div>
+    <div class="pad-in" style="display:flex;flex-direction:column;justify-content:center;padding:96px 72px">
+      <div class="lbl" style="color:#6E5B49;margin-bottom:22px">Our philosophy</div>
+      <h2 class="h2" style="font-size:36px;margin-bottom:30px;max-width:20ch">A slower, more considered approach.</h2>
+      <p class="drop" style="font-size:16px;line-height:1.85;color:#4A3F36;margin:0 0 24px;max-width:56ch">At AMAI, we believe self-care is about more than how you look. While our treatments are designed to help you feel confident on the outside, we place equal importance on how you feel within yourself.</p>
+      <p style="font-size:16px;line-height:1.85;color:#4A3F36;margin:0;max-width:56ch">From the way you are welcomed to the care, privacy and attention you receive throughout your treatment, everything at AMAI is considered to help you leave feeling comfortable, confident and genuinely good in yourself.</p>
+    </div>
+  </div>
+</div>
+
+<!-- VISIT AMAI -->
+<div style="background:#3A322E;color:#E8D5C4">
+  <div class="wrap split" style="display:grid;grid-template-columns:1.2fr 1fr;gap:64px;align-items:end;padding-top:110px;padding-bottom:110px">
+    <div>
+      <div class="lbl" style="color:#B39C88;margin-bottom:26px">Visit Amai</div>
+      <h2 class="h2" style="font-size:52px;max-width:18ch">Where beauty, comfort and confidence come together.</h2>
+    </div>
+    <div>
+      <p style="font-size:15.5px;line-height:1.8;color:#CBB49E;margin:0 0 34px;max-width:46ch">Appointments are by booking only. If you have any questions, please submit an enquiry and we'll aim to get back to you as soon as possible.</p>
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        <a href="amai-website.html#book" class="btn">Book appointment</a>
+        <a href="mailto:hello@amai" class="btn ghost">Send enquiry</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER (shared with the landing page) -->
+<div style="background:#241F1C;color:#B39C88">
+  <div style="max-width:1120px;margin:0 auto;padding:64px 40px 34px">
+    <div class="split3" style="display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:56px;padding-bottom:44px;border-bottom:1px solid rgba(232,213,196,.16)">
+      <div>
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
+          <div style="width:13px;height:18px;border:1px solid #E8D5C4;border-bottom:none;border-radius:999px 999px 0 0"></div>
+          <span style="font-family:Marcellus,serif;font-size:17px;letter-spacing:.3em;color:#E8D5C4">AMAI</span>
+        </div>
+        <p style="font-family:Marcellus,serif;font-size:19px;line-height:1.5;color:#E8D5C4;margin:0">Care, unhurried.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;font-size:14px;line-height:1.6">
+        <span style="font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:#8A7361">Studio</span>
+        <span style="color:#CBB49E">North London<br>(full address on booking)</span>
+        <span style="color:#CBB49E">Tuesday to Saturday<br>9.00–18.00</span>
+        <span style="color:#CBB49E">£10 deposit, refundable<br>up to 24 hours before</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;font-size:14px;line-height:1.6">
+        <span style="font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:#8A7361">Get in touch</span>
+        <a href="tel:+442000000000" style="color:#E8D5C4;border-bottom:1px solid rgba(232,213,196,.3);align-self:flex-start;padding-bottom:3px">020 0000 0000</a>
+        <a href="amai-website.html#book" style="color:#E8D5C4;border-bottom:1px solid rgba(232,213,196,.3);align-self:flex-start;padding-bottom:3px">Book a visit</a>
+        <span style="color:#CBB49E">Instagram @amai</span>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;gap:24px;padding-top:22px;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase">
+      <span>Amai · Beauty · Skin · Body</span>
+      <span>© 2026 Amai</span>
+    </div>
+  </div>
+</div>
+
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#3A322E"/><text x="50" y="62" font-family="serif" font-size="36" fill="#E8D5C4" text-anchor="middle">A</text></svg></template>
+</body>
+</html>
