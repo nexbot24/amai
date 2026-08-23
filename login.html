@@ -234,6 +234,14 @@ a:hover{color:#F7F1EA}
 
 <template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#3A322E"/><circle cx="50" cy="38" r="13" fill="none" stroke="#E8D5C4" stroke-width="4"/><path d="M26 82v-6a24 24 0 0 1 48 0v6" fill="none" stroke="#E8D5C4" stroke-width="4"/></svg></template>
 
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const supabaseUrl = 'https://tphyrmweauzfletdlqvi.supabase.co';
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwaHlybXdlYXV6ZmxldGRscXZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0NTIxOTQsImV4cCI6MjEwMzAyODE5NH0.Z_utKsxYquCoL2LfTjjL8QFB1tnLJZW9j3El7Sykk8o';
+  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+</script>
+
 <script>
 var $=function(i){return document.getElementById(i);};
 var KNOWN={
@@ -271,9 +279,28 @@ $("phone").oninput=function(){
 $("phone").onkeydown=function(e){ if(e.key==="Enter"&&phoneOk()) lookup(); };
 $("look").onclick=lookup;
 
-function lookup(){
+
+async function lookup(){
   st.phone=$("phone").value.trim();
-  st.account=KNOWN[digits(st.phone)]||null;
+  var btn = $("look");
+  var oldText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Checking...";
+  
+  let clients = [];
+  try {
+    let res = await supabase.from('clients').select('id, name').eq('phone', st.phone);
+    clients = res.data || [];
+  } catch(e) {}
+  
+  btn.textContent = oldText;
+  btn.disabled = false;
+  
+  st.account = (clients && clients.length > 0) ? clients[0] : null;
+  if (!st.account && KNOWN[digits(st.phone)]) {
+      st.account = KNOWN[digits(st.phone)];
+  }
+
   st.isNew=!st.account;
   if(st.isNew){
     st.step=2; st.name="";
@@ -285,6 +312,7 @@ function lookup(){
     st.step=2;
     sendCode();
   }
+}
 }
 
 /* ---- step 2 (new): name ---- */
@@ -352,8 +380,25 @@ $("resend").onclick=function(){ if(!this.disabled){ otpReset(); $("otp").firstCh
 $("back-2").onclick=function(){ clearInterval(st.timer); st.step=1; st.isNew=false; panel("p-phone"); $("phone").focus(); };
 $("verify").onclick=function(){ doVerify(); };
 
-function doVerify(){
+
+async function doVerify(){
   if(code().length!==6){ $("code-err").textContent="Enter all six digits."; return; }
+  clearInterval(st.timer);
+  
+  var btn = $("verify");
+  var oldText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Verifying...";
+  
+  if (st.isNew) {
+    try {
+      var email = st.phone || "unknown@amai";
+      await supabase.from('clients').insert([{ name: st.name, email: email, phone: st.phone }]);
+    } catch(e) {}
+  }
+  
+  signIn();
+}
   clearInterval(st.timer);
   signIn();
 }
