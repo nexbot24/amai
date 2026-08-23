@@ -346,9 +346,10 @@ async function sendCode(){
   else if (!cleanPhone.startsWith("+")) cleanPhone = "+" + cleanPhone;
   
   try {
-      await sb.auth.signInWithOtp({ phone: cleanPhone });
+      const { data, error } = await sb.auth.signInWithOtp({ phone: cleanPhone });
+      if (error) alert("SMS Error: " + error.message);
   } catch(e) {
-      console.error(e);
+      alert("Error: " + e);
   }
 
   var s=59; $("timer").textContent="0:59";
