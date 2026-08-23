@@ -151,7 +151,7 @@ button{font-family:Mulish,sans-serif}
 <script>
   const supabaseUrl = 'https://tphyrmweauzfletdlqvi.supabase.co';
   const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwaHlybXdlYXV6ZmxldGRscXZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0NTIxOTQsImV4cCI6MjEwMzAyODE5NH0.Z_utKsxYquCoL2LfTjjL8QFB1tnLJZW9j3El7Sykk8o';
-  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+  const sb = window.supabase.createClient(supabaseUrl, supabaseKey);
 </script>
 
 <script>
@@ -599,7 +599,7 @@ async function fetchMonthBookings(v) {
   var dim = new Date(y, m+1, 0).getDate();
   var endStr = y + "-" + String(m+1).padStart(2,'0') + "-" + String(dim).padStart(2,'0');
 
-  var { data } = await supabase.from('bookings')
+  var { data } = await sb.from('bookings')
     .select('appointment_date, appointment_time, treatment_name')
     .gte('appointment_date', startStr)
     .lte('appointment_date', endStr)
@@ -718,16 +718,16 @@ function bindBookingModal(cta){
       toast("Moved to "+longDate(parseKey(draft.dateKey))+", "+draft.time+".");
     } else {
       var email = S.phone || "unknown@amai"; // Temporary fallback
-      let { data: clients } = await supabase.from('clients').select('id').eq('email', email);
+      let { data: clients } = await sb.from('clients').select('id').eq('email', email);
       let clientId;
       if (!clients || clients.length === 0) {
-        const { data: newClient } = await supabase.from('clients').insert([{ name: S.name, email: email, phone: S.phone }]).select().single();
+        const { data: newClient } = await sb.from('clients').insert([{ name: S.name, email: email, phone: S.phone }]).select().single();
         if(newClient) clientId = newClient.id;
       } else {
         clientId = clients[0].id;
       }
       if(clientId) {
-        await supabase.from('bookings').insert([{
+        await sb.from('bookings').insert([{
           client_id: clientId,
           treatment_name: draft.treat,
           appointment_date: draft.dateKey,
