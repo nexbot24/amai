@@ -510,57 +510,89 @@ function balanceOf(n){ var p=priceOf(n), v=parseFloat(String(p).replace(/[^0-9.]
   return (String(p).indexOf("from")===0||String(p).indexOf("–")>-1?"from £":"£")+(v-10); }
 function today(){ var d=new Date(); d.setHours(0,0,0,0); return d; }
 function viewMonth(){ var t=today(); return new Date(t.getFullYear(),t.getMonth()+S.monthOffset,1); }
-function dayOpen(d){ var w=d.getDay(); return w!==0&&w!==1; }
-function dayFree(d){ return (d.getDate()*7+d.getMonth()*3)%6!==0; }
-function slotList(d){ return ["9.00","10.30","12.00","13.30","15.00","16.30"].map(function(l,i){ return {label:l,open:(d.getDate()+i*3)%4!==0}; }); }
-function chosenDate(){ if(!S.dateKey) return null; var p=S.dateKey.split("-"); return new Date(+p[0],+p[1],+p[2]); }
-function longDate(d){ return d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}); }
-function whenLabel(){ var d=chosenDate(); if(!d) return "Not chosen yet"; return S.time? longDate(d)+", "+S.time : longDate(d); }
-function digits(v){ return String(v).replace(/\D/g,""); }
-function priceNum(n){ return parseFloat(String(priceOf(n)).replace(/[^0-9.]/g,""))||0; }
-function wantsAccount(){ return $("f-acct").checked; }
-function checkKnown(){
-  var name=KNOWN[digits($("f-contact").value)];
-  S.returning=!!name;
-  if(name){
-    $("known").className="";
-    $("known-copy").innerHTML='Welcome back, <strong style="font-weight:600">'+name+'</strong>. We\'ve found your account — your stamps and history are waiting.';
-    if(!$("f-name").value.trim()) $("f-name").value=name;
-    $("acct-head").textContent="Add this visit to my account";
-  } else {
-    $("known").className="hide";
-    $("acct-head").textContent="Keep this as my Amai account";
-  }
+var CAL_CACHE = {};
+
+function timeToMins(t) {
+  if(!t) return 0;
+  var p = String(t).split(/[:.]/);
+  return parseInt(p[0], 10) * 60 + parseInt(p[1]||0, 10);
 }
-function cardValid(){ return true; }
-function ready(){
-  if(S.step===1) return !!S.treatment;
-  if(S.step===2) return !!(S.dateKey&&S.time);
-  if(S.step===3) return digits($("f-contact").value).length>=10 && !!$("f-name").value.trim();
-  return cardValid();
+function minsToTime(m) {
+  var h = Math.floor(m / 60);
+  var mm = m % 60;
+  return h + "." + (mm < 10 ? "0" + mm : mm);
+}
+function getDuration(name) {
+  var t = BOOKABLE.find(function(i){ return i.name === name; });
+  if(!t) return 60;
+  var match = String(t.time).match(/(\d+)/);
+  return match ? parseInt(match[1], 10) : 60;
+}
+async function fetchMonthBookings(v) {
+  var y = v.getFullYear(), m = v.getMonth();
+  var key = y + "-" + m;
+  if (CAL_CACHE[key]) return CAL_CACHE[key];
+  
+  var startStr = y + "-" + String(m+1).padStart(2,'0') + "-01";
+  var dim = new Date(y, m+1, 0).getDate();
+  var endStr = y + "-" + String(m+1).padStart(2,'0') + "-" + String(dim).padStart(2,'0');
+
+  var { data } = await supabase.from('bookings')
+    .select('appointment_date, appointment_time, treatment_name')
+    .gte('appointment_date', startStr)
+    .lte('appointment_date', endStr)
+    .neq('status', 'cancelled');
+  
+  CAL_CACHE[key] = data || [];
+  return CAL_CACHE[key];
 }
 
-function renderPicker(){
-  var q=S.query.trim().toLowerCase();
-  var list=q? BOOKABLE.filter(function(i){ return i.name.toLowerCase().indexOf(q)>-1; }) : BOOKABLE;
-  var box=$("picker"); box.innerHTML="";
-  if(!list.length){
-    box.appendChild(el("div",{style:"padding:18px 2px;font-size:14px;color:#B39C88"},'No treatment by that name. Clear the search to see everything, or tell us in the notes at the next step.'));
+function calcSlots(d) {
+  var y = d.getFullYear(), m = d.getMonth(), day = d.getDate();
+  var key = y + "-" + m;
+  var dateStr = y + "-" + String(m+1).padStart(2,'0') + "-" + String(day).padStart(2,'0');
+  
+  var bookings = CAL_CACHE[key] || [];
+  var dayBookings = bookings.filter(function(b){ return b.appointment_date === dateStr; });
+  
+  var dur = getDuration(S.treatment);
+  var start = 9 * 60; // 9:00
+  var end = 18 * 60; // 18:00
+  var step = 15;
+  
+  var slots = [];
+  for (var t = start; t + dur <= end; t += step) {
+    var t_end = t + dur;
+    var overlap = false;
+    for (var i=0; i<dayBookings.length; i++) {
+      var b = dayBookings[i];
+      var b_start = timeToMins(b.appointment_time);
+      var b_dur = getDuration(b.treatment_name);
+      var b_end = b_start + b_dur;
+      if (t < b_end && t_end > b_start) {
+        overlap = true;
+        break;
+      }
+    }
+    if (!overlap) slots.push({ label: minsToTime(t), open: true });
   }
-  list.forEach(function(it){
-    var b=el("button",{class:"srow","aria-checked":String(S.treatment===it.name),onclick:function(){ S.treatment=it.name; renderPicker(); renderTracker(); syncNext(); }});
-    b.innerHTML='<span style="flex:1;text-align:left;font-family:Marcellus,serif;font-size:17px">'+it.name+'</span>'+
-      '<span style="font-size:12.5px;color:#B39C88">'+it.time+'</span>'+
-      '<span style="font-size:14.5px;font-weight:600;min-width:78px;text-align:right">'+it.price+'</span><span class="tick"></span>';
-    box.appendChild(b);
-  });
+  return slots;
 }
-function renderCalendar(){
+
+function dayOpen(d){ var w=d.getDay(); return w!==0&&w!==1; }
+function dayFree(d){ return calcSlots(d).length > 0; }
+function slotList(d){ return calcSlots(d); }
+
+async function renderCalendar(){
   var v=viewMonth();
   $("month").textContent=v.toLocaleDateString("en-GB",{month:"long",year:"numeric"});
   $("prev").style.opacity=S.monthOffset>0?"1":".35";
   var firstDow=(v.getDay()+6)%7, dim=new Date(v.getFullYear(),v.getMonth()+1,0).getDate(), t=today();
-  var box=$("cells"); box.innerHTML="";
+  var box=$("cells"); box.innerHTML="<div style='grid-column:1/-1;padding:20px;text-align:center;color:#B39C88'>Loading...</div>";
+  
+  await fetchMonthBookings(v);
+  
+  box.innerHTML="";
   for(var i=0;i<firstDow;i++) box.appendChild(el("div",{style:"height:44px"}));
   for(var day=1;day<=dim;day++){
     (function(day){
