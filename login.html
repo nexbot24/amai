@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Amai — Sign in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Mulish:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Mulish:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;font-family:Mulish,sans-serif;color:#241F1C;background:#3A322E}
+html{scroll-behavior:smooth}
+a{color:#E8D5C4;text-decoration:none}
+a:hover{color:#F7F1EA}
+::placeholder{color:#B39C88;opacity:1}
+.wrap{max-width:1120px;margin:0 auto;padding:0 40px}
+.serif{font-family:Marcellus,serif;font-weight:400}
+.lbl-d{font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:#B39C88}
+.hide{display:none!important}
+.loginmark{margin-left:-14px}
+.loginmark:hover{color:#F7F1EA}
+.loginmark:hover span:first-child{border-color:#E8D5C4}
+.btn{display:inline-flex;align-items:center;justify-content:center;border:none;cursor:pointer;font-family:Marcellus,serif;font-size:16px;min-height:52px;padding:0 30px;border-radius:26px 26px 0 0;background:#E8D5C4;color:#3A322E}
+.btn:hover{background:#F7F1EA}
+.btn[disabled]{background:rgba(232,213,196,.28);cursor:default}
+.field{width:100%;background:transparent;border:1px solid rgba(232,213,196,.32);color:#F7F1EA;padding:16px 18px;font-family:Mulish,sans-serif;font-size:17px;outline:none}
+.field:focus{border-color:#E8D5C4}
+.flab{display:flex;flex-direction:column;gap:10px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#B39C88}
+.otp{width:100%;aspect-ratio:3/4;max-height:76px;background:transparent;border:1px solid rgba(232,213,196,.32);color:#F7F1EA;font-family:Marcellus,serif;font-size:28px;text-align:center;outline:none;padding:0}
+.otp:focus{border-color:#E8D5C4;background:#443B36}
+.otp.filled{border-color:rgba(232,213,196,.6)}
+.link{background:none;border:none;color:#B39C88;font-family:Mulish,sans-serif;font-size:13.5px;cursor:pointer;padding:4px 0;border-bottom:1px solid rgba(179,156,136,.4)}
+.link:hover{color:#E8D5C4;border-color:#E8D5C4}
+.link[disabled]{color:#B39C88;border-color:transparent;cursor:default}
+.inside{display:grid;grid-template-columns:52px 1fr;gap:22px;padding:20px 0;border-top:1px solid rgba(232,213,196,.18)}
+@media (max-width:900px){
+  .wrap{padding:0 22px}
+  .split{grid-template-columns:1fr!important;gap:48px!important}
+  .nav-links{display:none!important}
+  .h1{font-size:36px!important}
+  .card{padding:32px 26px 30px!important}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div style="position:sticky;top:0;z-index:10;background:#3A322E;border-bottom:1px solid rgba(232,213,196,.14)">
+  <div style="max-width:1120px;margin:0 auto;padding:22px 40px;display:flex;align-items:center;justify-content:space-between">
+    <a href="amai-website.html" style="display:flex;align-items:center;gap:16px">
+      <div style="width:15px;height:21px;border:1.5px solid #E8D5C4;border-bottom:none;border-radius:999px 999px 0 0"></div>
+      <div style="width:1px;height:22px;background:rgba(232,213,196,.3)"></div>
+      <div class="serif" style="font-size:19px;letter-spacing:.3em;color:#E8D5C4">AMAI</div>
+    </a>
+    <div class="nav-links" style="display:flex;align-items:center;gap:32px;font-size:12px;letter-spacing:.18em;text-transform:uppercase">
+      <a href="about.html" style="color:#CBB49E">About</a>
+      <a href="services.html" style="color:#CBB49E">Services</a>
+      <a href="index.html#studio" style="color:#CBB49E">How it works</a>
+      <a href="contact.html" style="color:#CBB49E">Contact</a>
+      <a href="index.html#book" style="color:#3A322E;background:#E8D5C4;padding:12px 26px;border-radius:20px 20px 0 0;font-family:Marcellus,serif;font-size:15px;letter-spacing:.02em;text-transform:none">Book a visit</a>
+      <a href="login.html" class="loginmark" title="Sign in to your account" aria-label="Sign in to your account" style="display:flex;align-items:center;gap:9px;color:#CBB49E;text-transform:none;letter-spacing:normal">
+        <span style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border:1px solid rgba(232,213,196,.42);border-radius:18px 18px 4px 4px">
+          <svg width="17" height="18" viewBox="0 0 17 18" fill="none" aria-hidden="true">
+            <circle cx="8.5" cy="5.4" r="3.6" stroke="currentColor" stroke-width="1.3"></circle>
+            <path d="M1.9 17.2v-1.7a6.6 6.6 0 0 1 13.2 0v1.7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"></path>
+          </svg>
+        </span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- SIGN IN -->
+<div style="background:#3A322E;color:#E8D5C4;min-height:calc(100vh - 82px);display:flex;align-items:center">
+  <div class="wrap" style="width:100%;padding-top:70px;padding-bottom:70px">
+    <div class="split" style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center">
+
+      <!-- left: what's inside -->
+      <div>
+        <div class="lbl-d" style="margin-bottom:26px">Your Amai</div>
+        <h1 class="h1 serif" style="font-size:50px;line-height:1.12;margin:0 0 24px;max-width:16ch">Your diary, your card, your room.</h1>
+        <p style="font-size:16.5px;line-height:1.8;color:#CBB49E;margin:0 0 34px;max-width:46ch">Everything from your visits in one place — and no waiting on a message to change a booking.</p>
+        <div style="max-width:440px">
+          <div class="inside">
+            <span class="serif" style="font-size:20px;color:#B39C88;line-height:1.3">01</span>
+            <div>
+              <div class="serif" style="font-size:20px;margin-bottom:5px">Your bookings</div>
+              <span style="font-size:13.5px;line-height:1.65;color:#CBB49E">See what's next, move it or cancel it yourself, and rebook a favourite in two taps.</span>
+            </div>
+          </div>
+          <div class="inside">
+            <span class="serif" style="font-size:20px;color:#B39C88;line-height:1.3">02</span>
+            <div>
+              <div class="serif" style="font-size:20px;margin-bottom:5px">Your loyalty card</div>
+              <span style="font-size:13.5px;line-height:1.65;color:#CBB49E">Stamps count themselves. Five is 25% off, ten and the visit is on us.</span>
+            </div>
+          </div>
+          <div class="inside">
+            <span class="serif" style="font-size:20px;color:#B39C88;line-height:1.3">03</span>
+            <div>
+              <div class="serif" style="font-size:20px;margin-bottom:5px">Your subscription</div>
+              <span style="font-size:13.5px;line-height:1.65;color:#CBB49E">Keep the same hour every four to six weeks at a lower price, and pause it whenever.</span>
+            </div>
+          </div>
+          <div class="inside" style="border-bottom:1px solid rgba(232,213,196,.18)">
+            <span class="serif" style="font-size:20px;color:#B39C88;line-height:1.3">04</span>
+            <div>
+              <div class="serif" style="font-size:20px;margin-bottom:5px">Aftercare and your details</div>
+              <span style="font-size:13.5px;line-height:1.65;color:#CBB49E">Guides for the treatments you've had, your notes and preferences, receipts and saved card.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- right: the flow -->
+      <div class="card" style="border:1px solid rgba(232,213,196,.22);padding:42px 42px 38px;min-width:0">
+
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:28px">
+          <div id="bars" style="display:flex;gap:9px;flex:1"></div>
+          <span id="steplbl" class="lbl-d" style="font-size:10.5px;letter-spacing:.2em"></span>
+        </div>
+
+        <!-- 1. number -->
+        <div id="p-phone">
+          <h2 class="serif" style="font-size:27px;margin:0 0 8px">Sign in to your account</h2>
+          <p style="font-size:14.5px;line-height:1.7;color:#CBB49E;margin:0 0 26px">Enter the mobile number your appointments are under and we'll bring up your account.</p>
+          <label class="flab" style="margin-bottom:16px">Mobile number
+            <input id="phone" class="field" inputmode="tel" autocomplete="tel" placeholder="07700 900123">
+          </label>
+          <button id="look" class="btn" style="width:100%;font-size:17px" disabled>Continue</button>
+          <p style="font-size:12.5px;line-height:1.7;color:#B39C88;margin:16px 0 0">Used to reach you about appointments and to sign you in. Nothing else.</p>
+        </div>
+
+        <!-- 2a. new — name -->
+        <div id="p-name" class="hide">
+          <h2 class="serif" style="font-size:27px;margin:0 0 8px">Let's set you up.</h2>
+          <p style="font-size:14.5px;line-height:1.7;color:#CBB49E;margin:0 0 4px">No account on <span id="new-phone" style="color:#F7F1EA"></span> yet — one name and it's made.</p>
+          <button id="back-1" class="link" style="margin-bottom:26px">Use a different number</button>
+          <label class="flab" style="margin-bottom:16px">First name
+            <input id="new-name" class="field" placeholder="Your name">
+          </label>
+          <button id="tocode" class="btn" style="width:100%;font-size:17px" disabled>Continue</button>
+          <p style="font-size:12.5px;line-height:1.7;color:#B39C88;margin:16px 0 0">Your loyalty card starts at your first visit. Already booked with us on another number? <a href="contact.html" style="border-bottom:1px solid rgba(232,213,196,.4)">Tell us</a> and we'll join them up.</p>
+        </div>
+
+        <!-- 2b/3. code -->
+        <div id="p-code" class="hide">
+          <h2 id="code-head" class="serif" style="font-size:27px;margin:0 0 8px"></h2>
+          <p style="font-size:14.5px;line-height:1.7;color:#CBB49E;margin:0 0 4px">Six-digit code texted to <span id="shown-phone" style="color:#F7F1EA"></span>.</p>
+          <button id="back-2" class="link" style="margin-bottom:24px">Wrong number?</button>
+          <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:9px;margin-bottom:12px" id="otp"></div>
+          <div id="code-err" style="font-size:13px;color:#E8D5C4;min-height:20px;margin-bottom:10px"></div>
+          <button id="verify" class="btn" style="width:100%;font-size:17px" disabled>Open my account</button>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:18px">
+            <button id="resend" class="link" disabled>Send it again</button>
+            <span style="font-size:12px;color:#B39C88">Demo code: any six digits</span>
+          </div>
+        </div>
+
+        <!-- 4. done -->
+        <div id="p-done" class="hide" style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px;padding:20px 0 8px">
+          <div style="width:38px;height:52px;border:2px solid #E8D5C4;border-bottom:none;border-radius:999px 999px 0 0"></div>
+          <div id="done-title" class="serif" style="font-size:27px;line-height:1.3"></div>
+          <p id="done-copy" style="font-size:15px;line-height:1.7;color:#CBB49E;margin:0;max-width:34ch"></p>
+          <div id="done-facts" style="width:100%;border:1px solid rgba(232,213,196,.2);padding:18px 20px;display:flex;flex-direction:column;gap:9px;text-align:left"></div>
+          <a id="go" href="hub.html" class="btn" style="width:100%;font-size:17px">Open my dashboard</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div style="background:#241F1C;color:#B39C88;border-top:1px solid rgba(232,213,196,.14)">
+  <div style="max-width:1120px;margin:0 auto;padding:40px 40px;display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase">
+    <span>Amai · Beauty · Skin · Body</span>
+    <span>Tuesday to Saturday · 020 0000 0000</span>
+  </div>
+</div>
+
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#3A322E"/><circle cx="50" cy="38" r="13" fill="none" stroke="#E8D5C4" stroke-width="4"/><path d="M26 82v-6a24 24 0 0 1 48 0v6" fill="none" stroke="#E8D5C4" stroke-width="4"/></svg></template>
+
+<script>
+var $=function(i){return document.getElementById(i);};
+var KNOWN={
+  "07700900123":{name:"Nadia",stamps:4,visits:5,next:"Hollywood wax"},
+  "07700900456":{name:"Priya",stamps:2,visits:2,next:null},
+  "07700900789":{name:"Hannah",stamps:9,visits:9,next:"Bikini wax"}
+};
+var HUB_KEY="amai_hub_v2";
+var st={phone:"",name:"",account:null,isNew:false,step:1,timer:0};
+var digits=function(v){ return String(v).replace(/\D/g,""); };
+
+/* progress — two steps for a returning client, three for a new one */
+function total(){ return st.isNew?3:2; }
+function progress(){
+  var bars=$("bars"); bars.innerHTML="";
+  for(var n=1;n<=total();n++){
+    var d=document.createElement("div");
+    d.setAttribute("style","height:3px;flex:1;max-width:"+(n===st.step?"46px":"26px")+";background:"+(n<=st.step?"#E8D5C4":"rgba(232,213,196,.25)"));
+    bars.appendChild(d);
+  }
+  $("steplbl").textContent = st.step>total()? "Signed in" : "Step "+st.step+" of "+total();
+}
+function panel(id){
+  ["p-phone","p-name","p-code","p-done"].forEach(function(p){ $(p).className = p===id? "" : "hide"; });
+  progress();
+}
+
+/* ---- step 1: number, then branch ---- */
+function phoneOk(){ var d=digits($("phone").value); return d.length>=10&&d.length<=13; }
+$("phone").oninput=function(){
+  var d=digits(this.value).slice(0,11);
+  this.value = d.length>5? d.slice(0,5)+" "+d.slice(5) : d;
+  $("look").disabled=!phoneOk();
+};
+$("phone").onkeydown=function(e){ if(e.key==="Enter"&&phoneOk()) lookup(); };
+$("look").onclick=lookup;
+
+function lookup(){
+  st.phone=$("phone").value.trim();
+  st.account=KNOWN[digits(st.phone)]||null;
+  st.isNew=!st.account;
+  if(st.isNew){
+    st.step=2; st.name="";
+    $("new-phone").textContent=st.phone;
+    panel("p-name");
+    setTimeout(function(){ $("new-name").focus(); },60);
+  } else {
+    st.name=st.account.name;
+    st.step=2;
+    sendCode();
+  }
+}
+
+/* ---- step 2 (new): name ---- */
+$("new-name").oninput=function(){ $("tocode").disabled=!this.value.trim(); };
+$("new-name").onkeydown=function(e){ if(e.key==="Enter"&&this.value.trim()) toCode(); };
+$("tocode").onclick=toCode;
+function toCode(){ st.name=$("new-name").value.trim(); st.step=3; sendCode(); }
+$("back-1").onclick=function(){ st.step=1; st.isNew=false; panel("p-phone"); $("phone").focus(); };
+
+/* ---- code ---- */
+function sendCode(){
+  $("shown-phone").textContent=st.phone;
+  $("code-head").textContent = st.isNew? "Confirm it's you, "+st.name+"." : "Welcome back, "+st.name+".";
+  $("verify").textContent = st.isNew? "Open my account" : "Take me to my dashboard";
+  otpReset();
+  panel("p-code");
+  countdown(30);
+  setTimeout(function(){ $("otp").firstChild.focus(); },60);
+}
+function code(){ return [].map.call($("otp").children,function(c){ return c.value; }).join(""); }
+function otpReset(){
+  var box=$("otp"); box.innerHTML="";
+  for(var i=0;i<6;i++){
+    var inp=document.createElement("input");
+    inp.className="otp"; inp.inputMode="numeric"; inp.maxLength=1;
+    inp.setAttribute("aria-label","Digit "+(i+1));
+    box.appendChild(inp);
+  }
+  [].forEach.call(box.children,function(inp,i){
+    inp.oninput=function(){
+      this.value=digits(this.value).slice(0,1);
+      this.className="otp"+(this.value?" filled":"");
+      if(this.value&&i<5) box.children[i+1].focus();
+      $("code-err").textContent="";
+      $("verify").disabled=code().length!==6;
+      if(code().length===6) $("verify").focus();
+    };
+    inp.onkeydown=function(e){
+      if(e.key==="Backspace"&&!this.value&&i>0){ var p=box.children[i-1]; p.focus(); p.value=""; p.className="otp"; $("verify").disabled=true; }
+      if(e.key==="ArrowLeft"&&i>0) box.children[i-1].focus();
+      if(e.key==="ArrowRight"&&i<5) box.children[i+1].focus();
+      if(e.key==="Enter"&&code().length===6) doVerify();
+    };
+    inp.onpaste=function(e){
+      e.preventDefault();
+      var d=digits((e.clipboardData||window.clipboardData).getData("text")).slice(0,6);
+      [].forEach.call(box.children,function(c,j){ c.value=d[j]||""; c.className="otp"+(d[j]?" filled":""); });
+      $("verify").disabled=d.length!==6;
+      if(d.length===6) $("verify").focus();
+    };
+  });
+  $("verify").disabled=true;
+}
+function countdown(s){
+  clearInterval(st.timer);
+  var left=s, r=$("resend");
+  r.disabled=true; r.textContent="Send it again in "+left+"s";
+  st.timer=setInterval(function(){
+    left--;
+    if(left<=0){ clearInterval(st.timer); r.disabled=false; r.textContent="Send it again"; }
+    else r.textContent="Send it again in "+left+"s";
+  },1000);
+}
+$("resend").onclick=function(){ if(!this.disabled){ otpReset(); $("otp").firstChild.focus(); countdown(30); } };
+$("back-2").onclick=function(){ clearInterval(st.timer); st.step=1; st.isNew=false; panel("p-phone"); $("phone").focus(); };
+$("verify").onclick=function(){ doVerify(); };
+
+function doVerify(){
+  if(code().length!==6){ $("code-err").textContent="Enter all six digits."; return; }
+  clearInterval(st.timer);
+  signIn();
+}
+
+/* ---- sign in: write to the dashboard's own store ---- */
+function signIn(){
+  try{
+    var raw=localStorage.getItem(HUB_KEY), h=raw?JSON.parse(raw):null;
+    var samePerson = h && digits(h.phone||"")===digits(st.phone);
+    if(samePerson){ h.signedIn=true; h.name=st.name||h.name; }
+    else {
+      var now=new Date();
+      h={signedIn:true,name:st.name,phone:st.phone,email:"",
+         since:now.toLocaleDateString("en-GB",{month:"long",year:"numeric"}),
+         view:"home",stamps:st.account?st.account.stamps:0,plan:null,notes:"",card:null,
+         upcoming:[],past:[]};
+    }
+    localStorage.setItem(HUB_KEY,JSON.stringify(h));
+  }catch(e){}
+
+  st.step=total()+1;
+  $("done-title").textContent = st.isNew? st.name+", your account is open." : "You're in, "+st.name+".";
+  $("done-copy").textContent = st.isNew
+    ? "Book your first visit whenever suits — everything after that keeps itself up to date."
+    : "Your bookings, stamps and aftercare are where you left them.";
+  var facts = st.isNew
+    ? [["Waiting for you","Book a visit and your loyalty card starts"],["Stamps","0 of 10"]]
+    : [[st.account.next?"Next visit":"Bookings", st.account.next||"Nothing booked yet"],["Stamps",st.account.stamps+" of 10"],["Visits with us",String(st.account.visits)]];
+  $("done-facts").innerHTML=facts.map(function(f){
+    return '<div style="display:flex;justify-content:space-between;gap:18px;font-size:14px"><span style="color:#B39C88">'+f[0]+'</span><span>'+f[1]+'</span></div>';
+  }).join("");
+  panel("p-done");
+}
+
+progress();
+</script>
+</body>
+</html>
