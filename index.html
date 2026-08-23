@@ -751,6 +751,51 @@ renderTabs(); renderPanel(); renderPicker(); renderCalendar(); renderSlots(); ch
       document.querySelectorAll("a[href='login.html']").forEach(function(el) {
         el.href = "hub.html";
       });
+      
+      var phoneInput = document.getElementById("f-contact");
+      var nameInput = document.getElementById("f-name");
+      if (phoneInput && nameInput) {
+        phoneInput.value = h.phone;
+        nameInput.value = h.name;
+        
+        var container = phoneInput.closest("div");
+        if (container) {
+          var signedInDiv = document.createElement("div");
+          signedInDiv.id = "signed-in-block";
+          signedInDiv.innerHTML = '<div style="margin-bottom:16px"><span style="font-size:15px;color:#CBB49E">Signed in as </span><strong style="color:#E8D5C4">' + h.name + '</strong> <span style="color:#8A7361">(' + h.phone + ')</span></div>' +
+                                  '<a href="#" id="sign-out-link" style="font-size:13px;color:#8A7361;text-decoration:underline">Not you? Sign out</a>';
+          container.insertBefore(signedInDiv, container.firstChild);
+          
+          var pWrapper = phoneInput.closest("label");
+          var nWrapper = nameInput.closest("label");
+          if(pWrapper) pWrapper.style.display = "none";
+          if(nWrapper) nWrapper.style.display = "none";
+          
+          var acctCheckbox = document.getElementById("f-acct");
+          if(acctCheckbox) acctCheckbox.closest("label").style.display = "none";
+          var knownDiv = document.getElementById("known");
+          if(knownDiv) knownDiv.style.display = "none";
+          
+          document.getElementById("sign-out-link").onclick = function(e) {
+            e.preventDefault();
+            localStorage.removeItem("amai_hub_v2");
+            
+            // Revert UI without reloading
+            signedInDiv.style.display = "none";
+            if(pWrapper) pWrapper.style.display = "";
+            if(nWrapper) nWrapper.style.display = "";
+            if(acctCheckbox) acctCheckbox.closest("label").style.display = "";
+            if(knownDiv && knownDiv.className !== "hide") knownDiv.style.display = "";
+            
+            phoneInput.value = "";
+            nameInput.value = "";
+            if(typeof syncNext === 'function') syncNext();
+            if(typeof renderTracker === 'function') renderTracker();
+          };
+          
+          if (typeof syncNext === 'function') setTimeout(syncNext, 100);
+        }
+      }
     }
   } catch(e) {}
 })();
