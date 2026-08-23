@@ -1,66 +1,13 @@
 <!DOCTYPE html>
-<html lang="en-GB"><head>
+<html lang="en-GB">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Your Amai — client hub</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Mulish:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>/* latin-ext */
-
-/* latin */
-
-/* cyrillic-ext */
-
-/* cyrillic */
-
-/* vietnamese */
-
-/* latin-ext */
-
-/* latin */
-
-/* cyrillic-ext */
-
-/* cyrillic */
-
-/* vietnamese */
-
-/* latin-ext */
-
-/* latin */
-
-/* cyrillic-ext */
-
-/* cyrillic */
-
-/* vietnamese */
-
-/* latin-ext */
-
-/* latin */
-
-/* cyrillic-ext */
-
-/* cyrillic */
-
-/* vietnamese */
-
-/* latin-ext */
-
-/* latin */
-
-/* cyrillic-ext */
-
-/* cyrillic */
-
-/* vietnamese */
-
-/* latin-ext */
-
-/* latin */
-
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Mulish:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box}
 body{margin:0;font-family:Mulish,sans-serif;color:#241F1C;background:#EFE9E1}
@@ -135,7 +82,7 @@ button{font-family:Mulish,sans-serif}
 <!-- SIGN IN -->
 <div id="auth" style="min-height:100vh;display:grid;grid-template-columns:1.1fr 1fr">
   <div style="background:#3A322E;color:#E8D5C4;padding:64px 64px;display:flex;flex-direction:column;justify-content:space-between">
-    <a href="index.html" style="display:flex;align-items:center;gap:14px">
+    <a href="amai-website.html" style="display:flex;align-items:center;gap:14px">
       <div class="arch" style="width:14px;height:19px;border:1.4px solid #E8D5C4;border-bottom:none"></div>
       <span class="serif" style="font-size:17px;letter-spacing:.3em">AMAI</span>
     </a>
@@ -179,7 +126,7 @@ button{font-family:Mulish,sans-serif}
 <div id="hub" class="shell hide">
   <div class="side">
     <div style="width:100%">
-      <a href="index.html" style="display:flex;align-items:center;gap:12px;padding:0 26px 30px">
+      <a href="amai-website.html" style="display:flex;align-items:center;gap:12px;padding:0 26px 30px">
         <div class="arch" style="width:13px;height:18px;border:1.3px solid #E8D5C4;border-bottom:none"></div>
         <span class="serif" style="font-size:16px;letter-spacing:.3em;color:#E8D5C4">AMAI</span>
       </a>
@@ -197,7 +144,7 @@ button{font-family:Mulish,sans-serif}
 
 <div id="modal-host"></div>
 
-
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#3A322E"/><text x="50" y="62" font-family="serif" font-size="34" fill="#E8D5C4" text-anchor="middle">A</text></svg></template>
 
 <script>
 var $=function(id){return document.getElementById(id);};
@@ -239,12 +186,13 @@ function shortDate(d){ return d.toLocaleDateString("en-GB",{day:"numeric",month:
 function parseKey(k){ var p=k.split("-"); return new Date(+p[0],+p[1],+p[2]); }
 function money(n){ return "£"+n; }
 
-var S=load()||{
+var DEFAULTS={
   signedIn:false, name:"Nadia", phone:"07700 900123", email:"nadia@example.com", since:"January 2026",
   view:"home", stamps:4, plan:null, notes:"Sensitive skin on legs — patch test done Feb 2026.",
   prefs:{room:"Warm, low light",music:"Quiet",chat:"Happy to chat"},
   notify:{reminder:true,aftercare:true,openings:false,news:false},
   card:{brand:"Visa",last4:"4242",exp:"04 / 29"},
+  referrals:[{who:"Priya · booked 4 Mar",state:"Stamp earned"},{who:"Hannah · invited 18 Mar",state:"Not booked yet"}],
   upcoming:[{id:1,treat:"Hollywood wax",dateKey:iso(openDay(9)),time:"14.30",price:42,deposit:10}],
   past:[
     {id:101,treat:"Hollywood wax",dateKey:iso(pastDay(-26)),time:"15.00",price:42},
@@ -254,6 +202,15 @@ var S=load()||{
     {id:105,treat:"First visit — consultation & treatment",dateKey:iso(pastDay(-131)),time:"12.00",price:30}
   ]
 };
+var S=(function(){
+  var saved=load()||{}, s={};
+  for(var k in DEFAULTS) s[k]=DEFAULTS[k];
+  for(var j in saved) if(Object.prototype.hasOwnProperty.call(saved,j)&&saved[j]!==undefined) s[j]=saved[j];
+  s.prefs=s.prefs||DEFAULTS.prefs; s.notify=s.notify||DEFAULTS.notify;
+  s.upcoming=s.upcoming||[]; s.past=s.past||[]; s.referrals=s.referrals||[];
+  if(typeof s.stamps!=="number") s.stamps=0;
+  return s;
+})();
 
 /* ---------- auth ---------- */
 $("a-send").onclick=function(){
@@ -293,7 +250,7 @@ function boot(){
   $("auth").className="hide"; $("hub").className="shell";
   render();
 }
-function render(){ nav(); $("view").innerHTML=VIEW[S.view](); wire(); window.scrollTo(0,0); }
+function render(){ if(typeof VIEW[S.view]!=="function") S.view="home"; nav(); $("view").innerHTML=VIEW[S.view](); wire(); window.scrollTo(0,0); }
 
 /* ---------- helpers ---------- */
 function nextBooking(){
@@ -315,6 +272,10 @@ function stampsRow(){
     out+='<div class="'+cls+'">'+(i===5?"25%":(i===10?"Free":i))+'</div>';
   }
   return out;
+}
+function topSpend(){
+  var all=S.past.concat(S.upcoming).map(function(b){ return b.price; }).filter(function(p){ return typeof p==="number"&&p>0; });
+  return all.length? Math.max.apply(null,all) : 42;
 }
 function rewardState(){
   var s=S.stamps;
@@ -347,7 +308,9 @@ var VIEW={};
 VIEW.home=function(){
   var nb=nextBooking();
   var spend=S.past.reduce(function(a,b){ return a+b.price; },0);
-  return head("Good to see you, "+S.name+".","Member since "+S.since+" · "+S.past.length+" visits so far",
+  var fresh=!S.past.length;
+  return head(fresh? "Welcome to Amai, "+S.name+"." : "Good to see you, "+S.name+".",
+    fresh? "Joined "+S.since+" · your first visit is still to come" : "Member since "+S.since+" · "+S.past.length+" visits so far",
     '<button class="btn btn-l" data-go="book">Book a visit</button>')+
   '<div class="grid2" style="margin-bottom:20px">'+
     '<div class="card" style="background:#3A322E;border-color:#3A322E;color:#E8D5C4;padding:32px 34px">'+
@@ -360,6 +323,15 @@ VIEW.home=function(){
           '<button class="btn btn-sm" data-cancel="'+nb.id+'" style="background:transparent;color:#E8D5C4;border:1px solid rgba(232,213,196,.4)">Cancel</button>'+
         '</div>'+
         '<div style="margin-top:24px;padding-top:18px;border-top:1px solid rgba(232,213,196,.18);font-size:13px;color:#B39C88">£'+nb.deposit+' deposit paid · '+money(nb.price-nb.deposit)+' in the studio · free to move until 24 hours before</div>'
+      : fresh?
+        '<div class="lbl-d" style="margin-bottom:18px">Nothing in the diary yet</div>'+
+        '<div class="serif" style="font-size:30px;margin-bottom:10px">Let\'s find your first hour.</div>'+
+        '<p style="font-size:15px;line-height:1.7;color:#CBB49E;margin:0 0 24px;max-width:44ch">First visits are booked with extra time at no extra cost, so we can talk everything through before anything begins.</p>'+
+        '<div style="display:flex;gap:12px;flex-wrap:wrap">'+
+          '<button class="btn btn-l btn-sm" data-go="book">Find a time</button>'+
+          '<a class="btn btn-sm" href="services.html" style="background:transparent;color:#E8D5C4;border:1px solid rgba(232,213,196,.4)">See treatments</a>'+
+        '</div>'+
+        '<div style="margin-top:24px;padding-top:18px;border-top:1px solid rgba(232,213,196,.18);font-size:13px;color:#B39C88">£10 deposit holds the room · free to move until 24 hours before · Tuesday to Saturday</div>'
       :
         '<div class="lbl-d" style="margin-bottom:18px">Nothing in the diary</div>'+
         '<div class="serif" style="font-size:30px;margin-bottom:10px">Your last visit was '+shortDate(parseKey(S.past[0].dateKey))+'.</div>'+
@@ -375,13 +347,16 @@ VIEW.home=function(){
         '<div class="serif" style="font-size:20px;margin-bottom:8px">'+S.plan.name+'</div><p style="font-size:13.5px;line-height:1.7;color:#5C5148;margin:0 0 16px">'+money(S.plan.now)+' a visit, billed after each appointment.</p><button class="btn btn-o btn-sm" data-go="plan">Manage</button>'
       : '<div class="serif" style="font-size:20px;margin-bottom:8px">Not on a plan</div><p style="font-size:13.5px;line-height:1.7;color:#5C5148;margin:0 0 16px">A standing slot every 4–6 weeks, at a lower price.</p><button class="btn btn-o btn-sm" data-go="plan">See plans</button>')+
     '</div>'+
-    '<div class="card"><div class="lbl" style="margin-bottom:14px">With us since</div>'+
-      '<div class="serif" style="font-size:20px;margin-bottom:8px">'+S.since+'</div>'+
-      '<p style="font-size:13.5px;line-height:1.7;color:#5C5148;margin:0 0 16px">'+S.past.length+' visits · '+money(spend)+' spent · '+S.stamps+' stamps earned.</p>'+
-      '<button class="btn btn-o btn-sm" data-go="bookings">Visit history</button></div>'+
+    '<div class="card"><div class="lbl" style="margin-bottom:14px">'+(fresh?"Your loyalty card":"With us since")+'</div>'+
+      '<div class="serif" style="font-size:20px;margin-bottom:8px">'+(fresh?"0 of 10 stamps":S.since)+'</div>'+
+      '<p style="font-size:13.5px;line-height:1.7;color:#5C5148;margin:0 0 16px">'+
+        (fresh? "Your first stamp lands the day you are in the chair. Five is 25% off, ten and the visit is on us."
+              : S.past.length+' visits · '+money(spend)+' spent · '+S.stamps+' stamps earned.')+'</p>'+
+      '<button class="btn btn-o btn-sm" data-go="'+(fresh?"loyalty":"bookings")+'">'+(fresh?"How stamps work":"Visit history")+'</button></div>'+
     '<div class="card"><div class="lbl" style="margin-bottom:14px">On your file</div>'+
-      '<p style="font-size:14px;line-height:1.7;color:#241F1C;margin:0 0 16px">'+S.notes+'</p>'+
-      '<button class="btn btn-o btn-sm" data-go="account">Update notes</button></div>'+
+      '<p style="font-size:14px;line-height:1.7;color:'+(S.notes?"#241F1C":"#5C5148")+';margin:0 0 16px">'+
+        (S.notes||"Nothing yet. Sensitive skin, a medication, a first intimate wax — anything you add here is read before your appointment.")+'</p>'+
+      '<button class="btn btn-o btn-sm" data-go="account">'+(S.notes?"Update notes":"Add a note")+'</button></div>'+
   '</div>';
 };
 
@@ -400,7 +375,7 @@ VIEW.bookings=function(){
       '<span style="font-size:15px">'+money(b.price)+'</span>'+
       '<span style="display:flex;gap:8px"><button class="btn btn-o btn-sm" data-rebook="'+b.id+'">Book again</button>'+
       '<button class="btn btn-o btn-sm" data-receipt="'+b.id+'">Receipt</button></span></div>';
-  }).join("");
+  }).join("")||'<p style="font-size:15px;line-height:1.75;color:#5C5148;margin:0;max-width:60ch">No visits yet. Once you have been in, each appointment stays here with its receipt so you can rebook the same thing in a tap.</p>';
 
   return head("Your bookings","Move or cancel free of charge up to 24 hours before. Inside 24 hours, call the studio and we'll do what we can.",
     '<button class="btn btn-l" data-go="book">Book a visit</button>')+
@@ -442,7 +417,7 @@ VIEW.loyalty=function(){
       '<div class="serif" style="font-size:34px;color:'+(S.stamps>=10?'#3A322E':'#B39C88')+';line-height:1">10</div>'+
       '<div><div class="serif" style="font-size:22px;margin-bottom:8px">A visit on us</div>'+
       '<p style="font-size:14px;line-height:1.75;color:#5C5148;margin:0 0 14px">Your tenth visit is free, up to the value of your most expensive treatment so far ('+
-      money(Math.max.apply(null,S.past.map(function(b){return b.price;})))+'). The card then starts again at one.</p>'+
+      money(topSpend())+'). The card then starts again at one.</p>'+
       '<span class="pill'+(S.stamps>=10?' on':'')+'">'+(S.stamps>=10?'Ready to use':(10-S.stamps)+' visits away')+'</span></div></div>'+
   '</div>'+
   '<div class="grid3" style="margin-top:20px">'+
@@ -512,8 +487,11 @@ VIEW.refer=function(){
       '<div id="copied" style="font-size:13px;color:#6E5B49;margin-top:14px">&nbsp;</div>'+
     '</div>'+
     '<div class="card"><div class="lbl" style="margin-bottom:14px">Referrals so far</div>'+
-      '<div class="row" style="grid-template-columns:1fr auto"><span>Priya · booked 4 Mar</span><span style="color:#6E5B49">Stamp earned</span></div>'+
-      '<div class="row" style="grid-template-columns:1fr auto"><span>Hannah · invited 18 Mar</span><span style="color:#6E5B49">Not booked yet</span></div>'+
+      ((S.referrals&&S.referrals.length)?
+        S.referrals.map(function(r){
+          return '<div class="row" style="grid-template-columns:1fr auto"><span>'+r.who+'</span><span style="color:#6E5B49">'+r.state+'</span></div>';
+        }).join("")
+        :'<p style="font-size:15px;line-height:1.75;color:#5C5148;margin:0">Nobody yet. Send your code to one person and it shows up here the moment she books.</p>')+
       '<p style="font-size:13.5px;line-height:1.7;color:#5C5148;margin:18px 0 0">We never contact anyone you refer unless they book themselves.</p></div>'+
   '</div>';
 };
@@ -542,9 +520,13 @@ VIEW.account=function(){
       '<div class="card" style="padding:30px 32px;margin-bottom:20px">'+
         '<div class="lbl" style="margin-bottom:18px">Payment</div>'+
         '<div style="display:flex;align-items:center;justify-content:space-between;gap:20px;padding-bottom:18px;border-bottom:1px solid #E0D2C2">'+
-          '<div><div class="serif" style="font-size:20px">'+S.card.brand+' ending '+S.card.last4+'</div>'+
-          '<div style="font-size:13px;color:#6E5B49;margin-top:4px">Expires '+S.card.exp+' · used for deposits</div></div>'+
-          '<button class="btn btn-o btn-sm" id="changecard">Change</button></div>'+
+          (S.card?
+            '<div><div class="serif" style="font-size:20px">'+S.card.brand+' ending '+S.card.last4+'</div>'+
+            '<div style="font-size:13px;color:#6E5B49;margin-top:4px">Expires '+S.card.exp+' · used for deposits</div></div>'+
+            '<button class="btn btn-o btn-sm" id="changecard">Change</button>'
+           :'<div><div class="serif" style="font-size:20px">No card saved</div>'+
+            '<div style="font-size:13px;color:#6E5B49;margin-top:4px">Save one and deposits take a single tap next time.</div></div>'+
+            '<button class="btn btn-sm" id="changecard">Add a card</button>')+'</div>'+
         '<div class="lbl" style="margin:20px 0 10px">Receipts</div>'+
         S.past.slice(0,3).map(function(b){
           return '<div style="display:flex;justify-content:space-between;gap:16px;padding:9px 0;font-size:14px"><span>'+shortDate(parseKey(b.dateKey))+' · '+b.treat+'</span>'+
@@ -720,7 +702,7 @@ function wire(){
       var p=PLANS.filter(function(x){ return x.k===b.dataset.plan; })[0];
       modal('<div class="lbl" style="margin-bottom:14px">Start a plan</div>'+
         '<h3 class="serif" style="font-size:26px;margin:0 0 10px">'+p.name+'</h3>'+
-        '<p style="font-size:14.5px;line-height:1.75;color:#5C5148;margin:0 0 20px">'+money(p.now)+' a visit instead of '+money(p.was)+'. Charged after each appointment on your '+S.card.brand+' ending '+S.card.last4+'. No contract — end it from this page whenever you like.</p>'+
+        '<p style="font-size:14.5px;line-height:1.75;color:#5C5148;margin:0 0 20px">'+money(p.now)+' a visit instead of '+money(p.was)+'. Charged after each appointment on '+(S.card? 'your '+S.card.brand+' ending '+S.card.last4 : 'the card you save at your next deposit')+'. No contract — end it from this page whenever you like.</p>'+
         '<div style="display:flex;gap:12px"><button class="btn btn-o btn-sm" id="m-no" style="flex:1">Not now</button>'+
         '<button class="btn btn-sm" id="m-yes" style="flex:1">Start plan</button></div>');
       $("m-no").onclick=closeModal;
@@ -752,7 +734,7 @@ function wire(){
     $("m-save").onclick=function(){
       var n=$("k-num").value.replace(/\D/g,"");
       if(n.length<15) return;
-      S.card={brand:"Visa",last4:n.slice(-4),exp:$("k-exp").value||S.card.exp};
+      S.card={brand:"Visa",last4:n.slice(-4),exp:$("k-exp").value||(S.card&&S.card.exp)||"—"};
       save(); closeModal(); render(); toast("Card updated.");
     };
   };
@@ -771,6 +753,5 @@ function wire(){
 
 boot();
 </script>
-
-
-</body></html>
+</body>
+</html>
