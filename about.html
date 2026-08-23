@@ -220,7 +220,7 @@ a{color:#E8D5C4;text-decoration:none}
   try {
     var raw = localStorage.getItem("amai_hub_v2"), h = raw ? JSON.parse(raw) : null;
     if (h && h.signedIn) {
-      document.querySelectorAll("a[href='login.html']").forEach(function(el) {
+      document.querySelectorAll("a[href*='login.html']").forEach(function(el) {
         el.href = "hub.html";
       });
     }

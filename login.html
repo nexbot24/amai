@@ -43,7 +43,17 @@ a:hover{color:#F7F1EA}
   .card{padding:32px 26px 30px!important}
 }
 </style>
+
+<script>
+  try {
+    var raw = localStorage.getItem("amai_hub_v2"), h = raw ? JSON.parse(raw) : null;
+    if (h && h.signedIn) {
+      window.location.href = "hub.html";
+    }
+  } catch(e) {}
+</script>
 </head>
+
 <body>
 
 <!-- NAV -->
@@ -441,7 +451,7 @@ progress();
   try {
     var raw = localStorage.getItem("amai_hub_v2"), h = raw ? JSON.parse(raw) : null;
     if (h && h.signedIn) {
-      document.querySelectorAll("a[href='login.html']").forEach(function(el) {
+      document.querySelectorAll("a[href*='login.html']").forEach(function(el) {
         el.href = "hub.html";
       });
     }
