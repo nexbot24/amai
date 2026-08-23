@@ -323,7 +323,6 @@ async function lookup(){
     sendCode();
   }
 }
-}
 
 /* ---- step 2 (new): name ---- */
 $("new-name").oninput=function(){ $("tocode").disabled=!this.value.trim(); };
@@ -435,9 +434,6 @@ async function doVerify(){
     } catch(e) {}
   }
   
-  signIn();
-}
-  clearInterval(st.timer);
   signIn();
 }
 
