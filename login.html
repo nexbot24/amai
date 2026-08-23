@@ -333,14 +333,25 @@ function toCode(){ st.name=$("new-name").value.trim(); st.step=3; sendCode(); }
 $("back-1").onclick=function(){ st.step=1; st.isNew=false; panel("p-phone"); $("phone").focus(); };
 
 /* ---- code ---- */
-function sendCode(){
+
+async function sendCode(){
   $("shown-phone").textContent=st.phone;
   $("code-head").textContent = st.isNew? "Confirm it's you, "+st.name+"." : "Welcome back, "+st.name+".";
-  $("verify").textContent = st.isNew? "Open my account" : "Take me to my dashboard";
-  otpReset();
   panel("p-code");
-  countdown(30);
-  setTimeout(function(){ $("otp").firstChild.focus(); },60);
+  $("c-1").focus();
+  
+  try {
+      await sb.auth.signInWithOtp({ phone: st.phone });
+  } catch(e) {
+      console.error(e);
+  }
+
+  var s=59; $("timer").textContent="0:59";
+  clearInterval(st.timer);
+  st.timer=setInterval(function(){
+    s--; $("timer").textContent="0:"+(s<10?"0":"")+s;
+    if(s<=0){ clearInterval(st.timer); $("timer").textContent="Resend code"; }
+  },1000);
 }
 function code(){ return [].map.call($("otp").children,function(c){ return c.value; }).join(""); }
 function otpReset(){
@@ -391,6 +402,7 @@ $("back-2").onclick=function(){ clearInterval(st.timer); st.step=1; st.isNew=fal
 $("verify").onclick=function(){ doVerify(); };
 
 
+
 async function doVerify(){
   if(code().length!==6){ $("code-err").textContent="Enter all six digits."; return; }
   clearInterval(st.timer);
@@ -399,6 +411,22 @@ async function doVerify(){
   var oldText = btn.textContent;
   btn.disabled = true;
   btn.textContent = "Verifying...";
+  $("code-err").textContent = "";
+  
+  try {
+      const { data, error } = await sb.auth.verifyOtp({ phone: st.phone, token: code(), type: 'sms' });
+      if (error) {
+          $("code-err").textContent = "Incorrect code. Try again.";
+          btn.textContent = oldText;
+          btn.disabled = false;
+          return;
+      }
+  } catch (e) {
+      $("code-err").textContent = "Something went wrong.";
+      btn.textContent = oldText;
+      btn.disabled = false;
+      return;
+  }
   
   if (st.isNew) {
     try {
