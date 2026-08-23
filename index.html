@@ -110,6 +110,22 @@ section[id]{scroll-margin-top:84px}
 }
 </style>
 
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const supabaseUrl = 'https://tphyrmweauzfletdlqvi.supabase.co';
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwaHlybXdlYXV6ZmxldGRscXZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0NTIxOTQsImV4cCI6MjEwMzAyODE5NH0.Z_utKsxYquCoL2LfTjjL8QFB1tnLJZW9j3El7Sykk8o';
+  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const supabaseUrl = 'https://tphyrmweauzfletdlqvi.supabase.co';
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwaHlybXdlYXV6ZmxldGRscXZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0NTIxOTQsImV4cCI6MjEwMzAyODE5NH0.Z_utKsxYquCoL2LfTjjL8QFB1tnLJZW9j3El7Sykk8o';
+  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+</script>
+
 </head>
 <body>
 
@@ -484,7 +500,7 @@ function slotList(d){ return ["9.00","10.30","12.00","13.30","15.00","16.30"].ma
 function chosenDate(){ if(!S.dateKey) return null; var p=S.dateKey.split("-"); return new Date(+p[0],+p[1],+p[2]); }
 function longDate(d){ return d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}); }
 function whenLabel(){ var d=chosenDate(); if(!d) return "Not chosen yet"; return S.time? longDate(d)+", "+S.time : longDate(d); }
-function cardValid(){ return $("c-num").value.replace(/\D/g,"").length>=15 && $("c-exp").value.replace(/\D/g,"").length>=4 && $("c-cvc").value.replace(/\D/g,"").length>=3; }
+function cardValid(){ return true; }
 function ready(){
   if(S.step===1) return !!S.treatment;
   if(S.step===2) return !!(S.dateKey&&S.time);
@@ -573,16 +589,45 @@ function showStep(){
   }
   renderTracker(); syncNext();
 }
-function confirm(how){
+
+async 
+async function confirm(how){
   var name=$("f-name").value.trim()||"Thank you";
+  var email = $("f-contact").value.trim();
+  var phone = ""; // Optional
+
+  // Create client if not exists
+  let { data: clients } = await supabase.from('clients').select('id').eq('email', email);
+  let clientId;
+  if (!clients || clients.length === 0) {
+    const { data: newClient } = await supabase.from('clients').insert([{ name: name, email: email, phone: phone }]).select().single();
+    if(newClient) clientId = newClient.id;
+  } else {
+    clientId = clients[0].id;
+  }
+
+  // Create booking
+  if(clientId) {
+    await supabase.from('bookings').insert([{
+      client_id: clientId,
+      treatment_name: S.treatment,
+      appointment_date: S.dateKey,
+      appointment_time: S.time,
+      price: parseFloat(String(priceOf(S.treatment)).replace(/[^0-9.]/g,"")),
+      deposit_amount: 10,
+      status: 'confirmed'
+    }]);
+  }
+
   $("d-title").textContent=name+", you're booked in.";
   $("d-treat").textContent=S.treatment;
   $("d-when").textContent=whenLabel();
-  $("d-paid").textContent = how==="apple"? "£10 deposit paid · Apple Pay"
-    : "£10 deposit paid · card ending "+$("c-num").value.replace(/\D/g,"").slice(-4);
+  $("d-paid").textContent = how==="apple"? "£10 deposit to be paid later" : "£10 deposit to be paid later";
   $("d-bal").textContent=balanceOf(S.treatment)+" in the studio";
   $("form-side").className="hide"; $("done-side").className="";
 }
+
+
 
 $("q").oninput=function(){ S.query=this.value; renderPicker(); };
 $("prev").onclick=function(){ if(S.monthOffset>0){ S.monthOffset--; renderCalendar(); } };
