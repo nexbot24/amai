@@ -260,6 +260,70 @@ a{color:#E8D5C4;text-decoration:none}
 </div>
 
 <script>
+var $=function(id){return document.getElementById(id);};
+
+/* router */
+var REASONS=[
+  {k:"book",label:"Book a treatment",hint:"Choose a time now",
+   title:"The diary is the fastest way in.",
+   copy:"Four steps, under a minute, with a £10 refundable deposit that holds the room. You'll see the hours that are genuinely free rather than waiting for us to check.",
+   actions:[["Book a visit","index.html#book","solid"],["See prices","services.html","ghost"]]},
+  {k:"ask",label:"Ask about a treatment",hint:"Sensitivity, first time, medication",
+   title:"Tell us what you're weighing up.",
+   copy:"Sensitive skin, a medication, a first intimate wax, a condition you'd rather mention in writing first — all fine. Use the enquiry form below and we'll answer properly, in writing.",
+   actions:[["Send an enquiry","#enquiry","solid"]]},
+  {k:"change",label:"Move or cancel",hint:"Do it yourself, in seconds",
+   title:"Handle it in your account.",
+   copy:"Sign in with your phone number and everything is there: move a visit to another time, cancel it, see your stamps and past appointments. Move or cancel up to 24 hours before and the deposit is refunded in full. Inside 24 hours, please call the studio so we can try to fill the hour.",
+   actions:[["Go to my account","hub.html","solid"],["Call the studio","tel:+442000000000","ghost"]]},
+  {k:"late",label:"Running late",hint:"Today's appointment",
+   title:"Call, don't type.",
+   copy:"We hold your room for ten minutes, and often longer if we know. Give the studio a ring and we will keep your time.",
+   actions:[["Call now","tel:+442000000000","solid"]]}
+];
+(function(){
+  var box=$("reasons");
+  REASONS.forEach(function(r,i){
+    var b=document.createElement("button");
+    b.className="reason"; b.setAttribute("aria-pressed",String(i===0));
+    b.innerHTML="<span>"+r.label+"</span><span>"+r.hint+"</span>";
+    b.onclick=function(){
+      [].forEach.call(box.children,function(c,j){ c.setAttribute("aria-pressed",String(j===i)); });
+      show(r);
+    };
+    box.appendChild(b);
+  });
+  show(REASONS[0]);
+})();
+function show(r){
+  $("a-title").textContent=r.title;
+  $("a-copy").textContent=r.copy;
+  var box=$("a-action"); box.innerHTML="";
+  r.actions.forEach(function(a){
+    var el=document.createElement("a");
+    el.href=a[1]; el.className="btn"+(a[2]==="ghost"?" ghost":""); el.textContent=a[0];
+    if(a[1]==="#enquiry") el.onclick=function(e){ e.preventDefault(); $("c-msg").scrollIntoView===undefined||window.scrollTo({top:$("c-name").getBoundingClientRect().top+window.scrollY-120,behavior:"smooth"}); $("c-msg").focus(); };
+    box.appendChild(el);
+  });
+}
+
+/* enquiry */
+$("c-send").onclick=function(){
+  var n=$("c-name").value.trim(), c=$("c-contact").value.trim(), m=$("c-msg").value.trim();
+  if(!n||!c||!m){ $("c-help").textContent="Please add your name, a way to reach you, and your question."; return; }
+  $("sent-title").textContent=n+", that's with us.";
+  $("sent-copy").textContent="We'll come back to you personally. Nothing else will be sent to you.";
+  $("form-side").className="hide"; $("sent-side").className="";
+};
+$("c-again").onclick=function(){
+  ["c-name","c-contact","c-msg"].forEach(function(id){ $(id).value=""; });
+  $("sent-side").className="hide"; $("form-side").className="";
+};
+</script>
+
+
+
+<script>
 (function(){
   try {
     var raw = localStorage.getItem("amai_hub_v2"), h = raw ? JSON.parse(raw) : null;
