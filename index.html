@@ -616,6 +616,62 @@ function renderSlots(){
     box.appendChild(b);
   });
 }
+
+function chosenDate(){ if(!S.dateKey) return null; var p=S.dateKey.split("-"); return new Date(+p[0],+p[1],+p[2]); }
+function longDate(d){ return d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}); }
+function whenLabel(){ var d=chosenDate(); if(!d) return "Not chosen yet"; return S.time? longDate(d)+", "+S.time : longDate(d); }
+function digits(v){ return String(v).replace(/\D/g,""); }
+function priceNum(n){ return parseFloat(String(priceOf(n)).replace(/[^0-9.]/g,""))||0; }
+function wantsAccount(){ return $("f-acct") && $("f-acct").checked; }
+function checkKnown(){
+  var contactInput = $("f-contact");
+  if(!contactInput) return;
+  var name=KNOWN[digits(contactInput.value)];
+  S.returning=!!name;
+  if(name){
+    if($("known")) $("known").className="";
+    if($("known-copy")) $("known-copy").innerHTML='Welcome back, <strong style="font-weight:600">'+name+'</strong>. We\'ve found your account — your stamps and history are waiting.';
+    if($("f-name") && !$("f-name").value.trim()) $("f-name").value=name;
+    if($("acct-head")) $("acct-head").textContent="Add this visit to my account";
+  } else {
+    if($("known")) $("known").className="hide";
+    if($("acct-head")) $("acct-head").textContent="Keep this as my Amai account";
+  }
+}
+function cardValid(){ return true; }
+function ready(){
+  if(S.step===1) return !!S.treatment;
+  if(S.step===2) return !!(S.dateKey&&S.time);
+  if(S.step===3) {
+    var contactInput = $("f-contact");
+    var nameInput = $("f-name");
+    if(contactInput && nameInput) {
+       return digits(contactInput.value).length>=10 && !!nameInput.value.trim();
+    }
+    // If hidden by session block, it's ready.
+    return true; 
+  }
+  return cardValid();
+}
+
+function renderPicker(){
+  var q=S.query.trim().toLowerCase();
+  var list=q? BOOKABLE.filter(function(i){ return i.name.toLowerCase().indexOf(q)>-1; }) : BOOKABLE;
+  var box=$("picker"); 
+  if(!box) return;
+  box.innerHTML="";
+  if(!list.length){
+    box.appendChild(el("div",{style:"padding:18px 2px;font-size:14px;color:#B39C88"},'No treatment by that name. Clear the search to see everything, or tell us in the notes at the next step.'));
+  }
+  list.forEach(function(it){
+    var b=el("button",{class:"srow","aria-checked":String(S.treatment===it.name),onclick:function(){ S.treatment=it.name; renderPicker(); renderTracker(); syncNext(); }});
+    b.innerHTML='<span style="flex:1;text-align:left;font-family:Marcellus,serif;font-size:17px">'+it.name+'</span>'+
+      '<span style="font-size:12.5px;color:#B39C88">'+it.time+'</span>'+
+      '<span style="font-size:14.5px;font-weight:600;min-width:78px;text-align:right">'+it.price+'</span><span class="tick"></span>';
+    box.appendChild(b);
+  });
+}
+
 function renderTracker(){
   var titles=["Treatment","Date & time","You & your account","Deposit"];
   var vals=[S.treatment, whenLabel(),
