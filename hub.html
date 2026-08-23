@@ -384,14 +384,27 @@ VIEW.bookings=function(){
 };
 
 VIEW.book=function(){
-  return head("Book a visit","Pick a treatment, then a day and time. A £10 refundable deposit holds the room.","")+
-  '<div class="grid2" style="align-items:start">'+
-    '<div class="card"><div class="lbl" style="margin-bottom:16px">Book again</div>'+
+  var leftSide = '';
+  if(S.past && S.past.length > 0){
+    leftSide = '<div class="card"><div class="lbl" style="margin-bottom:16px">Book again</div>'+
       '<p style="font-size:14.5px;line-height:1.7;color:#5C5148;margin:0 0 18px">Your usual, with the same practitioner.</p>'+
       S.past.slice(0,3).map(function(b){
         return '<button class="btn btn-o btn-sm" data-rebook="'+b.id+'" style="width:100%;justify-content:space-between;margin-bottom:8px">'+b.treat+'<span style="color:#6E5B49">'+money(b.price)+'</span></button>';
       }).join("")+
-    '</div>'+
+    '</div>';
+  } else {
+    var first = TREATMENTS[0];
+    leftSide = '<div class="card"><div class="lbl" style="margin-bottom:16px">Start here</div>'+
+      '<div class="serif" style="font-size:26px;margin-bottom:12px">First visit</div>'+
+      '<p style="font-size:14.5px;line-height:1.7;color:#5C5148;margin:0 0 20px">Booked with extra time at no extra cost — we talk through what you would like, and what to expect, before anything begins.</p>'+
+      '<button class="btn btn-o btn-sm" data-new="0" style="width:100%;justify-content:space-between;margin-bottom:16px"><span style="text-align:left">Consultation & treatment</span><span style="color:#6E5B49">'+money(first.price)+'</span></button>'+
+      '<p style="font-size:13.5px;color:#6E5B49;margin:0">Know what you want already? Pick it from the list.</p>'+
+    '</div>';
+  }
+
+  return head("Book a visit","Pick a treatment, then a day and time. A £10 refundable deposit holds the room.","")+
+  '<div class="grid2" style="align-items:start">'+
+    leftSide +
     '<div class="card"><div class="lbl" style="margin-bottom:16px">Everything else</div>'+
       '<div style="display:flex;flex-direction:column;gap:8px;max-height:340px;overflow-y:auto;padding-right:4px">'+
       TREATMENTS.map(function(t,i){
