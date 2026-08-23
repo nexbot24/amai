@@ -57,7 +57,6 @@ a:hover{color:#F7F1EA}
     <div class="nav-links" style="display:flex;align-items:center;gap:32px;font-size:12px;letter-spacing:.18em;text-transform:uppercase">
       <a href="about.html" style="color:#CBB49E">About</a>
       <a href="services.html" style="color:#CBB49E">Services</a>
-      <a href="index.html#studio" style="color:#CBB49E">How it works</a>
       <a href="contact.html" style="color:#CBB49E">Contact</a>
       <a href="index.html#book" style="color:#3A322E;background:#E8D5C4;padding:12px 26px;border-radius:20px 20px 0 0;font-family:Marcellus,serif;font-size:15px;letter-spacing:.02em;text-transform:none">Book a visit</a>
       <a href="login.html" class="loginmark" title="Sign in to your account" aria-label="Sign in to your account" style="display:flex;align-items:center;gap:9px;color:#CBB49E;text-transform:none;letter-spacing:normal">
@@ -390,6 +389,19 @@ function signIn(){
 }
 
 progress();
+</script>
+
+<script>
+(function(){
+  try {
+    var raw = localStorage.getItem("amai_hub_v2"), h = raw ? JSON.parse(raw) : null;
+    if (h && h.signedIn) {
+      document.querySelectorAll("a[href='login.html']").forEach(function(el) {
+        el.href = "hub.html";
+      });
+    }
+  } catch(e) {}
+})();
 </script>
 </body>
 </html>
