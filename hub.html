@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Your Amai — client hub</title>
+<title>Your AMAI — client hub</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Mulish:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -88,7 +88,7 @@ button{font-family:Mulish,sans-serif}
       <span class="serif" style="font-size:17px;letter-spacing:.3em">AMAI</span>
     </a>
     <div>
-      <div class="lbl-d" style="margin-bottom:24px">Your Amai</div>
+      <div class="lbl-d" style="margin-bottom:24px">Your AMAI</div>
       <h1 class="serif" style="font-size:50px;line-height:1.12;margin:0 0 22px;max-width:15ch">Your diary, your stamps, your room.</h1>
       <p style="font-size:16px;line-height:1.8;color:#CBB49E;margin:0;max-width:44ch">Book, move or cancel a visit, keep your aftercare to hand, and watch your stamps add up.</p>
     </div>
@@ -268,7 +268,7 @@ function nextBooking(){
 }
 function daysAway(k){ return Math.round((parseKey(k)-addDays(0))/86400000); }
 function head(title,sub,action){
-  return '<div class="head"><div><div class="lbl" style="margin-bottom:12px">Your Amai</div>'+
+  return '<div class="head"><div><div class="lbl" style="margin-bottom:12px">Your AMAI</div>'+
     '<h1 class="serif" style="font-size:38px;margin:0 0 8px">'+title+'</h1>'+
     (sub?'<p style="font-size:15px;line-height:1.7;color:#5C5148;margin:0;max-width:60ch">'+sub+'</p>':'')+
     '</div>'+(action||'')+'</div>';
@@ -296,7 +296,7 @@ function loyaltyCard(compact){
   var r=rewardState();
   return '<div class="loyalty">'+
     '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:24px;position:relative;z-index:1">'+
-      '<div><div class="lbl-d" style="margin-bottom:10px">Amai loyalty card</div>'+
+      '<div><div class="lbl-d" style="margin-bottom:10px">AMAI loyalty card</div>'+
       '<div class="serif" style="font-size:'+(compact?"22px":"26px")+'">'+S.name+'</div></div>'+
       '<div style="text-align:right"><div class="lbl-d" style="margin-bottom:10px">Stamps</div>'+
       '<div class="serif" style="font-size:'+(compact?"22px":"26px")+'">'+S.stamps+' / 10</div></div>'+
@@ -318,7 +318,7 @@ VIEW.home=function(){
   var nb=nextBooking();
   var spend=S.past.reduce(function(a,b){ return a+b.price; },0);
   var fresh=!S.past.length;
-  return head(fresh? "Welcome to Amai, "+S.name+"." : "Good to see you, "+S.name+".",
+  return head(fresh? "Welcome to AMAI, "+S.name+"." : "Good to see you, "+S.name+".",
     fresh? "Joined "+S.since+" · your first visit is still to come" : "Member since "+S.since+" · "+S.past.length+" visits so far",
     '<button class="btn btn-l" data-go="book">Book a visit</button>')+
   '<div class="grid2" style="margin-bottom:20px">'+
@@ -718,7 +718,7 @@ function bindBookingModal(cta){
       save(); closeModal(); render();
       toast("Moved to "+longDate(parseKey(draft.dateKey))+", "+draft.time+".");
     } else {
-      var email = S.phone || "unknown@amai"; // Temporary fallback
+      var email = S.phone || "unknown@AMAI"; // Temporary fallback
       let { data: clients } = await sb.from('clients').select('id').eq('email', email);
       let clientId;
       if (!clients || clients.length === 0) {

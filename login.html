@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Amai — Sign in</title>
+<title>AMAI — Sign in</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Mulish:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -89,7 +89,7 @@ a:hover{color:#F7F1EA}
 
       <!-- left: what's inside -->
       <div>
-        <div class="lbl-d" style="margin-bottom:26px">Your Amai</div>
+        <div class="lbl-d" style="margin-bottom:26px">Your AMAI</div>
         <h1 class="h1 serif" style="font-size:50px;line-height:1.12;margin:0 0 24px;max-width:16ch">Your diary, your card, your room.</h1>
         <p style="font-size:16.5px;line-height:1.8;color:#CBB49E;margin:0 0 34px;max-width:46ch">Everything from your visits in one place — and no waiting on a message to change a booking.</p>
         <div style="max-width:440px">
@@ -202,7 +202,7 @@ a:hover{color:#F7F1EA}
             <circle cx="8" cy="8" r="3.2" stroke="currentColor" stroke-width="1.2"></circle>
             <circle cx="11.9" cy="4.1" r="0.85" fill="currentColor"></circle>
           </svg>
-          <span style="border-bottom:1px solid rgba(232,213,196,.32);padding-bottom:2px">@amai</span>
+          <span style="border-bottom:1px solid rgba(232,213,196,.32);padding-bottom:2px">@AMAI</span>
         </a>
       </div>
 
@@ -230,15 +230,15 @@ a:hover{color:#F7F1EA}
         <span style="color:#CBB49E">North London, by appointment<br>Full address sent on booking</span>
         <div class="fnav" style="display:flex;flex-direction:column;gap:9px">
           <a href="tel:+442000000000">020 0000 0000</a>
-          <a href="mailto:hello@amai">hello@amai</a>
+          <a href="mailto:hello@AMAI">hello@AMAI</a>
         </div>
         <span style="color:#B39C88;font-size:13px">£10 deposit, refundable up to 24 hours before</span>
       </div>
     </div>
 
     <div class="fbot" style="display:flex;justify-content:space-between;align-items:center;gap:24px;padding-top:24px;flex-wrap:wrap;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase">
-      <span>Amai · Beauty · Skin · Body</span>
-      <span>© 2026 Amai. All rights reserved.</span>
+      <span>AMAI · Beauty · Skin · Body</span>
+      <span>© 2026 AMAI. All rights reserved.</span>
     </div>
   </div>
 </div>
@@ -441,7 +441,7 @@ async function doVerify(){
   
   if (st.isNew) {
     try {
-      var email = st.phone || "unknown@amai";
+      var email = st.phone || "unknown@AMAI";
       await sb.from('clients').insert([{ name: st.name, email: email, phone: st.phone }]);
     } catch(e) {}
   }
