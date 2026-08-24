@@ -139,11 +139,11 @@ a:hover{color:#F7F1EA}
         </div>
 
         <!-- 1. number -->
-        <div id="p-phone">
+        <div id="p-email">
           <h2 class="serif" style="font-size:27px;margin:0 0 8px">Sign in to your account</h2>
           <p style="font-size:14.5px;line-height:1.7;color:#CBB49E;margin:0 0 26px">Enter the mobile number your appointments are under and we'll bring up your account.</p>
           <label class="flab" style="margin-bottom:16px">Mobile number
-            <input id="phone" class="field" inputmode="tel" autocomplete="tel" placeholder="07700 900123">
+            <input id="email" class="field" type="email" autocomplete="email" placeholder="hello@example.com">
           </label>
           <button id="look" class="btn" style="width:100%;font-size:17px" disabled>Continue</button>
           <p style="font-size:12.5px;line-height:1.7;color:#B39C88;margin:16px 0 0">Used to reach you about appointments and to sign you in. Nothing else.</p>
@@ -152,7 +152,7 @@ a:hover{color:#F7F1EA}
         <!-- 2a. new — name -->
         <div id="p-name" class="hide">
           <h2 class="serif" style="font-size:27px;margin:0 0 8px">Let's set you up.</h2>
-          <p style="font-size:14.5px;line-height:1.7;color:#CBB49E;margin:0 0 4px">No account on <span id="new-phone" style="color:#F7F1EA"></span> yet — one name and it's made.</p>
+          <p style="font-size:14.5px;line-height:1.7;color:#CBB49E;margin:0 0 4px">No account on <span id="new-email" style="color:#F7F1EA"></span> yet — one name and it's made.</p>
           <button id="back-1" class="link" style="margin-bottom:26px">Use a different number</button>
           <label class="flab" style="margin-bottom:16px">First name
             <input id="new-name" class="field" placeholder="Your name">
@@ -164,7 +164,7 @@ a:hover{color:#F7F1EA}
         <!-- 2b/3. code -->
         <div id="p-code" class="hide">
           <h2 id="code-head" class="serif" style="font-size:27px;margin:0 0 8px"></h2>
-          <p style="font-size:14.5px;line-height:1.7;color:#CBB49E;margin:0 0 4px">Six-digit code texted to <span id="shown-phone" style="color:#F7F1EA"></span>.</p>
+          <p style="font-size:14.5px;line-height:1.7;color:#CBB49E;margin:0 0 4px">Six-digit code emailed to <span id="shown-email" style="color:#F7F1EA"></span>.</p>
           <button id="back-2" class="link" style="margin-bottom:24px">Wrong number?</button>
           <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:9px;margin-bottom:12px" id="otp"></div>
           <div id="code-err" style="font-size:13px;color:#E8D5C4;min-height:20px;margin-bottom:10px"></div>
@@ -267,7 +267,7 @@ var KNOWN={
   "07700900789":{name:"Hannah",stamps:9,visits:9,next:"Bikini wax"}
 };
 var HUB_KEY="amai_hub_v2";
-var st={phone:"",name:"",account:null,isNew:false,step:1,timer:0};
+var st={email:"",name:"",account:null,isNew:false,step:1,timer:0};
 var digits=function(v){ return String(v).replace(/\D/g,""); };
 
 /* progress — two steps for a returning client, three for a new one */
@@ -282,23 +282,23 @@ function progress(){
   $("steplbl").textContent = st.step>total()? "Signed in" : "Step "+st.step+" of "+total();
 }
 function panel(id){
-  ["p-phone","p-name","p-code","p-done"].forEach(function(p){ $(p).className = p===id? "" : "hide"; });
+  ["p-email","p-name","p-code","p-done"].forEach(function(p){ $(p).className = p===id? "" : "hide"; });
   progress();
 }
 
 /* ---- step 1: number, then branch ---- */
-function phoneOk(){ var d=digits($("phone").value); return d.length>=10&&d.length<=13; }
-$("phone").oninput=function(){
+function emailOk(){ var e=$("email").value; return e.includes("@") && e.includes("."); }
+$("email").oninput=function(){
   var d=digits(this.value).slice(0,11);
   this.value = d.length>5? d.slice(0,5)+" "+d.slice(5) : d;
-  $("look").disabled=!phoneOk();
+  $("look").disabled=!emailOk();
 };
-$("phone").onkeydown=function(e){ if(e.key==="Enter"&&phoneOk()) lookup(); };
+$("email").onkeydown=function(e){ if(e.key==="Enter"&&emailOk()) lookup(); };
 $("look").onclick=lookup;
 
 
 async function lookup(){
-  st.phone=$("phone").value.trim();
+  st.email=$("email").value.trim().toLowerCase();
   var btn = $("look");
   var oldText = btn.textContent;
   btn.disabled = true;
@@ -306,7 +306,7 @@ async function lookup(){
   
   let clients = [];
   try {
-    let res = await sb.from('clients').select('id, name').eq('phone', st.phone);
+    let res = await sb.from('clients').select('id, name').eq('email', st.email);
     clients = res.data || [];
   } catch(e) {}
   
@@ -314,14 +314,14 @@ async function lookup(){
   btn.disabled = false;
   
   st.account = (clients && clients.length > 0) ? clients[0] : null;
-  if (!st.account && KNOWN[digits(st.phone)]) {
-      st.account = KNOWN[digits(st.phone)];
+  if (!st.account && KNOWN[st.email]) {
+      st.account = KNOWN[st.email];
   }
 
   st.isNew=!st.account;
   if(st.isNew){
     st.step=2; st.name="";
-    $("new-phone").textContent=st.phone;
+    $("new-email").textContent=st.email;
     panel("p-name");
     setTimeout(function(){ $("new-name").focus(); },60);
   } else {
@@ -336,24 +336,24 @@ $("new-name").oninput=function(){ $("tocode").disabled=!this.value.trim(); };
 $("new-name").onkeydown=function(e){ if(e.key==="Enter"&&this.value.trim()) toCode(); };
 $("tocode").onclick=toCode;
 function toCode(){ st.name=$("new-name").value.trim(); st.step=3; sendCode(); }
-$("back-1").onclick=function(){ st.step=1; st.isNew=false; panel("p-phone"); $("phone").focus(); };
+$("back-1").onclick=function(){ st.step=1; st.isNew=false; panel("p-email"); $("email").focus(); };
 
 /* ---- code ---- */
 
 async function sendCode(){
-  $("shown-phone").textContent=st.phone;
+  $("shown-email").textContent=st.email;
   $("code-head").textContent = st.isNew? "Confirm it's you, "+st.name+"." : "Welcome back, "+st.name+".";
   $("verify").textContent = st.isNew? "Open my account" : "Take me to my dashboard";
   otpReset();
   panel("p-code");
   setTimeout(function(){ $("otp").firstChild.focus(); },60);
   
-  var cleanPhone = digits(st.phone);
+  var cleanEmail = st.email;
   if (cleanPhone.startsWith("0")) cleanPhone = "+44" + cleanPhone.substring(1);
   else if (!cleanPhone.startsWith("+")) cleanPhone = "+" + cleanPhone;
   
   try {
-      const { data, error } = await sb.auth.signInWithOtp({ phone: cleanPhone });
+      const { data, error } = await sb.auth.signInWithOtp({ email: cleanEmail });
       if (error) alert("SMS Error: " + error.message);
   } catch(e) {
       alert("Error: " + e);
@@ -411,7 +411,7 @@ function countdown(s){
   },1000);
 }
 $("resend").onclick=function(){ if(!this.disabled){ otpReset(); $("otp").firstChild.focus(); countdown(30); } };
-$("back-2").onclick=function(){ clearInterval(st.timer); st.step=1; st.isNew=false; panel("p-phone"); $("phone").focus(); };
+$("back-2").onclick=function(){ clearInterval(st.timer); st.step=1; st.isNew=false; panel("p-email"); $("email").focus(); };
 $("verify").onclick=function(){ doVerify(); };
 
 
@@ -426,12 +426,12 @@ async function doVerify(){
   btn.textContent = "Verifying...";
   $("code-err").textContent = "";
   
-  var cleanPhone = digits(st.phone);
+  var cleanEmail = st.email;
   if (cleanPhone.startsWith("0")) cleanPhone = "+44" + cleanPhone.substring(1);
   else if (!cleanPhone.startsWith("+")) cleanPhone = "+" + cleanPhone;
   
   try {
-      const { data, error } = await sb.auth.verifyOtp({ phone: cleanPhone, token: code(), type: 'sms' });
+      const { data, error } = await sb.auth.verifyOtp({ email: cleanEmail, token: code(), type: 'email' });
       if (error) {
           $("code-err").textContent = "Incorrect code. Try again.";
           btn.textContent = oldText;
@@ -447,8 +447,8 @@ async function doVerify(){
   
   if (st.isNew) {
     try {
-      var email = st.phone || "unknown@AMAI";
-      await sb.from('clients').insert([{ name: st.name, email: email, phone: st.phone }]);
+      
+      await sb.from('clients').insert([{ name: st.name, email: st.email }]);
     } catch(e) {}
   }
   
@@ -459,11 +459,11 @@ async function doVerify(){
 function signIn(){
   try{
     var raw=localStorage.getItem(HUB_KEY), h=raw?JSON.parse(raw):null;
-    var samePerson = h && digits(h.phone||"")===digits(st.phone);
+    var samePerson = h && (h.email||"").toLowerCase()===st.email;
     if(samePerson){ h.signedIn=true; h.name=st.name||h.name; }
     else {
       var now=new Date();
-      h={signedIn:true,name:st.name,phone:st.phone,email:"",
+      h={signedIn:true,name:st.name,email:st.email,
          since:now.toLocaleDateString("en-GB",{month:"long",year:"numeric"}),
          view:"home",stamps:st.account?st.account.stamps:0,plan:null,notes:"",card:null,
          upcoming:[],past:[]};

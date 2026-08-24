@@ -112,7 +112,7 @@ button,input,textarea,select{font-family:inherit;font-size:16px}
         <h1 class="serif" style="font-size:38px;line-height:1.12;margin:0 0 16px">Sign in with your number.</h1>
         <p style="font-size:15px;line-height:1.75;color:#CBB49E;margin:0 0 26px">No password. We text you a six-digit code — the same number you booked with.</p>
         <label class="flab" style="margin-bottom:18px">Mobile number
-          <input id="phone" class="field" inputmode="tel" autocomplete="tel" placeholder="07700 900123" style="font-size:19px;padding:17px 16px">
+          <input id="email" class="field" type="email" autocomplete="email" placeholder="hello@example.com" style="font-size:19px;padding:17px 16px">
         </label>
         <button id="send" class="btn">Text me a code</button>
         <div id="p1help" style="font-size:12.5px;line-height:1.7;color:#B39C88;margin-top:14px">Standard message rates apply. We never text anything but codes and appointment reminders.</div>
@@ -170,24 +170,26 @@ button,input,textarea,select{font-family:inherit;font-size:16px}
 </nav>
 
 <template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#3A322E"/><path d="M36 72 L36 46 A14 14 0 0 1 64 46 L64 72" fill="none" stroke="#E8D5C4" stroke-width="4"/></svg></template>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (function(){
   var top=document.querySelector(".top");
   addEventListener("scroll",function(){ top.style.borderBottomColor = scrollY>8 ? "rgba(232,213,196,.2)" : "rgba(232,213,196,.12)"; },{passive:true});
 })();
 
+const supabaseUrl = 'https://tphyrmweauzfletdlqvi.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwaHlybXdlYXV6ZmxldGRscXZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQ0MDk1MjksImV4cCI6MjA0MDAxNzUyOX0.L2k8HXZdIDk7V3eM3Wc7r3p-t_7q6r9-h-wH7jC7V3E';
+const sb = supabase.createClient(supabaseUrl, supabaseKey);
+
 var $=function(i){return document.getElementById(i);};
-var KNOWN={
-  "07700900123":{name:"Nadia",stamps:4,visits:5,next:"Hollywood wax, Tuesday 1 September, 14.30"},
-  "07700900456":{name:"Priya",stamps:2,visits:2,next:null},
-  "07700900789":{name:"Hannah",stamps:9,visits:9,next:"Bikini wax, Thursday 3 September, 12.00"}
-};
 var HUB_KEY="amai_hub_v2";
-var st={phone:"",acct:null,isNew:false,left:0,tick:null};
-function dg(v){ return String(v).replace(/\D/g,""); }
+var st={email:"",name:"",acct:null,isNew:false,left:0,tick:null};
+
 function stored(){ try{ return JSON.parse(localStorage.getItem(HUB_KEY))||null; }catch(e){ return null; } }
 
-function syncSend(){ var ok=dg($("phone").value).length>=10; $("send").style.background=ok?"#E8D5C4":"rgba(232,213,196,.28)"; }
+function emailOk(){ var e=$("email").value; return e.includes("@") && e.includes("."); }
+function syncSend(){ $("send").style.background=emailOk()?"#E8D5C4":"rgba(232,213,196,.28)"; }
+
 function countdown(){
   st.left=30; clearInterval(st.tick);
   $("resend").style.opacity=".45";
@@ -198,17 +200,33 @@ function countdown(){
     else $("timer").textContent="Code sent · resend in "+st.left+"s";
   },1000);
 }
-function toStep2(){
-  st.phone=$("phone").value.trim();
+
+async function toStep2(){
+  st.email=$("email").value.trim().toLowerCase();
   var h=stored();
-  st.acct = KNOWN[dg(st.phone)] || (h&&dg(h.phone||"")===dg(st.phone) ? {name:h.name,stamps:h.stamps||0,visits:(h.past||[]).length,next:(h.upcoming&&h.upcoming[0])?h.upcoming[0].treat:null} : null);
-  st.isNew=!st.acct;
-  $("p2title").textContent = st.isNew? "Enter your code." : "Welcome back, "+st.acct.name+".";
-  $("p2sub").innerHTML = 'Texted to <strong style="font-weight:600;color:#E8D5C4">'+st.phone+'</strong>. Any six digits work in this preview.';
+  
+  // Lookup client in supabase
+  try {
+    let res = await sb.from('clients').select('id, name').eq('email', st.email);
+    if (res.data && res.data.length > 0) {
+      st.acct = res.data[0];
+      st.name = st.acct.name;
+    } else {
+      st.acct = null;
+    }
+  } catch(e) {}
+  
+  st.isNew = !st.acct;
+  
+  $("p2title").textContent = st.isNew? "Enter your code." : "Welcome back, "+st.name+".";
+  $("p2sub").innerHTML = 'Emailed to <strong style="font-weight:600;color:#E8D5C4">'+st.email+'</strong>.';
   $("newname").className = st.isNew? "" : "hide";
   $("p1").className="hide"; $("p2").className="";
   $("code").focus(); countdown();
+  
+  await sb.auth.signInWithOtp({ email: st.email });
 }
+
 function stampRow(n){
   var box=$("stamps"); box.innerHTML="";
   for(var i=1;i<=10;i++){
@@ -219,45 +237,69 @@ function stampRow(n){
     box.appendChild(d);
   }
 }
-function finish(){
-  var name = st.isNew ? ($("fname").value.trim()||"there") : st.acct.name;
-  var stamps = st.isNew?0:st.acct.stamps;
+
+async function finish(){
+  var name = st.isNew ? ($("fname").value.trim()||"there") : st.name;
+  var stamps = 0; // Assuming 0 for now as we don't have stamps in DB yet
+  var visits = 0;
+  
+  if (st.isNew) {
+    await sb.from('clients').insert([{ name: name, email: st.email }]);
+  }
+  
   $("p3title").textContent = st.isNew? "You're in, "+name+"." : "Signed in, "+name+".";
   $("p3sub").textContent = st.isNew
     ? "Your account is open. Book your first visit and your loyalty card starts filling."
-    : st.acct.visits+" visits with us so far. Everything is where you left it.";
+    : visits+" visits with us so far. Everything is where you left it.";
+    
   stampRow(stamps);
   $("stampcopy").textContent = stamps>=10? "Your next visit is free — we'll take it off at the studio."
     : stamps>=5? (10-stamps)+" more and your visit is free. 25% off is ready to use now."
     : stamps===0? "Ten stamps, one free visit. Five gets you 25% off."
     : (5-stamps)+" more stamps and you're at 25% off.";
-  if(!st.isNew&&st.acct.next){ $("nextcard").className="card"; $("nexttreat").textContent=st.acct.next; }
+    
   try{
     var h=stored()||{};
-    h.signedIn=true; h.phone=st.phone; h.name=h.name||name; h.stamps=h.stamps||stamps;
+    h.signedIn=true; h.email=st.email; h.name=h.name||name; h.stamps=h.stamps||stamps;
     h.upcoming=h.upcoming||[]; h.past=h.past||[]; h.referrals=h.referrals||[];
     h.since=h.since||new Date().toLocaleDateString("en-GB",{month:"long",year:"numeric"});
     h.view=h.view||"home";
     localStorage.setItem(HUB_KEY,JSON.stringify(h));
   }catch(e){}
+  
   clearInterval(st.tick);
   $("p2").className="hide"; $("p3").className="";
 }
 
-$("phone").oninput=syncSend;
-$("phone").onkeydown=function(e){ if(e.key==="Enter"&&dg(this.value).length>=10) toStep2(); };
-$("send").onclick=function(){ if(dg($("phone").value).length>=10) toStep2(); };
+$("email").oninput=syncSend;
+$("email").onkeydown=function(e){ if(e.key==="Enter"&&emailOk()) toStep2(); };
+$("send").onclick=function(){ if(emailOk()) toStep2(); };
 $("edit").onclick=function(){ clearInterval(st.tick); $("p2").className="hide"; $("p1").className=""; };
-$("code").oninput=function(){
-  this.value=dg(this.value).slice(0,6);
-  var ok=this.value.length===6;
+$("code").oninput=async function(){
+  var codeVal = this.value.trim();
+  var ok = codeVal.length === 6;
   $("verify").style.background=ok?"#E8D5C4":"rgba(232,213,196,.28)";
-  if(ok&&!st.isNew) finish();
+  if(ok) {
+    const { data, error } = await sb.auth.verifyOtp({ email: st.email, token: codeVal, type: 'email' });
+    if (!error) finish();
+    else alert("Invalid code. Please try again.");
+  }
 };
-$("verify").onclick=function(){ if(dg($("code").value).length===6) finish(); };
-$("resend").onclick=function(){ if(st.left<=0) countdown(); };
+$("verify").onclick=async function(){ 
+  var codeVal = $("code").value.trim();
+  if(codeVal.length===6) {
+    const { data, error } = await sb.auth.verifyOtp({ email: st.email, token: codeVal, type: 'email' });
+    if (!error) finish();
+    else alert("Invalid code. Please try again.");
+  }
+};
+$("resend").onclick=async function(){ 
+  if(st.left<=0) {
+    countdown(); 
+    await sb.auth.signInWithOtp({ email: st.email });
+  }
+};
 syncSend();
-
 </script>
 </body>
 </html>

@@ -275,9 +275,9 @@ section[id]{scroll-margin-top:84px}
 
         <div id="step3" class="hide">
           <h3 style="font-family:Marcellus,serif;font-size:26px;font-weight:400;margin:0 0 6px">Your number, and you're in.</h3>
-          <p style="font-size:14.5px;line-height:1.7;color:#CBB49E;margin:0 0 24px">We use your mobile to confirm the appointment — and it doubles as your sign-in. No password to invent, nothing to remember.</p>
+          <p style="font-size:14.5px;line-height:1.7;color:#CBB49E;margin:0 0 24px">We use your email to confirm the appointment — and it doubles as your sign-in. No password to invent, nothing to remember.</p>
           <div class="two" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:16px">
-            <label class="flab">Mobile number<input id="f-contact" class="field" inputmode="tel" placeholder="07700 900123"></label>
+            <label class="flab">Email address<input id="f-contact" class="field" type="email" autocomplete="email" placeholder="hello@example.com"></label>
             <label class="flab">First name<input id="f-name" class="field" placeholder="Your name"></label>
           </div>
           <div id="known" class="hide" style="display:flex;align-items:center;gap:14px;background:#443B36;padding:15px 18px;margin-bottom:16px">
@@ -633,7 +633,7 @@ function wantsAccount(){ return $("f-acct") && $("f-acct").checked; }
 function checkKnown(){
   var contactInput = $("f-contact");
   if(!contactInput) return;
-  var name=KNOWN[digits(contactInput.value)];
+  var name=KNOWN[contactInput.value.trim().toLowerCase()];
   S.returning=!!name;
   if(name){
     if($("known")) $("known").className="";
@@ -653,7 +653,7 @@ function ready(){
     var contactInput = $("f-contact");
     var nameInput = $("f-name");
     if(contactInput && nameInput) {
-       return digits(contactInput.value).length>=10 && !!nameInput.value.trim();
+       return contactInput.value.includes("@") && contactInput.value.includes(".") && !!nameInput.value.trim();
     }
     // If hidden by session block, it's ready.
     return true; 
@@ -721,8 +721,8 @@ function saveToHub(){
   try{
     var raw=localStorage.getItem(HUB_KEY), h=raw?JSON.parse(raw):null;
     var visit={id:Date.now(),treat:S.treatment,dateKey:S.dateKey,time:S.time,price:priceNum(S.treatment),deposit:10};
-    if(h&&h.upcoming){ h.upcoming.push(visit); h.name=$("f-name").value.trim()||h.name; h.phone=$("f-contact").value.trim()||h.phone; h.signedIn=true; }
-    else { h={signedIn:true,name:$("f-name").value.trim(),phone:$("f-contact").value.trim(),upcoming:[visit],pendingFromWeb:true}; }
+    if(h&&h.upcoming){ h.upcoming.push(visit); h.name=$("f-name").value.trim()||h.name; h.email=$("f-contact").value.trim()||h.email; h.signedIn=true; }
+    else { h={signedIn:true,name:$("f-name").value.trim(),email:$("f-contact").value.trim().toLowerCase(),upcoming:[visit],pendingFromWeb:true}; }
     localStorage.setItem(HUB_KEY,JSON.stringify(h));
   }catch(e){}
 }
@@ -734,7 +734,7 @@ function confirm(how){
     $("v-sub").textContent = S.returning? "One code and you're back in your account." : "One code and your account is open.";
     $("v-treat").textContent=S.treatment;
     $("v-when").textContent=whenLabel();
-    $("v-code-label").textContent="Code texted to "+$("f-contact").value.trim();
+    $("v-code-label").textContent="Code emailed to "+$("f-contact").value.trim();
     $("form-side").className="hide"; $("verify-side").className="";
     setTimeout(function(){ $("v-code").focus(); },60);
     return;
@@ -744,13 +744,13 @@ function confirm(how){
 async function showDone(how,acct){
   var name=$("f-name").value.trim()||"Thank you";
   var email = $("f-contact").value.trim();
-  var phone = ""; // We are using f-contact for mobile number now in the UI
+  
 
   // Create client if not exists
   let { data: clients } = await sb.from('clients').select('id').eq('email', email);
   let clientId;
   if (!clients || clients.length === 0) {
-    const { data: newClient } = await sb.from('clients').insert([{ name: name, email: email, phone: phone }]).select().single();
+    const { data: newClient } = await sb.from('clients').insert([{ name: name, email: email }]).select().single();
     if(newClient) clientId = newClient.id;
   } else {
     clientId = clients[0].id;
@@ -815,21 +815,21 @@ renderTabs(); renderPanel(); renderPicker(); renderCalendar(); renderSlots(); ch
         el.href = "hub.html";
       });
       
-      var phoneInput = document.getElementById("f-contact");
+      var emailInput = document.getElementById("f-contact");
       var nameInput = document.getElementById("f-name");
-      if (phoneInput && nameInput) {
-        phoneInput.value = h.phone;
+      if (emailInput && nameInput) {
+        emailInput.value = h.email;
         nameInput.value = h.name;
         
-        var container = phoneInput.closest("div");
+        var container = emailInput.closest("div");
         if (container) {
           var signedInDiv = document.createElement("div");
           signedInDiv.id = "signed-in-block";
-          signedInDiv.innerHTML = '<div style="margin-bottom:16px"><span style="font-size:15px;color:#CBB49E">Signed in as </span><strong style="color:#E8D5C4">' + h.name + '</strong> <span style="color:#8A7361">(' + h.phone + ')</span></div>' +
+          signedInDiv.innerHTML = '<div style="margin-bottom:16px"><span style="font-size:15px;color:#CBB49E">Signed in as </span><strong style="color:#E8D5C4">' + h.name + '</strong> <span style="color:#8A7361">(' + h.email + ')</span></div>' +
                                   '<a href="#" id="sign-out-link" style="font-size:13px;color:#8A7361;text-decoration:underline">Not you? Sign out</a>';
           container.insertBefore(signedInDiv, container.firstChild);
           
-          var pWrapper = phoneInput.closest("label");
+          var pWrapper = emailInput.closest("label");
           var nWrapper = nameInput.closest("label");
           if(pWrapper) pWrapper.style.display = "none";
           if(nWrapper) nWrapper.style.display = "none";
@@ -850,7 +850,7 @@ renderTabs(); renderPanel(); renderPicker(); renderCalendar(); renderSlots(); ch
             if(acctCheckbox) acctCheckbox.closest("label").style.display = "";
             if(knownDiv && knownDiv.className !== "hide") knownDiv.style.display = "";
             
-            phoneInput.value = "";
+            emailInput.value = "";
             nameInput.value = "";
             if(typeof syncNext === 'function') syncNext();
             if(typeof renderTracker === 'function') renderTracker();

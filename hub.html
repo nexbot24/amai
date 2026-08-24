@@ -107,13 +107,13 @@ button{font-family:Mulish,sans-serif}
         <h2 class="serif" style="font-size:30px;margin:0 0 12px">Your number is your account.</h2>
         <p style="font-size:14.5px;line-height:1.7;color:#5C5148;margin:0 0 28px">No password to forget. We'll text you a six-digit code — it's the same number we'd call you on.</p>
         <label class="flab" style="margin-bottom:20px">Mobile number
-          <input id="a-phone" class="field" inputmode="tel" placeholder="07700 900123" value="07700 900123">
+          <input id="a-email" class="field" type="email" placeholder="hello@example.com" value="nadia@example.com">
         </label>
         <button id="a-send" class="btn" style="width:100%;min-height:52px;font-size:16px;border-radius:26px 26px 0 0">Send my code</button>
         <p style="font-size:12.5px;line-height:1.6;color:#6E5B49;margin:16px 0 0">First time? Book a visit and your hub is created automatically.</p>
       </div>
       <div id="step-code" class="hide">
-        <div class="lbl" style="margin-bottom:16px">Check your phone</div>
+        <div class="lbl" style="margin-bottom:16px">Check your email</div>
         <h2 class="serif" style="font-size:30px;margin:0 0 12px">Enter your code.</h2>
         <p id="a-sent" style="font-size:14.5px;line-height:1.7;color:#5C5148;margin:0 0 28px"></p>
         <label class="flab" style="margin-bottom:20px">Six-digit code
@@ -202,7 +202,7 @@ function parseKey(k){ var p=k.split("-"); return new Date(+p[0],+p[1],+p[2]); }
 function money(n){ return "£"+n; }
 
 var DEFAULTS={
-  signedIn:false, name:"Nadia", phone:"07700 900123", email:"nadia@example.com", since:"January 2026",
+  signedIn:false, name:"Nadia",  email:"nadia@example.com", since:"January 2026",
   view:"home", stamps:4, plan:null, notes:"Sensitive skin on legs — patch test done Feb 2026.",
   prefs:{room:"Warm, low light",music:"Quiet",chat:"Happy to chat"},
   notify:{reminder:true,aftercare:true,openings:false,news:false},
@@ -229,12 +229,12 @@ var S=(function(){
 
 /* ---------- auth ---------- */
 $("a-send").onclick=function(){
-  var p=$("a-phone").value.trim();
+  var p=$("a-email").value.trim().toLowerCase();
   if(p.length<9){ return; }
-  S.phone=p;
+  S.email=p;
   $("a-sent").textContent="We've sent a code to "+p+". It lasts ten minutes.";
   $("a-hint").textContent="Demo code: 000000";
-  $("step-phone").className="hide"; $("step-code").className="";
+  if(p.includes("@")) { $("step-phone").className="hide"; $("step-code").className=""; }
   $("a-code").focus();
 };
 $("a-back").onclick=function(){ $("step-code").className="hide"; $("step-phone").className=""; };
@@ -537,7 +537,7 @@ VIEW.account=function(){
       '<div class="lbl" style="margin-bottom:18px">Your details</div>'+
       '<div style="display:flex;flex-direction:column;gap:16px">'+
         '<label class="flab">Name<input class="field" id="f-name" value="'+S.name+'"></label>'+
-        '<label class="flab">Mobile<input class="field" id="f-phone" value="'+S.phone+'"></label>'+
+        '<label class="flab">Email<input class="field" id="f-email" value="'+S.email+'"></label>'+
         '<label class="flab">Email<input class="field" id="f-email" value="'+S.email+'"></label>'+
         '<label class="flab">Notes for your practitioner<textarea class="field" id="f-notes" rows="3" style="resize:vertical">'+S.notes+'</textarea></label>'+
         '<div style="display:flex;gap:12px;align-items:center"><button class="btn btn-sm" id="savedetails">Save changes</button>'+
@@ -724,11 +724,11 @@ function bindBookingModal(cta){
       save(); closeModal(); render();
       toast("Moved to "+longDate(parseKey(draft.dateKey))+", "+draft.time+".");
     } else {
-      var email = S.phone || "unknown@AMAI"; // Temporary fallback
+      
       let { data: clients } = await sb.from('clients').select('id').eq('email', email);
       let clientId;
       if (!clients || clients.length === 0) {
-        const { data: newClient } = await sb.from('clients').insert([{ name: S.name, email: email, phone: S.phone }]).select().single();
+        const { data: newClient } = await sb.from('clients').insert([{ name: S.name, email: S.email }]).select().single();
         if(newClient) clientId = newClient.id;
       } else {
         clientId = clients[0].id;
@@ -854,7 +854,7 @@ function wire(){
     b.onclick=function(){ var k=b.dataset.toggle; S.notify[k]=!S.notify[k]; b.setAttribute("aria-checked",String(S.notify[k])); save(); };
   });
   if($("savedetails")) $("savedetails").onclick=function(){
-    S.name=$("f-name").value.trim()||S.name; S.phone=$("f-phone").value.trim();
+    S.name=$("f-name").value.trim()||S.name; S.phone=$("f-email").value.trim();
     S.email=$("f-email").value.trim(); S.notes=$("f-notes").value.trim();
     save(); $("saved").textContent="Saved."; setTimeout(function(){ if($("saved")) $("saved").textContent=""; },2200);
   };
