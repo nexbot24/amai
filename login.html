@@ -288,7 +288,7 @@ function panel(id){
 
 /* ---- step 1: number, then branch ---- */
 function emailOk(){ var e=$("email").value; return e.includes("@") && e.includes("."); }
-$("email").oninput=function(){
+$("email").oninput = $("email").onchange = $("email").onpaste = $("email").onkeyup = function(){
   $("look").disabled=!emailOk();
 };
 $("email").onkeydown=function(e){ if(e.key==="Enter"&&emailOk()) lookup(); };
@@ -330,7 +330,7 @@ async function lookup(){
 }
 
 /* ---- step 2 (new): name ---- */
-$("new-name").oninput=function(){ $("tocode").disabled=!this.value.trim(); };
+$("new-name").oninput = $("new-name").onchange = $("new-name").onpaste = $("new-name").onkeyup = function(){ $("tocode").disabled=!this.value.trim(); };
 $("new-name").onkeydown=function(e){ if(e.key==="Enter"&&this.value.trim()) toCode(); };
 $("tocode").onclick=toCode;
 function toCode(){ st.name=$("new-name").value.trim(); st.step=3; sendCode(); }
