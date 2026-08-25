@@ -256,6 +256,28 @@ async function boot(){
   await loadServices();
   if(!S.signedIn){ $("auth").className=""; $("hub").className="shell hide"; return; }
   $("auth").className="hide"; $("hub").className="shell";
+  /* load bookings from Supabase */
+  if(S.email){
+    try{
+      var cr=await sb.from('clients').select('*').eq('email',S.email);
+      if(cr.data&&cr.data.length>0){
+        var c=cr.data[0];
+        S.stamps=c.stamps||S.stamps||0;
+        S.clientId=c.id;
+        var today=new Date(); today.setHours(0,0,0,0);
+        var bk=await sb.from('bookings').select('*').eq('client_id',c.id).neq('status','cancelled');
+        if(bk.data){
+          S.upcoming=[]; S.past=[];
+          bk.data.forEach(function(b){
+            var v={id:b.id,treat:b.treatment_name,dateKey:b.appointment_date,time:b.appointment_time,price:Number(b.price),deposit:Number(b.deposit_amount||10)};
+            var d=parseKey(b.appointment_date);
+            if(b.status==='completed'||d<today) S.past.push(v);
+            else S.upcoming.push(v);
+          });
+        }
+      }
+    }catch(e){ console.warn('hub booking load',e); }
+  }
   render();
 }
 function render(){ if(typeof VIEW[S.view]!=="function") S.view="home"; nav(); $("view").innerHTML=VIEW[S.view](); wire(); window.scrollTo(0,0); }
@@ -795,8 +817,9 @@ function wire(){
         '<div style="display:flex;gap:12px"><button class="btn btn-o btn-sm" id="m-keep" style="flex:1">Keep my visit</button>'+
         '<button class="btn btn-sm" id="m-drop" style="flex:1">Cancel it</button></div>');
       $("m-keep").onclick=closeModal;
-      $("m-drop").onclick=function(){
+      $("m-drop").onclick=async function(){
         S.upcoming=S.upcoming.filter(function(x){ return x.id!==bk.id; });
+        if(sb) await sb.from('bookings').update({status:'cancelled'}).eq('id',bk.id);
         save(); closeModal(); render(); toast("Cancelled. "+(far?"Deposit refunded.":"Deposit retained."));
       };
     };
