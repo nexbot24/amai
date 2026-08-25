@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=5">
+<title>Amai — My account</title>
+<meta name="theme-color" content="#241F1C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Amai">
+<link rel="icon" href="favicon/amai-favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="favicon/amai-favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Mulish:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:Mulish,sans-serif;color:#F7F1EA;background:#241F1C;overscroll-behavior-y:contain}
+button,input,textarea,select{font-family:inherit;font-size:16px;color:inherit}
+a{color:#E8D5C4;text-decoration:none}
+.app{max-width:480px;margin:0 auto;background:#241F1C;min-height:100dvh;position:relative;overflow-x:clip}
+.serif{font-family:Marcellus,serif;font-weight:400}
+.lbl{font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:#B39C88}
+.arch{border-radius:999px 999px 0 0}
+.hide{display:none!important}
+.scroll{overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes up{from{transform:translateY(100%)}to{transform:none}}
+@keyframes veil{from{opacity:0}to{opacity:1}}
+.view{display:none}
+.view.on{display:block;animation:rise .34s ease both}
+
+/* header */
+.top{position:sticky;top:0;z-index:20;background:rgba(36,31,28,.94);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(232,213,196,.12);padding-top:env(safe-area-inset-top)}
+.topin{height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 18px}
+.mark{display:flex;align-items:center;gap:11px}
+.mark i{display:block;width:13px;height:18px;border:1.4px solid #E8D5C4;border-bottom:none;border-radius:999px 999px 0 0}
+.mark span{font-family:Marcellus,serif;font-size:16px;letter-spacing:.32em;color:#E8D5C4}
+.avatar{width:38px;height:38px;border-radius:50%;background:#3A322E;border:1px solid rgba(232,213,196,.24);display:flex;align-items:center;justify-content:center;font-family:Marcellus,serif;font-size:16px;color:#E8D5C4}
+
+/* tab bar */
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(36,31,28,.96);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid rgba(232,213,196,.14);padding-bottom:env(safe-area-inset-bottom)}
+.tabin{max-width:480px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);height:64px}
+.tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border:none;background:none;color:#B39C88;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;position:relative;padding:0}
+.tab i{display:block;width:16px;height:16px;border:1.3px solid currentColor;border-bottom:none;border-radius:999px 999px 0 0}
+.tab.on{color:#E8D5C4}
+.tab.on::before{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);width:24px;height:2px;background:#E8D5C4}
+.tab:active{opacity:.6}
+.dot{position:absolute;top:12px;right:calc(50% - 17px);width:7px;height:7px;border-radius:50%;background:#E8D5C4}
+
+/* structure */
+.sec{padding:24px 20px 0}
+.sec.last{padding-bottom:34px}
+.h1{font-family:Marcellus,serif;font-weight:400;font-size:31px;line-height:1.14;margin:0}
+.card{border:1px solid rgba(232,213,196,.18);background:#2C2623;padding:20px}
+.card.warm{background:#3A322E;border-color:rgba(232,213,196,.22)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:15px 0;border-bottom:1px solid rgba(232,213,196,.13);font-size:15px}
+.row:last-child{border-bottom:none}
+
+/* buttons */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:52px;border:none;font-family:Marcellus,serif;font-size:16.5px;border-radius:26px 26px 0 0;background:#E8D5C4;color:#3A322E}
+.btn:active{background:#F7F1EA}
+.btn-o{background:transparent;color:#E8D5C4;border:1px solid rgba(232,213,196,.32)}
+.btn-o:active{background:#3A322E}
+.btn-sm{min-height:44px;font-size:15px;border-radius:22px 22px 0 0;padding:0 18px}
+.btn-q{flex-direction:column;gap:9px;min-height:88px;background:#2C2623;border:1px solid rgba(232,213,196,.16);color:#E8D5C4;border-radius:0;font-size:14px}
+.btn-q i{display:block;width:17px;height:23px;border:1.3px solid #B39C88;border-bottom:none;border-radius:999px 999px 0 0}
+.btn-q:active{background:#3A322E}
+
+/* fields */
+.field{width:100%;background:transparent;border:1px solid rgba(232,213,196,.28);color:#F7F1EA;padding:14px 16px;outline:none;border-radius:0}
+.field:focus{border-color:#E8D5C4}
+.field::placeholder{color:#B39C88}
+.flab{display:flex;flex-direction:column;gap:9px;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#B39C88}
+.chip{min-height:46px;padding:0 16px;border-radius:23px 23px 0 0;background:transparent;border:1px solid rgba(232,213,196,.28);color:#E8D5C4;font-size:15px;width:100%}
+.chip[aria-pressed="true"]{background:#E8D5C4;color:#3A322E;border-color:#E8D5C4;font-weight:600}
+.chip[disabled]{color:rgba(232,213,196,.26);border-color:rgba(232,213,196,.12);text-decoration:line-through}
+.seg{display:grid;grid-auto-flow:column;gap:0;border:1px solid rgba(232,213,196,.22)}
+.seg button{min-height:44px;background:transparent;border:none;color:#B39C88;font-size:14px;letter-spacing:.04em}
+.seg button[aria-pressed="true"]{background:#E8D5C4;color:#3A322E;font-weight:600}
+
+/* loyalty card */
+.loyal{background:linear-gradient(160deg,#463C36 0%,#332C28 58%,#2A2421 100%);border:1px solid rgba(232,213,196,.24);padding:22px;position:relative;overflow:hidden}
+.loyal::after{content:"";position:absolute;right:20px;top:14px;width:104px;height:132px;border:1px solid rgba(232,213,196,.09);border-bottom:none;border-radius:999px 999px 0 0;pointer-events:none}
+.stamps{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;position:relative}
+.stamp{aspect-ratio:1/1;border:1px solid rgba(232,213,196,.26);display:flex;align-items:center;justify-content:center;font-family:Marcellus,serif;font-size:14px;color:#B39C88;background:transparent;padding:0}
+.stamp.on:active{background:#F7F1EA}
+.stamp.on{background:#E8D5C4;border-color:#E8D5C4;color:#3A322E}
+.stamp.key{border-color:rgba(232,213,196,.5);color:#CBB49E;font-size:11px;letter-spacing:.04em}
+.stamp.on.key{color:#3A322E;font-weight:600}
+
+/* list rows */
+.srow{display:flex;align-items:center;gap:14px;width:100%;padding:15px 16px;background:transparent;border:1px solid rgba(232,213,196,.16);color:#E8D5C4;text-align:left}
+.srow[aria-checked="true"]{background:#3A322E;border-color:#E8D5C4}
+.tick{flex:none;width:18px;height:18px;border-radius:50%;border:1px solid rgba(232,213,196,.3)}
+.srow[aria-checked="true"] .tick{background:#E8D5C4;border-color:#E8D5C4}
+.pick{max-height:244px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.pick::-webkit-scrollbar{display:none}
+
+/* calendar */
+.cal{border:1px solid rgba(232,213,196,.16);padding:6px 10px 12px}
+.calbar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 0 10px}
+.calnav{width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:transparent;border:1px solid rgba(232,213,196,.24);color:#E8D5C4;font-size:16px}
+.calnav[disabled]{opacity:.24}
+.dow{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding-bottom:6px}
+.dow span{text-align:center;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#B39C88}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.dcell{position:relative;aspect-ratio:1/1;min-height:42px;display:flex;align-items:center;justify-content:center;background:transparent;border:none;color:#E8D5C4;font-family:Marcellus,serif;font-size:16px;padding:0}
+.dcell u{position:absolute;bottom:6px;width:4px;height:4px;border-radius:50%;background:#B39C88}
+.dcell[disabled]{color:rgba(232,213,196,.18)}
+.dcell[aria-pressed="true"]{background:#E8D5C4;color:#3A322E;font-weight:600}
+.dcell[aria-pressed="true"] u{background:#3A322E}
+.blank{aspect-ratio:1/1;min-height:42px}
+
+/* switch */
+.sw{position:relative;width:46px;height:28px;border-radius:14px;background:rgba(232,213,196,.2);border:none;flex:none}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#8A7361;transition:transform .2s ease,background .2s ease}
+.sw[aria-pressed="true"]{background:#E8D5C4}
+.sw[aria-pressed="true"]::after{transform:translateX(18px);background:#3A322E}
+
+/* sheet + toast */
+.swrap{position:fixed;inset:0;z-index:40;background:rgba(18,15,14,.62);display:flex;align-items:flex-end;animation:veil .2s ease both}
+.sheet{width:100%;max-width:480px;margin:0 auto;max-height:90dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#2C2623;border-top:1px solid rgba(232,213,196,.22);padding:14px 20px calc(26px + env(safe-area-inset-bottom));animation:up .3s cubic-bezier(.32,.72,0,1) both;scrollbar-width:none}
+.sheet::-webkit-scrollbar{display:none}
+.grab{width:40px;height:4px;border-radius:2px;background:rgba(232,213,196,.28);margin:0 auto 16px}
+.toast{position:fixed;left:50%;bottom:calc(82px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:50;background:#E8D5C4;color:#3A322E;padding:13px 20px;font-size:14px;line-height:1.5;max-width:86%;text-align:center;animation:rise .24s ease both}
+</style>
+</head>
+<body>
+<div class="app" id="root">
+  <div class="top">
+    <div class="topin">
+      <a class="mark" href="m-home.html"><i></i><span>AMAI</span></a>
+      <button class="avatar" id="me" aria-label="Account"></button>
+    </div>
+  </div>
+  <main style="padding-bottom:88px">
+    <div class="view on" id="v-home"></div>
+    <div class="view" id="v-visits"></div>
+    <div class="view" id="v-rewards"></div>
+    <div class="view" id="v-account"></div>
+  </main>
+</div>
+
+<nav class="tabs">
+  <div class="tabin">
+    <button class="tab on" data-go="home"><i></i>Today</button>
+    <button class="tab" data-go="visits"><i></i>Visits</button>
+    <button class="tab" data-go="rewards"><i></i>Rewards</button>
+    <button class="tab" data-go="account"><i></i>Account</button>
+  </div>
+</nav>
+
+<div id="host"></div>
+
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#241F1C"/><path d="M36 72 L36 46 A14 14 0 0 1 64 46 L64 72" fill="none" stroke="#E8D5C4" stroke-width="4"/></svg></template>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const supabaseUrl = 'https://tphyrmweauzfletdlqvi.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwaHlybXdlYXV6ZmxldGRscXZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQ0MDk1MjksImV4cCI6MjA0MDAxNzUyOX0.L2k8HXZdIDk7V3eM3Wc7r3p-t_7q6r9-h-wH7jC7V3E';
+const sb = supabase.createClient(supabaseUrl, supabaseKey);
+
+var $=function(i){return document.getElementById(i);};
+var KEY="amai_hub_v2";
+var SERVICES=[
+  {n:"First visit — consultation & treatment",t:"60 min",p:30},
+  {n:"Full leg wax",t:"45 min",p:38},{n:"Half leg wax",t:"30 min",p:26},
+  {n:"Underarm wax",t:"15 min",p:14},{n:"Arm wax",t:"25 min",p:22},
+  {n:"Facial waxing",t:"15 min",p:12},{n:"Brow shape & tidy",t:"20 min",p:16},
+  {n:"Bikini wax",t:"30 min",p:28},{n:"Brazilian wax",t:"40 min",p:36},
+  {n:"Hollywood wax",t:"45 min",p:42},{n:"Maintenance visit",t:"30 min",p:24}
+];
+var PREP=[
+  ["Hair length","About a quarter of an inch — two to three weeks of growth. Don't shave in between."],
+  ["On the day","Clean, dry skin, no oils or lotions. Exfoliate gently the day before, not the same morning."],
+  ["Comfort","Avoid caffeine right before, and wear something loose for afterwards. Ask us to pause at any point."]
+];
+var AFTER={
+  "Hollywood wax":"Keep the area cool and dry for 24 hours. No swimming, sauna or tight clothing. Exfoliate gently from day three.",
+  "Brazilian wax":"Keep the area cool and dry for 24 hours. Loose cotton only. Gentle exfoliation from day three.",
+  "Bikini wax":"Avoid heat and friction for 24 hours. Hydrate daily, exfoliate lightly from day three.",
+  "Full leg wax":"No hot baths or sun for 24 hours. Moisturise daily; exfoliate from day two to keep ingrowns away.",
+  "Half leg wax":"No hot baths or sun for 24 hours. Moisturise daily from tomorrow.",
+  "Brow shape & tidy":"Avoid make-up on the area for a few hours. A little redness settles within the hour.",
+  "Underarm wax":"Skip deodorant until tomorrow. Loose sleeves help for the first evening."
+};
+
+function d0(){ var d=new Date(); d.setHours(0,0,0,0); return d; }
+function key(d){ return d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate(); }
+function parseK(k){ var p=String(k).split("-"); return new Date(+p[0],+p[1],+p[2]); }
+function isOpen(d){ return d.getDay()!==0&&d.getDay()!==1; }
+function freeDay(d){ return (d.getDate()*7+d.getMonth()*3)%6!==0; }
+function openDay(n){ var d=d0(),c=0; while(c<n){ d.setDate(d.getDate()+1); if(isOpen(d)) c++; } return d; }
+function relDay(n){ var d=d0(); d.setDate(d.getDate()+n); return d; }
+function longD(d){ return d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}); }
+function shortD(d){ return d.toLocaleDateString("en-GB",{day:"numeric",month:"short"}); }
+function slotsFor(d){ return ["9.00","10.30","12.00","13.30","15.00","16.30"].map(function(l,i){ return {l:l,open:(d.getDate()+i*3)%4!==0}; }); }
+function money(n){ return "£"+n; }
+function daysTo(k){ return Math.round((parseK(k)-d0())/86400000); }
+function svc(n){ return SERVICES.filter(function(s){ return s.n===n; })[0]; }
+
+var DEFAULTS={
+  signedIn:true, name:"Nadia", phone:"07700 900123", email:"nadia@example.com", since:"January 2026",
+  stamps:4, plan:null, notes:"Sensitive skin on legs — patch test done Feb 2026.",
+  prefs:{room:"Warm, low light",music:"Quiet"},
+  notify:{reminder:true,aftercare:true,openings:false,news:false},
+  card:{brand:"Visa",last4:"4242",exp:"04 / 29"},
+  referrals:[{who:"Priya",when:"Booked 4 Mar",state:"Stamp earned"},{who:"Hannah",when:"Invited 18 Mar",state:"Not booked yet"}],
+  upcoming:[{id:1,treat:"Hollywood wax",dateKey:key(openDay(9)),time:"14.30",price:42,deposit:10}],
+  past:[
+    {id:101,treat:"Hollywood wax",dateKey:key(relDay(-26)),time:"15.00",price:42},
+    {id:102,treat:"Brow shape & tidy",dateKey:key(relDay(-26)),time:"16.00",price:16},
+    {id:103,treat:"Hollywood wax",dateKey:key(relDay(-61)),time:"11.00",price:42},
+    {id:104,treat:"Full leg wax",dateKey:key(relDay(-96)),time:"10.00",price:38}
+  ]
+};
+function load(){
+  var s={},j;
+  for(j in DEFAULTS) s[j]=DEFAULTS[j];
+  try{ var v=JSON.parse(localStorage.getItem(KEY));
+    if(v) for(j in v) if(v[j]!==undefined&&v[j]!==null) s[j]=v[j];
+  }catch(e){}
+  s.prefs=s.prefs||DEFAULTS.prefs; s.notify=s.notify||DEFAULTS.notify;
+  s.upcoming=s.upcoming||[]; s.past=s.past||[]; s.referrals=s.referrals||[];
+  if(typeof s.stamps!=="number") s.stamps=0;
+  return s;
+}
+var S=load(), view="home";
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
+function toast(msg){
+  var old=document.querySelector(".toast"); if(old) old.remove();
+  var t=document.createElement("div"); t.className="toast"; t.textContent=msg;
+  document.body.appendChild(t); setTimeout(function(){ if(t.parentNode) t.remove(); },3000);
+}
+function first(){ return (S.name||"there").split(" ")[0]; }
+function nextVisit(){ return S.upcoming.slice().sort(function(a,b){ return parseK(a.dateKey)-parseK(b.dateKey); })[0]||null; }
+/* oldest earned visit first, so stamp 1 is the earliest */
+function earners(){
+  return S.past.slice().sort(function(a,b){ return parseK(a.dateKey)-parseK(b.dateKey); });
+}
+function stampsHTML(n){
+  var e=earners(), o="";
+  for(var i=1;i<=10;i++){
+    var k=(i===5||i===10), filled=i<=n;
+    var label=(i===5?"25%":i===10?"FREE":i);
+    if(filled) o+='<button class="stamp on'+(k?" key":"")+'" data-stamp="'+i+'" aria-label="Stamp '+i+'">'+label+'</button>';
+    else o+='<div class="stamp'+(k?" key":"")+'">'+label+'</div>';
+  }
+  return o;
+}
+function stampSheet(i){
+  var e=earners(), v=e[e.length-S.stamps+(i-1)];
+  var body = v?
+    '<div class="card" style="margin-bottom:16px">'+
+      '<div class="serif" style="font-size:21px;margin-bottom:5px">'+v.treat+'</div>'+
+      '<div style="font-size:14px;color:#CBB49E;margin-bottom:14px">'+longD(parseK(v.dateKey))+' · '+v.time+'</div>'+
+      '<div style="display:flex;justify-content:space-between;gap:14px;font-size:13.5px;padding-top:12px;border-top:1px solid rgba(232,213,196,.16)">'+
+        '<span style="color:#B39C88">Paid</span><span>'+money(v.price)+'</span></div></div>'+
+    '<div style="display:flex;gap:8px">'+
+      '<button class="btn btn-o btn-sm" data-again2="'+v.treat+'" style="flex:1">Book this again</button>'+
+      '<button class="btn btn-o btn-sm" data-after2="'+v.treat+'" style="flex:1">Aftercare</button></div>'
+    :
+    '<div class="card" style="margin-bottom:16px"><p style="font-size:14px;line-height:1.75;color:#CBB49E;margin:0">'+
+      'This stamp came from a visit before your account was set up, so we don\'t have the details on file. The studio has them — ask any time.</p></div>'+
+    '<button class="btn btn-o" data-close="1">Close</button>';
+  var note = i===5? "This one unlocked 25% off." : i===10? "This one made a visit free." : "";
+  sheet('<div class="lbl" style="margin-bottom:12px">Stamp '+i+' of 10</div>'+
+    '<h2 class="serif" style="font-size:25px;line-height:1.2;margin:0 0 '+(note?"8px":"18px")+'">Earned on this visit.</h2>'+
+    (note?'<p style="font-size:14px;line-height:1.7;color:#CBB49E;margin:0 0 18px">'+note+'</p>':'')+
+    body);
+}
+function rewardLine(n){
+  if(n>=10) return "Your next visit is free — we take it off at the studio, nothing to show us.";
+  if(n>=5) return "25% off is ready to use. "+(10-n)+(n===9?" more visit":" more visits")+" and it's free.";
+  if(n===0) return "A stamp for every visit. Five is 25% off, ten is free.";
+  return (5-n)+(n===4?" more stamp":" more stamps")+" and 25% comes off a visit.";
+}
+function when(k,t){ return longD(parseK(k))+(t?" · "+t:""); }
+function countdown(k){
+  var n=daysTo(k);
+  return n<0?"Passed":n===0?"Today":n===1?"Tomorrow":"In "+n+" days";
+}
+
+/* ---------------- views ---------------- */
+var V={};
+
+V.home=function(){
+  var v=nextVisit(), reward=S.stamps>=10?"free":S.stamps>=5?"quarter":null;
+
+  var hero = v? (function(){
+    var bal=v.price-v.deposit;
+    return '<div class="sec"><div class="card warm" style="padding:0;overflow:hidden">'+
+      '<div style="padding:22px 22px 20px">'+
+        '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:14px">'+
+          '<span class="lbl" style="color:#E8D5C4">'+countdown(v.dateKey)+'</span>'+
+          '<span class="lbl">'+shortD(parseK(v.dateKey))+'</span></div>'+
+        '<div class="serif" style="font-size:27px;line-height:1.18;margin-bottom:7px">'+v.treat+'</div>'+
+        '<div style="font-size:15px;color:#CBB49E">'+when(v.dateKey,v.time)+'</div>'+
+      '</div>'+
+      '<div style="display:flex;justify-content:space-between;gap:14px;padding:14px 22px;background:rgba(232,213,196,.07);font-size:13.5px">'+
+        '<span style="color:#B39C88">£'+v.deposit+' deposit paid</span>'+
+        '<span>'+money(bal)+' in the studio</span></div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:rgba(232,213,196,.16)">'+
+        '<button class="btn btn-o btn-sm" data-move="'+v.id+'" style="border:none;border-radius:0;min-height:50px">Move</button>'+
+        '<button class="btn btn-o btn-sm" data-cancel="'+v.id+'" style="border:none;border-radius:0;min-height:50px">Cancel</button>'+
+        '<button class="btn btn-o btn-sm" data-prep="'+v.id+'" style="border:none;border-radius:0;min-height:50px">Prepare</button>'+
+      '</div></div></div>';
+  })() :
+    '<div class="sec"><div class="card" style="text-align:center;padding:30px 22px">'+
+      '<div class="arch" style="width:26px;height:36px;border:1.4px solid #8A7361;border-bottom:none;margin:0 auto 18px"></div>'+
+      '<div class="serif" style="font-size:22px;margin-bottom:8px">Nothing booked</div>'+
+      '<p style="font-size:14px;line-height:1.7;color:#CBB49E;margin:0 0 20px">Most clients keep the same hour every four to six weeks.</p>'+
+      '<button class="btn" data-book="1">Book a visit</button></div></div>';
+
+  var loyal='<div class="sec"><div class="loyal">'+
+    '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:16px">'+
+      '<span class="lbl">Loyalty card</span>'+
+      '<span class="serif" style="font-size:15px;color:#CBB49E">'+S.stamps+' of 10</span></div>'+
+    '<div class="stamps" style="margin-bottom:14px">'+stampsHTML(S.stamps)+'</div>'+
+    '<div style="font-size:13.5px;line-height:1.65;color:#CBB49E;position:relative">'+rewardLine(S.stamps)+
+      (S.stamps?'<span style="display:block;font-size:12px;color:#B39C88;margin-top:6px">Tap a stamp to see the visit behind it.</span>':'')+'</div>'+
+    (reward?'<button class="btn btn-sm" data-tab="rewards" style="margin-top:16px;position:relative">'+(reward==="free"?"Use my free visit":"Use my 25% off")+'</button>':'')+
+  '</div></div>';
+
+  var usual=(S.plan&&S.plan.treat)||(S.past.length? S.past.slice().sort(function(a,b){ return parseK(b.dateKey)-parseK(a.dateKey); })[0].treat : "");
+  var quick='<div class="sec">'+
+    (usual?'<button class="btn" data-rebook="1" style="margin-bottom:8px">Book '+usual+' again</button>'
+          :'<button class="btn" data-book="1" style="margin-bottom:8px">Book a visit</button>')+
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">'+
+      '<button class="btn btn-q" data-tab="visits"><i></i>My visits</button>'+
+      '<button class="btn btn-q" data-tab="rewards"><i></i>Rewards</button>'+
+      '<a class="btn btn-q" href="tel:+442000000000"><i></i>Call studio</a>'+
+    '</div></div>';
+
+  var plan = S.plan?
+    '<div class="sec"><div class="card">'+
+      '<div class="lbl" style="margin-bottom:10px">Your plan</div>'+
+      '<div class="serif" style="font-size:20px;margin-bottom:5px">'+S.plan.treat+'</div>'+
+      '<div style="font-size:14px;color:#CBB49E">Every '+S.plan.weeks+' weeks · '+money(S.plan.price)+' a visit</div></div></div>'
+    :
+    '<div class="sec"><div class="card">'+
+      '<div class="lbl" style="margin-bottom:10px">Subscription</div>'+
+      '<div class="serif" style="font-size:20px;line-height:1.3;margin-bottom:8px">Same treatment, same hour, 15% less.</div>'+
+      '<p style="font-size:13.5px;line-height:1.7;color:#CBB49E;margin:0 0 16px">We hold your slot every four to six weeks. Pause or stop whenever you like.</p>'+
+      '<button class="btn btn-o btn-sm" data-plan="1" style="width:auto">See how it works</button></div></div>';
+
+  var recent = S.past.length? '<div class="sec last"><div class="lbl" style="margin-bottom:12px">Last visit</div>'+
+    (function(){ var p=S.past.slice().sort(function(a,b){ return parseK(b.dateKey)-parseK(a.dateKey); })[0];
+      return '<div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:14px">'+
+        '<span style="min-width:0"><span class="serif" style="display:block;font-size:18px;line-height:1.3;margin-bottom:4px">'+p.treat+'</span>'+
+        '<span style="font-size:12.5px;color:#B39C88">'+longD(parseK(p.dateKey))+'</span></span>'+
+        '<button class="btn btn-o btn-sm" data-after="'+p.id+'" style="width:auto;flex:none;min-height:40px;font-size:14px">Aftercare</button></div>';
+    })()+'</div>' : '<div style="height:20px"></div>';
+
+  return '<div class="sec" style="padding-top:26px">'+
+      '<div class="lbl" style="margin-bottom:12px">'+new Date().toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"})+'</div>'+
+      '<h1 class="h1" style="margin-bottom:7px">Hello, '+first()+'.</h1>'+
+      '<p style="font-size:14.5px;line-height:1.7;color:#CBB49E;margin:0">'+
+        (v?"Your room is held. Everything about the visit is here.":"Nothing in the diary. Booking takes about a minute.")+'</p></div>'+
+    hero+loyal+quick+plan+recent;
+};
+
+V.visits=function(){
+  var up=S.upcoming.slice().sort(function(a,b){ return parseK(a.dateKey)-parseK(b.dateKey); });
+  var past=S.past.slice().sort(function(a,b){ return parseK(b.dateKey)-parseK(a.dateKey); });
+  var tab=S.vtab||"up";
+
+  var body = tab==="up"?
+    (up.length? up.map(function(v){
+      return '<div class="card warm" style="margin-bottom:8px">'+
+        '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:6px">'+
+          '<span class="serif" style="font-size:20px;line-height:1.25">'+v.treat+'</span>'+
+          '<span class="lbl" style="flex:none">'+countdown(v.dateKey)+'</span></div>'+
+        '<div style="font-size:14px;color:#CBB49E;margin-bottom:16px">'+when(v.dateKey,v.time)+'</div>'+
+        '<div style="display:flex;gap:8px">'+
+          '<button class="btn btn-o btn-sm" data-move="'+v.id+'" style="flex:1">Move</button>'+
+          '<button class="btn btn-o btn-sm" data-cancel="'+v.id+'" style="flex:1">Cancel</button>'+
+          '<button class="btn btn-o btn-sm" data-prep="'+v.id+'" style="flex:1">Prepare</button></div></div>';
+    }).join("")
+    : '<div class="card" style="text-align:center;padding:28px 22px"><div class="serif" style="font-size:20px;margin-bottom:8px">Nothing booked</div>'+
+      '<p style="font-size:14px;line-height:1.7;color:#CBB49E;margin:0 0 18px">Pick a treatment and an hour that suits you.</p>'+
+      '<button class="btn" data-book="1">Book a visit</button></div>')
+    :
+    (past.length? past.map(function(v){
+      return '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 0;border-bottom:1px solid rgba(232,213,196,.13)">'+
+        '<span style="min-width:0"><span class="serif" style="display:block;font-size:17px;line-height:1.3;margin-bottom:3px">'+v.treat+'</span>'+
+        '<span style="font-size:12.5px;color:#B39C88">'+shortD(parseK(v.dateKey))+' · '+v.time+' · '+money(v.price)+'</span></span>'+
+        '<span style="display:flex;gap:6px;flex:none">'+
+          '<button class="btn btn-o btn-sm" data-again="'+v.id+'" style="min-height:40px;font-size:14px;padding:0 13px">Again</button>'+
+          '<button class="btn btn-o btn-sm" data-after="'+v.id+'" style="min-height:40px;font-size:14px;padding:0 13px">Care</button></span></div>';
+    }).join("")+
+      '<div style="display:flex;justify-content:space-between;gap:14px;padding:18px 0 0;font-size:13.5px;color:#B39C88">'+
+      '<span>'+past.length+' visits · spent with us</span><span style="color:#E8D5C4">'+money(past.reduce(function(a,b){ return a+b.price; },0))+'</span></div>'
+    : '<p style="font-size:14px;color:#CBB49E;margin:0">Your first visit will show here.</p>');
+
+  return '<div class="sec" style="padding-top:26px">'+
+      '<h1 class="h1" style="margin-bottom:7px">My visits.</h1>'+
+      '<p style="font-size:14.5px;line-height:1.7;color:#CBB49E;margin:0 0 20px">'+up.length+' booked · '+past.length+' behind you</p>'+
+      '<div class="seg" style="grid-template-columns:1fr 1fr">'+
+        '<button data-vtab="up" aria-pressed="'+(tab==="up")+'">Coming up</button>'+
+        '<button data-vtab="past" aria-pressed="'+(tab==="past")+'">Been and gone</button></div></div>'+
+    '<div class="sec last" style="padding-top:16px">'+body+'</div>';
+};
+
+V.rewards=function(){
+  var card='<div class="sec"><div class="loyal" style="padding:24px">'+
+    '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:18px">'+
+      '<span class="serif" style="font-size:21px">Loyalty card</span><span class="lbl">'+S.stamps+' / 10</span></div>'+
+    '<div class="stamps" style="margin-bottom:16px">'+stampsHTML(S.stamps)+'</div>'+
+    '<div style="font-size:14px;line-height:1.7;color:#CBB49E;position:relative;margin-bottom:16px">'+rewardLine(S.stamps)+'</div>'+
+    '<div style="position:relative;padding-top:14px;border-top:1px solid rgba(232,213,196,.18)">'+
+      '<div style="display:flex;justify-content:space-between;gap:14px;font-size:13.5px;padding-bottom:8px"><span style="color:#B39C88">5 stamps</span><span>25% off a visit</span></div>'+
+      '<div style="display:flex;justify-content:space-between;gap:14px;font-size:13.5px"><span style="color:#B39C88">10 stamps</span><span>Visit free</span></div></div>'+
+  '</div></div>';
+
+  var plan='<div class="sec"><div class="lbl" style="margin-bottom:12px">Subscription</div>'+
+    (S.plan?
+      '<div class="card">'+
+        '<div class="serif" style="font-size:21px;margin-bottom:5px">'+S.plan.treat+'</div>'+
+        '<div style="font-size:14px;color:#CBB49E;margin-bottom:16px">Every '+S.plan.weeks+' weeks · '+money(S.plan.price)+' a visit, 15% off</div>'+
+        '<div style="display:flex;gap:8px">'+
+          '<button class="btn btn-o btn-sm" data-plan="1" style="flex:1">Change</button>'+
+          '<button class="btn btn-o btn-sm" id="planstop" style="flex:1">Stop plan</button></div></div>'
+      :
+      '<div class="card">'+
+        '<div class="serif" style="font-size:21px;line-height:1.3;margin-bottom:8px">A standing appointment.</div>'+
+        '<p style="font-size:14px;line-height:1.7;color:#CBB49E;margin:0 0 18px">Pick a treatment and a rhythm. We hold the same hour and take 15% off every visit. Pause or stop any time.</p>'+
+        '<button class="btn" data-plan="1">Set up a plan</button></div>')+
+  '</div>';
+
+  var code=(first()||"AMAI").toUpperCase().slice(0,6)+"10";
+  var refer='<div class="sec last"><div class="lbl" style="margin-bottom:12px">Refer a friend</div>'+
+    '<div class="card">'+
+      '<p style="font-size:14px;line-height:1.7;color:#CBB49E;margin:0 0 16px">They get £10 off a first visit. You get a stamp when they come in.</p>'+
+      '<div style="display:flex;align-items:center;gap:10px;border:1px dashed rgba(232,213,196,.3);padding:15px 16px;margin-bottom:14px">'+
+        '<span id="code" class="serif" style="font-size:19px;letter-spacing:.16em;flex:1">'+code+'</span>'+
+        '<button class="btn btn-o btn-sm" id="copy" style="width:auto;min-height:38px;font-size:13.5px;padding:0 14px">Copy</button></div>'+
+      (S.referrals.length? S.referrals.map(function(r){
+        return '<div class="row"><span style="min-width:0"><span style="display:block">'+r.who+'</span>'+
+          '<span style="font-size:12.5px;color:#B39C88">'+r.when+'</span></span>'+
+          '<span style="font-size:13px;color:#B39C88;flex:none">'+r.state+'</span></div>';
+      }).join("") : '<p style="font-size:13.5px;color:#B39C88;margin:0">No referrals yet.</p>')+
+    '</div></div>';
+
+  return '<div class="sec" style="padding-top:26px">'+
+      '<h1 class="h1" style="margin-bottom:7px">Rewards.</h1>'+
+      '<p style="font-size:14.5px;line-height:1.7;color:#CBB49E;margin:0">A stamp a visit, a plan if you come often, and something for a friend.</p></div>'+
+    card+plan+refer;
+};
+
+V.account=function(){
+  var n=S.notify;
+  return '<div class="sec" style="padding-top:26px">'+
+      '<h1 class="h1" style="margin-bottom:7px">Account.</h1>'+
+      '<p style="font-size:14.5px;line-height:1.7;color:#CBB49E;margin:0">Client since '+S.since+'</p></div>'+
+
+    '<div class="sec"><div class="lbl" style="margin-bottom:12px">Your details</div>'+
+      '<div class="card" style="display:flex;flex-direction:column;gap:14px">'+
+        '<label class="flab">Name<input id="a-name" class="field" value="'+(S.name||"")+'"></label>'+
+        '<label class="flab">Mobile<input id="a-phone" class="field" inputmode="tel" value="'+(S.phone||"")+'"></label>'+
+        '<label class="flab">Email<input id="a-email" class="field" inputmode="email" value="'+(S.email||"")+'"></label>'+
+        '<button class="btn btn-o btn-sm" id="a-save" style="width:auto;align-self:flex-start">Save details</button></div></div>'+
+
+    '<div class="sec"><div class="lbl" style="margin-bottom:12px">For your practitioner</div>'+
+      '<div class="card">'+
+        '<label class="flab" style="margin-bottom:14px">Skin, sensitivities, anything to know'+
+          '<textarea id="a-notes" class="field" rows="3" style="resize:vertical">'+(S.notes||"")+'</textarea></label>'+
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">'+
+          '<label class="flab">Room<input id="a-room" class="field" value="'+S.prefs.room+'"></label>'+
+          '<label class="flab">Music<input id="a-music" class="field" value="'+S.prefs.music+'"></label></div>'+
+        '<button class="btn btn-o btn-sm" id="a-savenotes" style="width:auto">Save preferences</button></div></div>'+
+
+    '<div class="sec"><div class="lbl" style="margin-bottom:12px">Payment</div>'+
+      '<div class="card">'+
+        (S.card? '<div style="display:flex;justify-content:space-between;gap:14px;align-items:baseline;margin-bottom:16px">'+
+            '<span class="serif" style="font-size:19px">'+S.card.brand+' ···· '+S.card.last4+'</span>'+
+            '<span style="font-size:13px;color:#B39C88">Expires '+S.card.exp+'</span></div>'
+          : '<p style="font-size:14px;line-height:1.7;color:#CBB49E;margin:0 0 16px">No card saved. You can pay the deposit with Apple Pay when you book.</p>')+
+        '<div style="display:flex;gap:8px">'+
+          '<button class="btn btn-o btn-sm" id="a-card" style="flex:1">'+(S.card?"Replace card":"Add a card")+'</button>'+
+          (S.card?'<button class="btn btn-o btn-sm" id="a-cardoff" style="flex:1">Remove</button>':'')+'</div>'+
+        '<p style="font-size:12.5px;line-height:1.7;color:#B39C88;margin:14px 0 0">Deposits are £10 and come off the treatment price. Refunded in full up to 24 hours before.</p></div></div>'+
+
+    '<div class="sec"><div class="lbl" style="margin-bottom:12px">Notifications</div>'+
+      '<div class="card">'+
+        [["reminder","Appointment reminders","A text the day before"],
+         ["aftercare","Aftercare notes","Sent after each visit"],
+         ["openings","Last-minute openings","Only for your usual treatment"],
+         ["news","Studio news","New treatments, a few times a year"]].map(function(r){
+          return '<div class="row"><span style="min-width:0"><span style="display:block;margin-bottom:3px">'+r[1]+'</span>'+
+            '<span style="font-size:12.5px;color:#B39C88">'+r[2]+'</span></span>'+
+            '<button class="sw" data-notify="'+r[0]+'" aria-pressed="'+(!!n[r[0]])+'" aria-label="'+r[1]+'"></button></div>';
+        }).join("")+'</div></div>'+
+
+    '<div class="sec last" style="display:flex;flex-direction:column;gap:8px">'+
+      '<a class="btn btn-o" href="m-home.html">Back to the site</a>'+
+      '<button class="btn btn-o" id="signout">Sign out</button></div>';
+};
+
+/* ---------------- sheets ---------------- */
+var draft={};
+function closeSheet(){ $("host").innerHTML=""; }
+function sheet(html){
+  $("host").innerHTML='<div class="swrap" id="swrap"><div class="sheet"><div class="grab"></div>'+html+'</div></div>';
+  $("swrap").onclick=function(e){ if(e.target===this) closeSheet(); };
+  wire($("host"));
+}
+function calHTML(){
+  var v=new Date(d0().getFullYear(),d0().getMonth()+draft.off,1), t=d0();
+  var firstDow=(v.getDay()+6)%7, dim=new Date(v.getFullYear(),v.getMonth()+1,0).getDate(), cells="";
+  for(var i=0;i<firstDow;i++) cells+='<div class="blank"></div>';
+  for(var n=1;n<=dim;n++){
+    var d=new Date(v.getFullYear(),v.getMonth(),n), k=key(d);
+    var ok = d>=t && isOpen(d) && freeDay(d);
+    cells+='<button class="dcell" data-day="'+k+'" aria-pressed="'+(draft.dateKey===k)+'"'+(ok?"":" disabled")+'>'+n+(ok?'<u></u>':'')+'</button>';
+  }
+  return '<div class="cal"><div class="calbar">'+
+    '<button class="calnav" data-hop="-1"'+(draft.off<=0?" disabled":"")+'>←</button>'+
+    '<span class="serif" style="font-size:18px">'+v.toLocaleDateString("en-GB",{month:"long",year:"numeric"})+'</span>'+
+    '<button class="calnav" data-hop="1"'+(draft.off>=5?" disabled":"")+'>→</button></div>'+
+    '<div class="dow"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>'+
+    '<div class="grid">'+cells+'</div></div>';
+}
+function slotHTML(){
+  if(!draft.dateKey) return '<p style="font-size:13.5px;color:#B39C88;margin:0">Choose a day to see times.</p>';
+  var d=parseK(draft.dateKey), list=slotsFor(d);
+  if(draft.keep&&!list.some(function(s){ return s.l===draft.keep; }))
+    list=list.concat([{l:draft.keep,open:true}]).sort(function(a,b){ return parseFloat(a.l)-parseFloat(b.l); });
+  return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+list.map(function(s){
+    var open=s.open||s.l===draft.keep;
+    return '<button class="chip" data-slot="'+s.l+'" aria-pressed="'+(draft.time===s.l)+'"'+(open?"":" disabled")+'>'+s.l+'</button>';
+  }).join("")+'</div>';
+}
+function pickHTML(){
+  var q=(draft.q||"").toLowerCase();
+  var list=SERVICES.filter(function(s){ return !q||s.n.toLowerCase().indexOf(q)>-1; });
+  if(!list.length) return '<div class="pick"><p style="font-size:13.5px;color:#B39C88;margin:0;padding:12px 2px">Nothing by that name. Clear the search to see everything.</p></div>';
+  return '<div class="pick">'+list.map(function(s){
+    return '<button class="srow" data-treat="'+s.n+'" aria-checked="'+(draft.treat===s.n)+'">'+
+      '<span style="flex:1;min-width:0"><span class="serif" style="display:block;font-size:16.5px;line-height:1.3">'+s.n+'</span>'+
+      '<span style="font-size:12.5px;color:#B39C88">'+s.t+'</span></span>'+
+      '<span style="font-size:15px;font-weight:600;flex:none">'+money(s.p)+'</span><span class="tick"></span></button>';
+  }).join("")+'</div>';
+}
+function bookSheet(){
+  var moving=draft.mode==="move";
+  sheet('<div class="lbl" style="margin-bottom:12px">'+(moving?"Move a visit":"New booking")+'</div>'+
+    '<h2 class="serif" style="font-size:25px;line-height:1.2;margin:0 0 8px">'+(moving?draft.treat:"Book a visit")+'</h2>'+
+    '<p style="font-size:14px;line-height:1.7;color:#CBB49E;margin:0 0 18px">'+
+      (moving?"Your deposit moves with the appointment. Free of charge up to 24 hours before."
+             :"Dotted days have hours free. The studio is closed Sunday and Monday.")+'</p>'+
+    (moving?"":'<input id="s-q" class="field" placeholder="Search treatments" style="margin-bottom:12px">'+
+      '<div id="s-pick">'+pickHTML()+'</div><div class="lbl" style="margin:20px 0 10px">Day</div>')+
+    '<div id="s-cal">'+calHTML()+'</div>'+
+    '<div class="lbl" id="s-slotlbl" style="margin:20px 0 10px">'+(draft.dateKey?"Times on "+longD(parseK(draft.dateKey)):"Times")+'</div>'+
+    '<div id="s-slots">'+slotHTML()+'</div>'+
+    '<div id="s-sum" style="margin-top:18px"></div>'+
+    '<div style="display:flex;gap:8px;margin-top:20px">'+
+      '<button class="btn btn-o btn-sm" data-close="1" style="width:auto">Close</button>'+
+      '<button class="btn" id="s-ok" style="flex:1">'+(moving?"Confirm new time":"Confirm booking")+'</button></div>');
+  refreshBook();
+}
+function refreshBook(){
+  if($("s-cal")) $("s-cal").innerHTML=calHTML();
+  if($("s-slots")) $("s-slots").innerHTML=slotHTML();
+  if($("s-slotlbl")) $("s-slotlbl").textContent=draft.dateKey?"Times on "+longD(parseK(draft.dateKey)):"Times";
+  if($("s-pick")) $("s-pick").innerHTML=pickHTML();
+  var ready=!!(draft.treat&&draft.dateKey&&draft.time);
+  if($("s-sum")) $("s-sum").innerHTML = ready?
+    (function(){ var s=svc(draft.treat), p=s?s.p:0;
+      return '<div class="card" style="padding:16px 18px;font-size:13.5px;line-height:1.9">'+
+        '<div style="display:flex;justify-content:space-between;gap:14px"><span style="color:#B39C88">Treatment</span><span>'+draft.treat+'</span></div>'+
+        '<div style="display:flex;justify-content:space-between;gap:14px"><span style="color:#B39C88">When</span><span>'+shortD(parseK(draft.dateKey))+' · '+draft.time+'</span></div>'+
+        (draft.mode==="move"?'':'<div style="display:flex;justify-content:space-between;gap:14px"><span style="color:#B39C88">Deposit today</span><span>£10</span></div>'+
+        '<div style="display:flex;justify-content:space-between;gap:14px"><span style="color:#B39C88">In the studio</span><span>'+money(p-10)+'</span></div>')+
+      '</div>'; })() : "";
+  var b=$("s-ok"); if(b) b.style.background=ready?"#E8D5C4":"rgba(232,213,196,.3)";
+  wire($("host"));
+}
+function startBook(treat){
+  draft={mode:"new",treat:treat||"",dateKey:"",time:"",off:0,q:"",keep:null};
+  bookSheet();
+}
+function startMove(id){
+  var v=S.upcoming.filter(function(x){ return x.id===id; })[0]; if(!v) return;
+  var d=parseK(v.dateKey), t=d0();
+  draft={mode:"move",id:id,treat:v.treat,dateKey:v.dateKey,time:v.time,keep:v.time,q:"",
+         off:Math.max(0,(d.getFullYear()-t.getFullYear())*12+(d.getMonth()-t.getMonth()))};
+  bookSheet();
+}
+function cancelSheet(id){
+  var v=S.upcoming.filter(function(x){ return x.id===id; })[0]; if(!v) return;
+  var refund=daysTo(v.dateKey)>=1;
+  sheet('<div class="lbl" style="margin-bottom:12px">Cancel a visit</div>'+
+    '<h2 class="serif" style="font-size:25px;line-height:1.2;margin:0 0 8px">'+v.treat+'</h2>'+
+    '<p style="font-size:14px;line-height:1.7;color:#CBB49E;margin:0 0 18px">'+when(v.dateKey,v.time)+'</p>'+
+    '<div class="card" style="font-size:14px;line-height:1.75;color:#CBB49E;margin-bottom:18px">'+
+      (refund? 'More than 24 hours away, so your £'+v.deposit+' deposit is refunded in full.'
+             : 'Less than 24 hours away, so the £'+v.deposit+' deposit is kept. If something has happened, call the studio — we are reasonable people.')+'</div>'+
+    '<button class="btn btn-o" data-move="'+v.id+'" style="margin-bottom:8px">Move it instead</button>'+
+    '<div style="display:flex;gap:8px">'+
+      '<button class="btn btn-o btn-sm" data-close="1" style="flex:1">Keep it</button>'+
+      '<button class="btn" data-dropit="'+v.id+'" style="flex:1">Cancel visit</button></div>');
+}
+function prepSheet(treat){
+  sheet('<div class="lbl" style="margin-bottom:12px">Before your visit</div>'+
+    '<h2 class="serif" style="font-size:25px;line-height:1.2;margin:0 0 18px">'+treat+'</h2>'+
+    '<div style="display:flex;flex-direction:column;gap:0">'+
+      PREP.map(function(p,i){
+        return '<div style="padding:16px 0;'+(i<PREP.length-1?'border-bottom:1px solid rgba(232,213,196,.13)':'')+'">'+
+          '<div class="serif" style="font-size:18px;margin-bottom:6px">'+p[0]+'</div>'+
+          '<p style="font-size:14px;line-height:1.75;color:#CBB49E;margin:0">'+p[1]+'</p></div>';
+      }).join("")+'</div>'+
+    '<button class="btn btn-o" data-close="1" style="margin-top:18px">Close</button>');
+}
+function afterSheet(treat){
+  sheet('<div class="lbl" style="margin-bottom:12px">Aftercare</div>'+
+    '<h2 class="serif" style="font-size:25px;line-height:1.2;margin:0 0 14px">'+treat+'</h2>'+
+    '<p style="font-size:14.5px;line-height:1.8;color:#CBB49E;margin:0 0 20px">'+
+      (AFTER[treat]||"Keep the area cool and dry for 24 hours, avoid friction, and moisturise daily.")+'</p>'+
+    '<button class="btn btn-o" data-again2="'+treat+'" style="margin-bottom:8px">Book this again</button>'+
+    '<button class="btn btn-o" data-close="1">Close</button>');
+}
+function planSheet(){
+  if(!draft.plan) draft={plan:{treat:(S.plan&&S.plan.treat)||"Hollywood wax",weeks:(S.plan&&S.plan.weeks)||5}};
+  var opts=["Hollywood wax","Brazilian wax","Bikini wax","Full leg wax"];
+  var s=svc(draft.plan.treat);
+  sheet('<div class="lbl" style="margin-bottom:12px">Subscription</div>'+
+    '<h2 class="serif" style="font-size:25px;line-height:1.2;margin:0 0 8px">Same treatment, same hour.</h2>'+
+    '<p style="font-size:14px;line-height:1.7;color:#CBB49E;margin:0 0 18px">15% off every visit, and we hold your slot. Pause or stop any time.</p>'+
+    '<div class="lbl" style="margin-bottom:10px">Treatment</div>'+
+    '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">'+
+      opts.map(function(o){ var v=svc(o);
+        return '<button class="srow" data-plantreat="'+o+'" aria-checked="'+(draft.plan.treat===o)+'">'+
+          '<span class="serif" style="flex:1;font-size:16.5px">'+o+'</span>'+
+          '<span style="font-size:13px;color:#B39C88;text-decoration:line-through">'+money(v.p)+'</span>'+
+          '<span style="font-size:15px;font-weight:600">'+money(Math.round(v.p*0.85))+'</span>'+
+          '<span class="tick"></span></button>';
+      }).join("")+'</div>'+
+    '<div class="lbl" style="margin-bottom:10px">How often</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:18px">'+
+      [4,5,6].map(function(w){ return '<button class="chip" data-planweeks="'+w+'" aria-pressed="'+(draft.plan.weeks===w)+'">'+w+' weeks</button>'; }).join("")+'</div>'+
+    '<div class="card" style="font-size:13.5px;line-height:1.9;margin-bottom:20px">'+
+      '<div style="display:flex;justify-content:space-between;gap:14px"><span style="color:#B39C88">Per visit</span><span>'+money(Math.round(s.p*0.85))+'</span></div>'+
+      '<div style="display:flex;justify-content:space-between;gap:14px"><span style="color:#B39C88">You save each visit</span><span>'+money(s.p-Math.round(s.p*0.85))+'</span></div>'+
+      '<div style="display:flex;justify-content:space-between;gap:14px"><span style="color:#B39C88">Roughly a year</span><span>'+money(Math.round((52/draft.plan.weeks))*Math.round(s.p*0.85))+'</span></div></div>'+
+    '<div style="display:flex;gap:8px">'+
+      '<button class="btn btn-o btn-sm" data-close="1" style="width:auto">Close</button>'+
+      '<button class="btn" id="plan-ok" style="flex:1">'+(S.plan?"Update plan":"Start plan")+'</button></div>');
+}
+function cardSheet(){
+  sheet('<div class="lbl" style="margin-bottom:12px">Payment</div>'+
+    '<h2 class="serif" style="font-size:25px;line-height:1.2;margin:0 0 18px">'+(S.card?"Replace your card":"Add a card")+'</h2>'+
+    '<label class="flab" style="margin-bottom:14px">Card number<input id="k-num" class="field" inputmode="numeric" placeholder="1234 5678 9012 3456"></label>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">'+
+      '<label class="flab">Expiry<input id="k-exp" class="field" placeholder="MM / YY"></label>'+
+      '<label class="flab">Code<input id="k-cvc" class="field" inputmode="numeric" placeholder="123"></label></div>'+
+    '<div style="display:flex;gap:8px">'+
+      '<button class="btn btn-o btn-sm" data-close="1" style="width:auto">Close</button>'+
+      '<button class="btn" id="k-ok" style="flex:1">Save card</button></div>');
+}
+
+/* ---------------- wiring ---------------- */
+function wire(scope){
+  var root=scope||document;
+  var q=function(s){ return [].slice.call(root.querySelectorAll(s)); };
+  var one=function(id){ return root.querySelector("#"+id); };
+
+  q("[data-go]").forEach(function(b){ b.onclick=function(){ go(b.dataset.go); }; });
+  q("[data-tab]").forEach(function(b){ b.onclick=function(){ closeSheet(); go(b.dataset.tab); }; });
+  q("[data-vtab]").forEach(function(b){ b.onclick=function(){ S.vtab=b.dataset.vtab; save(); render(); }; });
+  q("[data-book]").forEach(function(b){ b.onclick=function(){ startBook(S.plan?S.plan.treat:""); }; });
+  q("[data-rebook]").forEach(function(b){ b.onclick=function(){
+    var last=S.past.slice().sort(function(x,y){ return parseK(y.dateKey)-parseK(x.dateKey); })[0];
+    startBook(S.plan?S.plan.treat:(last?last.treat:"")); }; });
+  q("[data-move]").forEach(function(b){ b.onclick=function(){ closeSheet(); startMove(+b.dataset.move); }; });
+  q("[data-cancel]").forEach(function(b){ b.onclick=function(){ cancelSheet(+b.dataset.cancel); }; });
+  q("[data-dropit]").forEach(function(b){ b.onclick=function(){
+    S.upcoming=S.upcoming.filter(function(x){ return x.id!==+b.dataset.dropit; });
+    save(); closeSheet(); render(); toast("Cancelled. Your deposit is on its way back."); }; });
+  q("[data-prep]").forEach(function(b){ b.onclick=function(){
+    var v=S.upcoming.filter(function(x){ return x.id===+b.dataset.prep; })[0]; if(v) prepSheet(v.treat); }; });
+  q("[data-after]").forEach(function(b){ b.onclick=function(){
+    var v=S.past.filter(function(x){ return x.id===+b.dataset.after; })[0]; if(v) afterSheet(v.treat); }; });
+  q("[data-again]").forEach(function(b){ b.onclick=function(){
+    var v=S.past.filter(function(x){ return x.id===+b.dataset.again; })[0]; if(v) startBook(v.treat); }; });
+  q("[data-again2]").forEach(function(b){ b.onclick=function(){ startBook(b.dataset.again2); }; });
+  q("[data-after2]").forEach(function(b){ b.onclick=function(){ afterSheet(b.dataset.after2); }; });
+  q("[data-stamp]").forEach(function(b){ b.onclick=function(){ stampSheet(+b.dataset.stamp); }; });
+  q("[data-close]").forEach(function(b){ b.onclick=closeSheet; });
+  q("[data-treat]").forEach(function(b){ b.onclick=function(){ draft.treat=b.dataset.treat; refreshBook(); }; });
+  q("[data-day]").forEach(function(b){ b.onclick=function(){ draft.dateKey=b.dataset.day; draft.time=""; refreshBook(); }; });
+  q("[data-slot]").forEach(function(b){ b.onclick=function(){ draft.time=b.dataset.slot; refreshBook(); }; });
+  q("[data-hop]").forEach(function(b){ b.onclick=function(){ draft.off=Math.min(5,Math.max(0,draft.off+ +b.dataset.hop)); refreshBook(); }; });
+  q("[data-plan]").forEach(function(b){ b.onclick=function(){ draft={}; planSheet(); }; });
+  q("[data-plantreat]").forEach(function(b){ b.onclick=function(){ draft.plan.treat=b.dataset.plantreat; planSheet(); }; });
+  q("[data-planweeks]").forEach(function(b){ b.onclick=function(){ draft.plan.weeks=+b.dataset.planweeks; planSheet(); }; });
+  q("[data-notify]").forEach(function(b){ b.onclick=function(){
+    var k=b.dataset.notify; S.notify[k]=!S.notify[k]; b.setAttribute("aria-pressed",String(S.notify[k])); save(); }; });
+
+  var sq=one("s-q"); if(sq) sq.oninput=function(){
+    draft.q=this.value; if($("s-pick")) $("s-pick").innerHTML=pickHTML(); wire($("host")); };
+  var ok=one("s-ok"); if(ok) ok.onclick=function(){
+    if(!(draft.treat&&draft.dateKey&&draft.time)) return;
+    if(draft.mode==="move"){
+      var was=S.upcoming.filter(function(x){ return x.id===draft.id; })[0];
+      var same=was&&was.dateKey===draft.dateKey&&was.time===draft.time;
+      S.upcoming.forEach(function(x){ if(x.id===draft.id){ x.dateKey=draft.dateKey; x.time=draft.time; } });
+      save(); closeSheet(); render();
+      toast(same?"Nothing changed — you're still on "+shortD(parseK(draft.dateKey))+" at "+draft.time+"."
+                :"Moved to "+longD(parseK(draft.dateKey))+", "+draft.time+".");
+    } else {
+      var s=svc(draft.treat);
+      S.upcoming.push({id:Date.now(),treat:draft.treat,dateKey:draft.dateKey,time:draft.time,price:s?s.p:0,deposit:10});
+      save(); closeSheet(); go("home");
+      toast("Booked — "+longD(parseK(draft.dateKey))+", "+draft.time+".");
+    }
+  };
+  var pok=one("plan-ok"); if(pok) pok.onclick=function(){
+    var s=svc(draft.plan.treat);
+    S.plan={treat:draft.plan.treat,weeks:draft.plan.weeks,price:Math.round(s.p*0.85)};
+    save(); closeSheet(); render(); toast("Plan set — "+S.plan.treat+" every "+S.plan.weeks+" weeks."); };
+  var pst=one("planstop"); if(pst) pst.onclick=function(){
+    S.plan=null; save(); render(); toast("Plan stopped. Your bookings stay as they are."); };
+  var cp=one("copy"); if(cp) cp.onclick=function(){
+    try{ navigator.clipboard.writeText($("code").textContent); }catch(e){}
+    toast("Code copied — send it to a friend."); };
+  var ac=one("a-card"); if(ac) ac.onclick=cardSheet;
+  var aco=one("a-cardoff"); if(aco) aco.onclick=function(){ S.card=null; save(); render(); toast("Card removed."); };
+  var kok=one("k-ok"); if(kok) kok.onclick=function(){
+    var num=$("k-num").value.replace(/\D/g,"");
+    if(num.length<15){ toast("That card number looks short."); return; }
+    S.card={brand:"Visa",last4:num.slice(-4),exp:$("k-exp").value.trim()||"—"};
+    save(); closeSheet(); render(); toast("Card saved."); };
+  var as=one("a-save"); if(as) as.onclick=function(){
+    S.name=$("a-name").value.trim(); S.phone=$("a-phone").value.trim(); S.email=$("a-email").value.trim();
+    save(); render(); toast("Details saved."); };
+  var an=one("a-savenotes"); if(an) an.onclick=function(){
+    S.notes=$("a-notes").value.trim();
+    S.prefs={room:$("a-room").value.trim(),music:$("a-music").value.trim()};
+    save(); toast("Saved. Your practitioner sees this before you arrive."); };
+  var so=one("signout"); if(so) so.onclick=async function(){ await sb.auth.signOut(); S.signedIn=false; save(); location.href="m-home.html"; };
+}
+
+function badge(){
+  var t=document.querySelector('.tab[data-go="rewards"]');
+  var old=t.querySelector(".dot"); if(old) old.remove();
+  if(S.stamps>=5){ var d=document.createElement("span"); d.className="dot"; t.appendChild(d); }
+}
+function go(name){
+  view=name;
+  ["home","visits","rewards","account"].forEach(function(v){ $("v-"+v).className = v===name?"view on":"view"; });
+  [].forEach.call(document.querySelectorAll(".tab"),function(t){ t.className = t.dataset.go===name?"tab on":"tab"; });
+  window.scrollTo(0,0);
+  render();
+}
+function render(){
+  ["home","visits","rewards","account"].forEach(function(v){ $("v-"+v).innerHTML=V[v](); });
+  $("me").textContent=(first()[0]||"A").toUpperCase();
+  badge(); wire(document);
+}
+
+async function initSupabase() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) {
+    window.location.href = "m-login.html";
+    return;
+  }
+  S.email = session.user.email;
+  let res = await sb.from('clients').select('name').eq('email', S.email);
+  if (res.data && res.data.length > 0) {
+    S.name = res.data[0].name;
+  }
+  
+  $("me").onclick=function(){ go("account"); };
+  [].forEach.call(document.querySelectorAll(".tab"),function(t){ t.onclick=function(){ go(t.dataset.go); }; });
+  render();
+}
+initSupabase();
+</script>
+</body>
+</html>
