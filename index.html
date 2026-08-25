@@ -440,23 +440,12 @@ var GROUPS = [
     heading:"Professional waxing, elevated.",
     copy:"Every appointment focuses on comfort, hygiene, detail and results — helping you leave feeling smooth, confident and cared for.",
     footnote:"First visits are booked with extra time, at no extra cost.",
-    items:[
-      {name:"First visit — consultation & treatment",time:"60 min",price:"from £30"},
-      {name:"Full leg wax",time:"45 min",price:"£38"},
-      {name:"Half leg wax",time:"30 min",price:"£26"},
-      {name:"Underarm wax",time:"15 min",price:"£14"},
-      {name:"Arm wax",time:"25 min",price:"£22"},
-      {name:"Facial waxing",time:"15 min",price:"from £12"},
-      {name:"Brow shape & tidy",time:"20 min",price:"£16"}]},
+    items:[]},
   { title:"Intimate Care", blurb:"Thoughtful intimate beauty support focused on confidence, sensitivity and aftercare.",
     heading:"Intimate care, without the awkwardness.",
     copy:"Booked with longer appointment times, talked through before anything begins, and always with one practitioner you'll see again.",
     footnote:"Every intimate booking includes aftercare in your hand.",
-    items:[
-      {name:"Bikini wax",time:"30 min",price:"£28"},
-      {name:"Brazilian wax",time:"40 min",price:"£36"},
-      {name:"Hollywood wax",time:"45 min",price:"£42"},
-      {name:"Maintenance visit (within 5 weeks)",time:"30 min",price:"from £24"}]},
+    items:[]},
   { title:"Skin, Body & Wellness", blurb:"Future skin, body and wellness treatments created to elevate your self-care.",
     heading:"Coming to the studio.",
     copy:"AMAI is built to grow beyond waxing. These are the treatments in preparation — ask to be told first when a date is set.",
@@ -466,6 +455,18 @@ var GROUPS = [
       {name:"Body treatments",time:"60–90 min",price:"In preparation"},
       {name:"Aftercare products",time:"—",price:"In preparation"}]}
 ];
+async function loadServicesIntoGroups(){
+  var {data}=await sb.from('services').select('*').eq('available',true).order('sort_order');
+  if(data){
+    GROUPS[0].items=[]; GROUPS[1].items=[];
+    data.forEach(function(s){
+      var item={name:s.name,time:s.duration_minutes+' min',price:'£'+Number(s.price)};
+      if(s.category==='Waxing') GROUPS[0].items.push(item);
+      else if(s.category==='Intimate Care') GROUPS[1].items.push(item);
+    });
+    BOOKABLE=GROUPS[0].items.concat(GROUPS[1].items);
+  }
+}
 var REASONS = [
   ["01","Professional Care","Treatments are delivered with respect, discretion and attention to comfort."],
   ["02","Luxury Environment","A calm, refined space designed to make every appointment feel considered."],
@@ -473,11 +474,11 @@ var REASONS = [
   ["04","Results-Focused","Our approach supports smoother skin, better results and long-term confidence."],
   ["05","Elevated Experience","AMAI is more than a treatment — it is considered self-care."]
 ];
-var BOOKABLE = GROUPS[0].items.concat(GROUPS[1].items);
+var BOOKABLE = [];
 
 var KNOWN = { "07700900123":"Nadia", "07700900456":"Priya", "07700900789":"Hannah" };
 var HUB_KEY = "amai_hub_v2";
-var S = { group:0, step:1, treatment:BOOKABLE[0].name, monthOffset:0, dateKey:"", time:"", query:"", paid:"", how:"", sent:false, returning:false };
+var S = { group:0, step:1, treatment:"", monthOffset:0, dateKey:"", time:"", query:"", paid:"", how:"", sent:false, returning:false };
 var $ = function(id){ return document.getElementById(id); };
 var el = function(tag, attrs, html){ var n=document.createElement(tag); for(var k in attrs){ if(k==="style")n.setAttribute("style",attrs[k]); else if(k.indexOf("on")===0)n[k]=attrs[k]; else n.setAttribute(k,attrs[k]); } if(html!=null)n.innerHTML=html; return n; };
 
@@ -765,6 +766,7 @@ async function showDone(how,acct){
       appointment_time: S.time,
       price: parseFloat(String(priceOf(S.treatment)).replace(/[^0-9.]/g,"")),
       deposit_amount: 10,
+      duration_minutes: getDuration(S.treatment),
       status: 'confirmed'
     }]);
   }
@@ -795,7 +797,7 @@ $("v-code").oninput=function(){
 $("v-go").onclick=function(){ if(digits($("v-code").value).length!==6) return; saveToHub(); showDone(S.how,true); };
 $("v-skip").onclick=function(){ showDone(S.how,false); };
 $("again").onclick=function(){
-  S={group:S.group,step:1,treatment:BOOKABLE[0].name,monthOffset:0,dateKey:"",time:"",query:"",paid:"",how:"",sent:false,returning:false};
+  S={group:S.group,step:1,treatment:(BOOKABLE.length?BOOKABLE[0].name:""),monthOffset:0,dateKey:"",time:"",query:"",paid:"",how:"",sent:false,returning:false};
   ["f-name","f-contact","f-note","c-num","c-exp","c-cvc","q","v-code"].forEach(function(id){ $(id).value=""; });
   $("f-acct").checked=true; checkKnown();
   $("done-side").className="hide"; $("verify-side").className="hide"; $("form-side").className="";
@@ -803,7 +805,11 @@ $("again").onclick=function(){
 };
 ["f-name","c-num","c-exp","c-cvc"].forEach(function(id){ $(id).oninput=function(){ renderTracker(); syncNext(); }; });
 
-renderTabs(); renderPanel(); renderPicker(); renderCalendar(); renderSlots(); checkKnown(); showStep();
+(async function(){
+  await loadServicesIntoGroups();
+  if(BOOKABLE.length) S.treatment=BOOKABLE[0].name;
+  renderTabs(); renderPanel(); renderPicker(); renderCalendar(); renderSlots(); checkKnown(); showStep();
+})();
 </script>
 
 <script>

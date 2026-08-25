@@ -163,19 +163,11 @@ button{font-family:Mulish,sans-serif}
 
 <script>
 var $=function(id){return document.getElementById(id);};
-var TREATMENTS=[
-  {name:"First visit — consultation & treatment",time:"60 min",price:30},
-  {name:"Full leg wax",time:"45 min",price:38},
-  {name:"Half leg wax",time:"30 min",price:26},
-  {name:"Underarm wax",time:"15 min",price:14},
-  {name:"Arm wax",time:"25 min",price:22},
-  {name:"Facial waxing",time:"15 min",price:12},
-  {name:"Brow shape & tidy",time:"20 min",price:16},
-  {name:"Bikini wax",time:"30 min",price:28},
-  {name:"Brazilian wax",time:"40 min",price:36},
-  {name:"Hollywood wax",time:"45 min",price:42},
-  {name:"Maintenance visit (within 5 weeks)",time:"30 min",price:24}
-];
+var TREATMENTS=[];
+async function loadServices(){
+  var {data}=await sb.from('services').select('*').eq('available',true).order('sort_order');
+  if(data) TREATMENTS=data.map(function(s){return {name:s.name,time:s.duration_minutes+' min',price:Number(s.price)};});
+}
 var PLANS=[
   {k:"bikini",name:"Bikini, every 5 weeks",was:28,now:22,blurb:"Your standing slot, held in the diary. Skip or move any month."},
   {k:"holly",name:"Hollywood, every 5 weeks",was:42,now:34,blurb:"The most-booked rhythm. Includes aftercare oil each visit."},
@@ -260,7 +252,8 @@ function nav(){
     n.appendChild(b);
   });
 }
-function boot(){
+async function boot(){
+  await loadServices();
   if(!S.signedIn){ $("auth").className=""; $("hub").className="shell hide"; return; }
   $("auth").className="hide"; $("hub").className="shell";
   render();
@@ -741,6 +734,7 @@ function bindBookingModal(cta){
           appointment_time: draft.time,
           price: parseFloat(String(draft.price).replace(/[^0-9.]/g,"")) || 0,
           deposit_amount: 10,
+          duration_minutes: getDuration(draft.treat),
           status: 'confirmed'
         }]);
         // Also add to local UI state

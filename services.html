@@ -153,15 +153,8 @@ div[id],section[id]{scroll-margin-top:84px}
       <p style="font-size:15px;line-height:1.8;color:#5C5148;margin:0 0 26px">Every appointment focuses on comfort, hygiene, detail and results — helping you leave feeling smooth, confident and cared for.</p>
       <a href="index.html#book" class="btn" style="padding:14px 30px">Book a visit</a>
     </div>
-    <div>
-      <div class="row"><span class="name">First visit — consultation &amp; treatment</span><span class="time">60 min</span><span class="price">from £30</span></div>
-      <div class="row"><span class="name">Full leg wax</span><span class="time">45 min</span><span class="price">£38</span></div>
-      <div class="row"><span class="name">Half leg wax</span><span class="time">30 min</span><span class="price">£26</span></div>
-      <div class="row"><span class="name">Underarm wax</span><span class="time">15 min</span><span class="price">£14</span></div>
-      <div class="row"><span class="name">Arm wax</span><span class="time">25 min</span><span class="price">£22</span></div>
-      <div class="row"><span class="name">Facial waxing</span><span class="time">15 min</span><span class="price">from £12</span></div>
-      <div class="row"><span class="name">Brow shape &amp; tidy</span><span class="time">20 min</span><span class="price">£16</span></div>
-      <p style="font-size:13.5px;line-height:1.7;color:#6E5B49;margin:22px 0 0">First visits are booked with extra time, at no extra cost.</p>
+    <div id="waxing-rows">
+      <div style="font-size:14px;color:#6E5B49;padding:20px 0">Loading…</div>
     </div>
   </div>
 </section>
@@ -175,12 +168,8 @@ div[id],section[id]{scroll-margin-top:84px}
       <p style="font-size:15px;line-height:1.8;color:#4A3F36;margin:0 0 26px">Booked with longer appointment times, talked through before anything begins, and always with one practitioner you'll see again.</p>
       <a href="index.html#book" class="btn" style="padding:14px 30px;background:#3A322E;color:#F7F1EA">Book a visit</a>
     </div>
-    <div>
-      <div class="row" style="border-color:#C9B8A4"><span class="name">Bikini wax</span><span class="time">30 min</span><span class="price">£28</span></div>
-      <div class="row" style="border-color:#C9B8A4"><span class="name">Brazilian wax</span><span class="time">40 min</span><span class="price">£36</span></div>
-      <div class="row" style="border-color:#C9B8A4"><span class="name">Hollywood wax</span><span class="time">45 min</span><span class="price">£42</span></div>
-      <div class="row" style="border-color:#C9B8A4;border-bottom-color:#C9B8A4"><span class="name">Maintenance visit (within 5 weeks)</span><span class="time">30 min</span><span class="price">from £24</span></div>
-      <p style="font-size:13.5px;line-height:1.7;color:#6E5B49;margin:22px 0 0">Every intimate booking includes aftercare in your hand.</p>
+    <div id="intimate-rows">
+      <div style="font-size:14px;color:#6E5B49;padding:20px 0">Loading…</div>
     </div>
   </div>
 </section>
@@ -297,15 +286,25 @@ div[id],section[id]{scroll-margin-top:84px}
   </div>
 </div>
 
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-(function(){
+(async function(){
+  var sb=supabase.createClient('https://tphyrmweauzfletdlqvi.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwaHlybXdlYXV6ZmxldGRscXZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0NTIxOTQsImV4cCI6MjEwMzAyODE5NH0.Z_utKsxYquCoL2LfTjjL8QFB1tnLJZW9j3El7Sykk8o');
+  var {data}=await sb.from('services').select('*').eq('available',true).order('sort_order');
+  if(!data) return;
+  function makeRow(s,border){
+    return '<div class="row"'+(border?' style="border-color:#C9B8A4"':'')+'><span class="name">'+s.name+'</span><span class="time">'+s.duration_minutes+' min</span><span class="price">£'+Number(s.price)+'</span></div>';
+  }
+  var wax=data.filter(function(s){return s.category==='Waxing';});
+  var int=data.filter(function(s){return s.category==='Intimate Care';});
+  var wEl=document.getElementById('waxing-rows');
+  var iEl=document.getElementById('intimate-rows');
+  if(wEl) wEl.innerHTML=wax.map(function(s){return makeRow(s,false);}).join('')+'<p style="font-size:13.5px;line-height:1.7;color:#6E5B49;margin:22px 0 0">First visits are booked with extra time, at no extra cost.</p>';
+  if(iEl) iEl.innerHTML=int.map(function(s){return makeRow(s,true);}).join('')+'<p style="font-size:13.5px;line-height:1.7;color:#6E5B49;margin:22px 0 0">Every intimate booking includes aftercare in your hand.</p>';
   try {
-    var raw = localStorage.getItem("amai_hub_v2"), h = raw ? JSON.parse(raw) : null;
-    if (h && h.signedIn) {
-      
-    }
-  } catch(e) {}
+    var raw=localStorage.getItem('amai_hub_v2'),h=raw?JSON.parse(raw):null;
+    if(h&&h.signedIn){}
+  }catch(e){}
 })();
 </script>
 </body></html>

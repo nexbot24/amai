@@ -165,14 +165,11 @@ const sb = supabase.createClient(supabaseUrl, supabaseKey);
 
 var $=function(i){return document.getElementById(i);};
 var KEY="amai_hub_v2";
-var SERVICES=[
-  {n:"First visit — consultation & treatment",t:"60 min",p:30},
-  {n:"Full leg wax",t:"45 min",p:38},{n:"Half leg wax",t:"30 min",p:26},
-  {n:"Underarm wax",t:"15 min",p:14},{n:"Arm wax",t:"25 min",p:22},
-  {n:"Facial waxing",t:"15 min",p:12},{n:"Brow shape & tidy",t:"20 min",p:16},
-  {n:"Bikini wax",t:"30 min",p:28},{n:"Brazilian wax",t:"40 min",p:36},
-  {n:"Hollywood wax",t:"45 min",p:42},{n:"Maintenance visit",t:"30 min",p:24}
-];
+var SERVICES=[];
+async function loadServices(){
+  var {data}=await sb.from('services').select('*').eq('available',true).order('sort_order');
+  if(data) SERVICES=data.map(function(s){return {n:s.name,t:s.duration_minutes+' min',p:Number(s.price)};});
+}
 var PREP=[
   ["Hair length","About a quarter of an inch — two to three weeks of growth. Don't shave in between."],
   ["On the day","Clean, dry skin, no oils or lotions. Exfoliate gently the day before, not the same morning."],
@@ -806,6 +803,7 @@ function checkPWA() {
 if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js'); }
 
 async function initSupabase() {
+  await loadServices();
   const { data: { session } } = await sb.auth.getSession();
   if (!session) {
     S.email = "demo@example.com";
