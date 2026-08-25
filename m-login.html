@@ -107,20 +107,27 @@ button,input,textarea,select{font-family:inherit;font-size:16px}
 
     <section style="background:#3A322E;color:#E8D5C4;padding:34px 20px 44px;min-height:calc(100dvh - 148px);display:flex;flex-direction:column">
 
-      <div id="p1">
-        <div class="lbl" style="color:#B39C88;margin-bottom:16px">Step 1 of 2</div>
+            <div id="p1">
+        <div class="lbl" style="color:#B39C88;margin-bottom:16px" id="p1step">Step 1 of 2</div>
         <h1 class="serif" style="font-size:34px;line-height:1.14;margin:0 0 12px">Sign in.</h1>
         <p style="font-size:15px;line-height:1.75;color:#CBB49E;margin:0 0 24px">Your account is created when you book.</p>
         
-        <label class="flab" style="margin-bottom:16px">Your first name
-          <input id="fname" class="field" placeholder="So we know what to call you">
-        </label>
-
         <label class="flab" style="margin-bottom:16px">Email address
           <input id="email" class="field" type="email" autocomplete="email" placeholder="hello@example.com">
         </label>
         
         <button id="send" class="btn" style="background:rgba(232,213,196,.28)" disabled>Continue</button>
+      </div>
+
+      <div id="p1b" class="hide">
+        <button id="edit1b" style="background:none;border:none;color:#B39C88;font-size:13.5px;padding:0 0 20px">← Change number</button>
+        <div class="lbl" style="color:#B39C88;margin-bottom:16px">Step 2 of 3</div>
+        <h1 class="serif" style="font-size:34px;line-height:1.14;margin:0 0 12px">Welcome.</h1>
+        <p style="font-size:15px;line-height:1.75;color:#CBB49E;margin:0 0 24px">Your account is created when you book.</p>
+        <label class="flab" style="margin-bottom:14px">Your first name
+          <input id="fname" class="field" placeholder="So we know what to call you">
+        </label>
+        <button id="sendname" class="btn" style="background:rgba(232,213,196,.28)">Next</button>
       </div>
 
       <div id="p2" class="hide">
@@ -186,12 +193,7 @@ var st={email:"",name:"",acct:null,isNew:false,left:0,tick:null};
 function stored(){ try{ return JSON.parse(localStorage.getItem(HUB_KEY))||null; }catch(e){ return null; } }
 
 function emailOk(){ var e=$("email").value; return e.includes("@") && e.includes("."); }
-function nameOk(){ return $("fname") && $("fname").value.trim().length > 0; }
-function syncSend(){ 
-  var ok = emailOk() && nameOk();
-  $("send").style.background = ok ? "#E8D5C4" : "rgba(232,213,196,.28)"; 
-  $("send").disabled = !ok;
-}
+function syncSend(){ $("send").style.background=emailOk()?"#E8D5C4":"rgba(232,213,196,.28)"; $("send").disabled=!emailOk(); }
 
 function countdown(){
   st.left=30; clearInterval(st.tick);
@@ -206,12 +208,11 @@ function countdown(){
 
 async function toStep2(){
   st.email = $("email").value.trim().toLowerCase();
-  st.name = $("fname").value.trim();
   
   var btn = $("send");
   var oldText = btn.textContent;
   btn.disabled = true;
-  btn.textContent = "Sending...";
+  btn.textContent = "Checking...";
   
   // Lookup client in supabase
   try {
@@ -225,30 +226,35 @@ async function toStep2(){
   
   st.isNew = !st.acct;
   
+  btn.disabled = false;
+  btn.textContent = oldText;
+
+  if (st.isNew) {
+    $("p1step").textContent = "Step 1 of 3";
+    $("p1").className="hide"; $("p1b").className="";
+    $("fname").focus();
+  } else {
+    st.name = st.acct.name;
+    sendCode();
+  }
+}
+
+async function sendCode() {
+  $("p2title").textContent = st.isNew? "Enter your code." : "Welcome back, "+st.name+".";
+  $("p2step").textContent = st.isNew? "Step 3 of 3" : "Step 2 of 2";
+  $("p2sub").innerHTML = 'Emailed to <strong style="font-weight:600;color:#E8D5C4">'+st.email+'</strong>.';
+  
+  $("p1").className="hide"; $("p1b").className="hide"; $("p2").className="";
+  $("code").focus(); countdown();
+  
   try {
       const { data, error } = await sb.auth.signInWithOtp({ email: st.email });
       if (error) {
         alert("Error sending code: " + error.message);
-        btn.disabled = false;
-        btn.textContent = oldText;
-        return;
       }
   } catch(e) {
-      alert("Error: " + e);
-      btn.disabled = false;
-      btn.textContent = oldText;
-      return;
+      alert("Error sending code: " + e);
   }
-  
-  btn.disabled = false;
-  btn.textContent = oldText;
-  
-  $("p2title").textContent = st.isNew? "Enter your code." : "Welcome back, "+st.name+".";
-  $("p2step").textContent = "Step 2 of 2";
-  $("p2sub").innerHTML = 'Emailed to <strong style="font-weight:600;color:#E8D5C4">'+st.email+'</strong>.';
-  
-  $("p1").className="hide"; $("p2").className="";
-  $("code").focus(); countdown();
 }
 
 function stampRow(n){
@@ -296,11 +302,13 @@ async function finish(){
 }
 
 $("email").oninput=syncSend;
-$("fname").oninput=syncSend;
-$("email").onkeydown=function(e){ if(e.key==="Enter"&&emailOk()&&nameOk()) toStep2(); };
-$("fname").onkeydown=function(e){ if(e.key==="Enter"&&emailOk()&&nameOk()) toStep2(); };
-$("send").onclick=function(){ if(emailOk()&&nameOk()) toStep2(); };
+$("email").onkeydown=function(e){ if(e.key==="Enter"&&emailOk()) toStep2(); };
+$("send").onclick=function(){ if(emailOk()) toStep2(); };
 $("edit").onclick=function(){ clearInterval(st.tick); $("p2").className="hide"; $("p1").className=""; };
+$("edit1b").onclick=function(){ $("p1b").className="hide"; $("p1").className=""; };
+$("fname").oninput=function(){ $("sendname").style.background = this.value.trim() ? "#E8D5C4" : "rgba(232,213,196,.28)"; };
+$("fname").onkeydown=function(e){ if(e.key==="Enter"&&this.value.trim()){ st.name=this.value.trim(); sendCode(); } };
+$("sendname").onclick=function(){ if($("fname").value.trim()){ st.name=$("fname").value.trim(); sendCode(); } };
 $("code").oninput=async function(){
   var codeVal = this.value.trim();
   var ok = codeVal.length === 6;
