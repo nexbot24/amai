@@ -1,7 +1,7 @@
 {
   "name": "Amai",
   "short_name": "Amai",
-  "start_url": "/mobile.html",
+  "start_url": "/m-hub.html",
   "display": "standalone",
   "background_color": "#241F1C",
   "theme_color": "#241F1C",
