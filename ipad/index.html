@@ -177,51 +177,128 @@ function longDate(d){ return d.toLocaleDateString("en-GB",{weekday:"long",day:"n
 function shortDate(d){ return d.toLocaleDateString("en-GB",{day:"numeric",month:"short"}); }
 function money(n){ return "£"+n; }
 
-
-/* Supabase */
-var supabaseUrl='https://tphyrmweauzfletdlqvi.supabase.co';
-var supabaseKey='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwaHlybXdlYXV6ZmxldGRscXZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0NTIxOTQsImV4cCI6MjEwMzAyODE5NH0.Z_utKsxYquCoL2LfTjjL8QFB1tnLJZW9j3El7Sykk8o';
-var sb=supabase.createClient(supabaseUrl,supabaseKey);
-function dateToDayKey(ds){ var d=new Date(ds+'T00:00:00'); return d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate(); }
-function dayKeyToDate(k){ var p=k.split('-'); var d=new Date(+p[0],+p[1],+p[2]); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
-
 var KEY="amai_studio_v4";
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY))||null; }catch(e){ return null; } }
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
 
-var S={view:"today",dayKey:iso(d0()),locked:false,clients:[],appts:[],requests:[],closed:{},messages:[],promos:[],services:[]};
-
-async function loadAll(){
-  var r;
-  r=await sb.from('services').select('*').eq('available',true).order('sort_order');
-  if(r.data) S.services=r.data.map(function(s){ return {n:s.name,d:s.duration_minutes,p:Number(s.price),dbId:s.id,id:s.id,on:true}; });
-  
-  r=await sb.from('clients').select('*');
-  if(r.data) S.clients=r.data.map(function(c){ return {id:c.id,name:c.name||'',phone:c.phone||'',email:c.email||'',since:c.created_at?new Date(c.created_at).toLocaleDateString('en-GB',{month:'short',year:'numeric'}):'Unknown',stamps:c.stamps||0,plan:c.plan||null,notes:c.notes||'',visits:0,spend:0}; });
-  
-  r=await sb.from('bookings').select('*').neq('status','cancelled');
-  if(r.data){
-    S.appts=r.data.map(function(b){ return {id:b.id,c:b.client_id,s:b.treatment_name,t:b.appointment_time,dur:b.duration_minutes||30,p:Number(b.price),dep:Number(b.deposit_amount)||10,day:dateToDayKey(b.appointment_date),st:b.status==='completed'?'done':'due'}; });
-    S.appts.forEach(function(a){ if(a.st==='done'){ var c=client(a.c); if(c){c.visits++;c.spend+=a.p;} } });
-  }
-  
-  r=await sb.from('requests').select('*').eq('status','new').order('created_at',{ascending:false});
-  if(r.data) S.requests=r.data.map(function(q){ return {id:q.id,name:q.name,phone:q.phone||'',email:q.email||'',s:q.service_name||'',want:q.preferred_time||'',note:q.message||''}; });
-  
-  r=await sb.from('closed_days').select('*');
-  if(r.data){ S.closed={}; r.data.forEach(function(d){ S.closed[d.date_key]=true; }); }
-  
-  try{ var loc=JSON.parse(localStorage.getItem(KEY)); if(loc&&loc.view) S.view=loc.view; if(loc&&loc.dayKey) S.dayKey=loc.dayKey; }catch(e){}
-  
-  if(!S.messages) S.messages=[];
-  if(!S.promos) S.promos=[];
-  if(!S.dmode) S.dmode="day";
-  if(!S.itab) S.itab="messages";
-  if(S.view==="requests") S.view="inbox";
-  if(S.view==="week"){ S.view="today"; S.dmode="week"; }
+function seed(){
+  var t=nextOpen(0), t2=nextOpen(1), t3=nextOpen(2);
+  return {
+    view:"today", dayKey:iso(t), locked:false,
+    clients:[
+      {id:1,name:"Nadia Rahman",phone:"07700 900123",since:"Jan 2026",stamps:4,plan:"Hollywood, every 5 weeks",notes:"Sensitive on legs — patch tested Feb.",visits:5,spend:158},
+      {id:2,name:"Priya Shah",phone:"07700 900456",since:"Mar 2026",stamps:2,plan:null,notes:"First Brazilian was Mar — prefers 10.00.",visits:2,spend:64},
+      {id:3,name:"Hannah Doyle",phone:"07700 900789",since:"Feb 2026",stamps:9,plan:"Bikini, every 5 weeks",notes:"Runs 5 mins late, always.",visits:9,spend:286},
+      {id:4,name:"Leila Osman",phone:"07700 900321",since:"Apr 2026",stamps:1,plan:null,notes:"New — consultation only so far.",visits:1,spend:30},
+      {id:5,name:"Chloe Baptiste",phone:"07700 900654",since:"Jan 2026",stamps:6,plan:null,notes:"Waxes brows every visit, add 20 min.",visits:6,spend:214}
+    ],
+    appts:[
+      {id:11,c:1,s:"Hollywood wax",t:"10.00",dur:45,p:42,dep:10,day:iso(t),st:"done"},
+      {id:12,c:5,s:"Full leg wax",t:"11.00",dur:45,p:38,dep:10,day:iso(t),st:"done"},
+      {id:13,c:2,s:"Brazilian wax",t:"13.00",dur:40,p:36,dep:10,day:iso(t),st:"due"},
+      {id:14,c:3,s:"Bikini wax",t:"15.00",dur:30,p:28,dep:10,day:iso(t),st:"due"},
+      {id:15,c:4,s:"Brow shape & tidy",t:"16.00",dur:20,p:16,dep:10,day:iso(t),st:"due"},
+      {id:16,c:3,s:"Hollywood wax",t:"10.00",dur:45,p:42,dep:10,day:iso(t2),st:"due"},
+      {id:17,c:1,s:"Brow shape & tidy",t:"14.00",dur:20,p:16,dep:10,day:iso(t2),st:"due"},
+      {id:18,c:5,s:"Underarm wax",t:"9.00",dur:15,p:14,dep:10,day:iso(t3),st:"due"},
+      {id:19,c:2,s:"Half leg wax",t:"12.00",dur:30,p:26,dep:10,day:iso(t3),st:"due"},
+      {id:20,c:1,s:"Brow shape & tidy",t:"10.00",dur:20,p:16,dep:10,day:iso(back(1)),st:"done"},
+      {id:21,c:3,s:"Bikini wax",t:"12.00",dur:30,p:28,dep:10,day:iso(back(1)),st:"done"},
+      {id:22,c:5,s:"Hollywood wax",t:"15.00",dur:45,p:42,dep:10,day:iso(back(1)),st:"done"},
+      {id:23,c:2,s:"Underarm wax",t:"11.00",dur:15,p:14,dep:10,day:iso(back(2)),st:"done"},
+      {id:24,c:4,s:"Facial waxing",t:"14.00",dur:15,p:12,dep:10,day:iso(back(2)),st:"done"},
+      {id:25,c:3,s:"Full leg wax",t:"9.00",dur:45,p:38,dep:10,day:iso(back(3)),st:"done"},
+      {id:26,c:1,s:"Hollywood wax",t:"13.00",dur:45,p:42,dep:10,day:iso(back(3)),st:"done"},
+      {id:27,c:5,s:"Brow shape & tidy",t:"16.00",dur:20,p:16,dep:10,day:iso(back(4)),st:"done"},
+      {id:28,c:2,s:"Brazilian wax",t:"10.00",dur:40,p:36,dep:10,day:iso(back(4)),st:"done"},
+      {id:29,c:4,s:"Bikini wax",t:"15.00",dur:30,p:28,dep:10,day:iso(back(5)),st:"done"}
+    ],
+    requests:[
+      {id:31,name:"Sara Whitfield",phone:"07700 900222",s:"First visit — consultation & treatment",want:"Any afternoon this week",note:"Never waxed before, a bit nervous."},
+      {id:32,name:"Priya Shah",phone:"07700 900456",s:"Brazilian wax",want:"Saturday morning",note:""}
+    ],
+    closed:{},
+    messages:[
+      {id:41,name:"Sara Whitfield",phone:"07700 900222",when:"Today, 08.42",read:false,
+       body:"Hi — I have never been waxed before and I am honestly a bit nervous about it. Do you talk it through first? And how long should I allow for a first appointment?"},
+      {id:42,name:"Amelia Cross",phone:"07700 900777",when:"Yesterday, 19.10",read:false,
+       body:"Do you have anything on a Saturday in the next fortnight? Happy with any time in the morning."},
+      {id:43,name:"Nadia Rahman",phone:"07700 900123",when:"Monday, 12.05",read:true,
+       body:"Could you make a note that the wax on my legs felt a little warm last time? Everything else was lovely, so no complaints."}
+    ],
+    promos:[
+      {id:51,code:"FIRST10",kind:"£",val:10,note:"First visit only",uses:14,cap:0,until:"",on:true},
+      {id:52,code:"AUGUST25",kind:"%",val:25,note:"Quiet weeks in August",uses:3,cap:40,until:"",on:true},
+      {id:53,code:"REFER10",kind:"£",val:10,note:"Client referrals",uses:6,cap:0,until:"",on:false}
+    ],
+    services:DEFAULT_SERVICES.map(function(s,i){ return {id:i+1,n:s.n,d:s.d,p:s.p,on:true}; })
+  };
 }
+var S=load()||seed();
+if(!S.clients) S=seed();
+if(!S.services||!S.services.length) S.services=DEFAULT_SERVICES.map(function(s,i){ return {id:i+1,n:s.n,d:s.d,p:s.p,on:true}; });
+if(!S.messages) S.messages=[];
+if(!S.promos) S.promos=[];
+if(!S.dmode) S.dmode="day";
+if(!S.itab) S.itab="messages";
+if(S.view==="requests") S.view="inbox";
+if(S.view==="week"){ S.view="today"; S.dmode="week"; }
 
-function save(){ try{ localStorage.setItem(KEY,JSON.stringify({view:S.view,dayKey:S.dayKey})); }catch(e){} }catch(e){} }
-
-
+/* ---------- SUPABASE ---------- */
+var sb = supabase.createClient(
+  'https://tphyrmweauzfletdlqvi.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwaHlybXdlYXV6ZmxldGRscXZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0NTIxOTQsImV4cCI6MjEwMzAyODE5NH0.Z_utKsxYquCoL2LfTjjL8QFB1tnLJZW9j3El7Sykk8o'
+);
+function dayKeyToDate(k){
+  var p=k.split("-"); var m=+p[1]+1; var d=+p[2];
+  return p[0]+"-"+(m<10?"0":"")+m+"-"+(d<10?"0":"")+d;
+}
+function dateToDayKey(ds){
+  var p=String(ds).split("-");
+  return p[0]+"-"+(+p[1]-1)+"-"+(+p[2]);
+}
+async function loadAll(){
+  try {
+    /* services */
+    var sr=await sb.from('services').select('*').order('id');
+    if(sr.data&&sr.data.length){
+      S.services=sr.data.map(function(r){
+        return {id:r.id,n:r.name,d:r.duration_minutes||30,p:r.price||0,on:r.active!==false};
+      });
+    }
+    /* clients */
+    var cr=await sb.from('clients').select('*');
+    if(cr.data&&cr.data.length){
+      S.clients=cr.data.map(function(r){
+        return {id:r.id,name:r.name||'Unknown',phone:r.phone||r.email||'',since:r.created_at?new Date(r.created_at).toLocaleDateString('en-GB',{month:'short',year:'numeric'}):'',stamps:r.stamps||0,plan:r.plan||null,notes:r.notes||'',visits:r.visits||0,spend:r.spend||0,email:r.email||''};
+      });
+    }
+    /* bookings → appts */
+    var br=await sb.from('bookings').select('*');
+    if(br.data){
+      S.appts=br.data.map(function(r){
+        var cid=r.client_id||0;
+        return {id:r.id,c:cid,s:r.treatment_name||'',t:r.appointment_time||'10.00',dur:r.duration||45,p:Number(r.price)||0,dep:Number(r.deposit_amount||10),day:dateToDayKey(r.appointment_date),st:r.status==='completed'?'done':r.status==='cancelled'?'cancelled':'due',dbId:r.id};
+      }).filter(function(a){ return a.st!=='cancelled'; });
+    }
+    /* requests */
+    var rr=await sb.from('requests').select('*');
+    if(rr.data){
+      S.requests=rr.data.map(function(r){
+        return {id:r.id,name:r.name||'',phone:r.phone||'',s:r.service||'',want:r.preferred_time||'',note:r.note||''};
+      });
+    }
+    /* closed days */
+    var cd=await sb.from('closed_days').select('*');
+    if(cd.data){
+      S.closed={};
+      cd.data.forEach(function(r){
+        S.closed[dateToDayKey(r.date)]={why:r.reason||''};
+      });
+    }
+    save();
+  } catch(e){ console.warn('Supabase load error',e); }
+}
 
 /* closures carry a reason; older saves stored a bare true */
 function closedInfo(k){ var v=S.closed[k]; if(!v) return null; return typeof v==="object"?v:{why:""}; }
@@ -652,18 +729,17 @@ function newSheet(dayKey,time){
     $("chips").innerHTML=timeChips(dayKey,draft.time,draft.dur);
     bindSheet();
   };
-  $("ssave").onclick=async function(){
+  $("ssave").onclick=function(){
     if(!draft.time) return;
     var sel=$("n-client").value, cid;
     if(sel==="new"){
       var nm=$("n-name").value.trim()||"New client";
-      var ph=$("n-phone").value.trim();
-      var res=await sb.from('clients').insert([{name:nm,phone:ph}]).select().single();
-      if(res.data) cid=res.data.id; else return;
-    } else cid=sel;
+      cid=Date.now();
+      S.clients.push({id:cid,name:nm,phone:$("n-phone").value.trim(),since:new Date().toLocaleDateString("en-GB",{month:"short",year:"numeric"}),stamps:0,plan:null,notes:"",visits:0,spend:0});
+    } else cid=+sel;
     var sv=bookable()[+$("n-svc").value];
-    await sb.from('bookings').insert([{client_id:cid,treatment_name:sv.n,appointment_date:dayKeyToDate(dayKey),appointment_time:draft.time,price:sv.p,deposit_amount:10,duration_minutes:sv.d,status:'confirmed'}]);
-    await loadAll(); closeSheet(); render();
+    S.appts.push({id:Date.now()+1,c:cid,s:sv.n,t:draft.time,dur:sv.d,p:sv.p,dep:10,day:dayKey,st:"due"});
+    save(); closeSheet(); render();
   };
 }
 var DURS=[15,20,25,30,40,45,60,75,90,120];
@@ -694,15 +770,16 @@ function svcSheet(id){
       spanNote();
     };
   });
-  $("s-save").onclick=async function(){
+  $("s-save").onclick=function(){
     var nm=$("s-name").value.trim(), pr=parseFloat($("s-price").value)||0;
     if(!nm) return;
     if(isNew){
-      await sb.from('services').insert([{name:nm,duration_minutes:svcDraft.d,price:pr,available:true,sort_order:S.services.length+1}]);
+      var nid=S.services.reduce(function(m,x){ return Math.max(m,x.id); },0)+1;
+      S.services.push({id:nid,n:nm,d:svcDraft.d,p:pr,on:true});
     } else {
-      await sb.from('services').update({name:nm,duration_minutes:svcDraft.d,price:pr}).eq('id',s.dbId);
+      S.services.forEach(function(x){ if(x.id===s.id){ x.n=nm; x.d=svcDraft.d; x.p=pr; } });
     }
-    await loadAll(); closeSheet(); render();
+    save(); closeSheet(); render();
   };
   wire(document);
 }
@@ -737,7 +814,7 @@ function clientSheet(c){
       '<button class="btn btn-o btn-sm" data-stamp="'+c.id+'">Add a stamp</button>'+
       '<button class="btn btn-o btn-sm" id="sclose" style="margin-left:auto">Close</button></div>');
   $("sclose").onclick=closeSheet;
-  $("savenotes").onclick=async function(){ c.notes=$("cnotes").value.trim(); await sb.from('clients').update({notes:c.notes}).eq('id',c.id); $("notesaved").textContent="Saved."; render(); };
+  $("savenotes").onclick=function(){ c.notes=$("cnotes").value.trim(); save(); $("notesaved").textContent="Saved."; render(); };
   bindSheet();
 }
 function bindSheet(){
@@ -746,7 +823,7 @@ function bindSheet(){
       if(b.disabled) return;
       draft.time=b.dataset.time;
       [].forEach.call(document.querySelectorAll("[data-time]"),function(x){ x.setAttribute("aria-pressed",String(x.dataset.time===draft.time)); });
-      if(draft.id){ S.appts.forEach(function(a){ if(a.id===draft.id) a.t=draft.time; }); sb.from('bookings').update({appointment_time:draft.time}).eq('id',draft.id); save(); render(); }
+      if(draft.id){ S.appts.forEach(function(a){ if(a.id===draft.id) a.t=draft.time; }); save(); render(); }
     };
   });
   wire(document);
@@ -900,22 +977,16 @@ function wire(scope){
     if(b.dataset.day==="today"){ S.dayKey=iso(nextOpen(0)); }
     else { var d=shift(parseKey(S.dayKey),+b.dataset.day); while(!open(d)) d=shift(d,+b.dataset.day); S.dayKey=iso(d); }
     save(); render(); }; });
-  q("[data-arrive]").forEach(function(b){ b.onclick=async function(){
-    var a=S.appts.filter(function(x){ return x.id===b.dataset.arrive||x.id===+b.dataset.arrive; })[0];
+  q("[data-arrive]").forEach(function(b){ b.onclick=function(){
+    var a=S.appts.filter(function(x){ return x.id===+b.dataset.arrive; })[0];
     a.st="done"; var c=client(a.c); c.stamps=Math.min(10,c.stamps+1); c.visits++; c.spend+=a.p;
-    await sb.from('bookings').update({status:'completed',completed_at:new Date().toISOString()}).eq('id',a.id);
-    await sb.from('clients').update({stamps:c.stamps}).eq('id',a.c);
-    closeSheet(); render(); }; });
-  q("[data-undone]").forEach(function(b){ b.onclick=async function(){
-    var a=S.appts.filter(function(x){ return x.id===b.dataset.undone||x.id===+b.dataset.undone; })[0];
+    save(); closeSheet(); render(); }; });
+  q("[data-undone]").forEach(function(b){ b.onclick=function(){
+    var a=S.appts.filter(function(x){ return x.id===+b.dataset.undone; })[0];
     a.st="due"; var c=client(a.c); c.stamps=Math.max(0,c.stamps-1); c.visits=Math.max(0,c.visits-1); c.spend=Math.max(0,c.spend-a.p);
-    await sb.from('bookings').update({status:'confirmed',completed_at:null}).eq('id',a.id);
-    await sb.from('clients').update({stamps:c.stamps}).eq('id',a.c);
-    closeSheet(); render(); }; });
-  q("[data-cancelappt]").forEach(function(b){ b.onclick=async function(){
-    var aid=b.dataset.cancelappt;
-    await sb.from('bookings').update({status:'cancelled'}).eq('id',aid);
-    S.appts=S.appts.filter(function(x){ return x.id!==aid&&x.id!==+aid; }); closeSheet(); render(); }; });
+    save(); closeSheet(); render(); }; });
+  q("[data-cancelappt]").forEach(function(b){ b.onclick=function(){
+    S.appts=S.appts.filter(function(x){ return x.id!==+b.dataset.cancelappt; }); save(); closeSheet(); render(); }; });
   q("[data-svcedit]").forEach(function(b){ b.onclick=function(){ svcSheet(+b.dataset.svcedit); }; });
   q("[data-svctoggle]").forEach(function(b){ b.onclick=function(){
     S.services.forEach(function(s){ if(s.id===+b.dataset.svctoggle) s.on = s.on===false; });
@@ -937,23 +1008,19 @@ function wire(scope){
     $("r-hide").onclick=function(){ S.services.forEach(function(x){ if(x.id===id) x.on=false; }); save(); closeSheet(); render(); };
     $("r-yes").onclick=function(){ S.services=S.services.filter(function(x){ return x.id!==id; }); save(); closeSheet(); render(); };
   }; });
-  q("[data-stamp]").forEach(function(b){ b.onclick=async function(){ var c=client(b.dataset.stamp)||client(+b.dataset.stamp); c.stamps=Math.min(10,c.stamps+1); await sb.from('clients').update({stamps:c.stamps}).eq('id',c.id); clientSheet(c); }; });
+  q("[data-stamp]").forEach(function(b){ b.onclick=function(){ var c=client(+b.dataset.stamp); c.stamps=Math.min(10,c.stamps+1); save(); clientSheet(c); }; });
   q("[data-bookfor]").forEach(function(b){ b.onclick=function(){ closeSheet(); newSheet(S.dayKey,""); setTimeout(function(){ $("n-client").value=b.dataset.bookfor; },0); }; });
-  q("[data-dismiss]").forEach(function(b){ b.onclick=async function(){ await sb.from('requests').update({status:'dismissed'}).eq('id',b.dataset.dismiss); S.requests=S.requests.filter(function(r){ return r.id!==b.dataset.dismiss&&r.id!==+b.dataset.dismiss; }); render(); }; });
-  q("[data-offer]").forEach(function(b){ b.onclick=async function(){
-    var r=S.requests.filter(function(x){ return x.id===b.dataset.offer||x.id===+b.dataset.offer; })[0];
-    await sb.from('requests').update({status:'offered'}).eq('id',r.id);
+  q("[data-dismiss]").forEach(function(b){ b.onclick=function(){ S.requests=S.requests.filter(function(r){ return r.id!==+b.dataset.dismiss; }); save(); render(); }; });
+  q("[data-offer]").forEach(function(b){ b.onclick=function(){
+    var r=S.requests.filter(function(x){ return x.id===+b.dataset.offer; })[0];
     S.requests=S.requests.filter(function(x){ return x.id!==r.id; });
     var exists=S.clients.filter(function(c){ return c.phone===r.phone; })[0];
-    if(!exists){
-      var res=await sb.from('clients').insert([{name:r.name,phone:r.phone,notes:r.note}]).select().single();
-      if(res.data) S.clients.push({id:res.data.id,name:res.data.name,phone:res.data.phone||'',email:'',since:'Now',stamps:0,plan:null,notes:res.data.notes||'',visits:0,spend:0});
-    }
+    if(!exists){ S.clients.push({id:Date.now(),name:r.name,phone:r.phone,since:new Date().toLocaleDateString("en-GB",{month:"short",year:"numeric"}),stamps:0,plan:null,notes:r.note,visits:0,spend:0}); }
     save(); newSheet(iso(nextOpen(1)),"");
     setTimeout(function(){
       var c=S.clients.filter(function(x){ return x.phone===r.phone; })[0];
       if(c&&$("n-client")) $("n-client").value=c.id;
-      var i=S.services.map(function(s){ return s.n; }).indexOf(r.s);
+      var i=bookable().map(function(s){ return s.n; }).indexOf(r.s);
       if(i>-1&&$("n-svc")) $("n-svc").value=i;
     },0);
   }; });
@@ -983,10 +1050,34 @@ function wire(scope){
   if(scope.getElementById&&scope.getElementById("closerange")) scope.getElementById("closerange").onclick=rangeSheet;
   q("[data-tab]").forEach(function(b){ b.onclick=function(){ S.view=b.dataset.tab; save(); render(); }; });
   if(scope.getElementById&&scope.getElementById("addsvc")) scope.getElementById("addsvc").onclick=function(){ svcSheet(null); };
-  if(scope.getElementById&&scope.getElementById("closeday")) scope.getElementById("closeday").onclick=async function(){
-    if(S.closed[S.dayKey]){ delete S.closed[S.dayKey]; await sb.from('closed_days').delete().eq('date_key',S.dayKey); }
-    else { shutDay(S.dayKey); await sb.from('closed_days').insert([{date_key:S.dayKey}]); }
-    save(); render(); };
+  if(scope.getElementById&&scope.getElementById("closeday")) scope.getElementById("closeday").onclick=function(){ closureSheet(S.dayKey); };
+  if(scope.getElementById&&scope.getElementById("csearch")) scope.getElementById("csearch").oninput=function(){
+    $("clist").innerHTML=clientRows(this.value); wire(document); };
+}
+
+/* ---------- render ---------- */
+var TITLES={today:"Diary",clients:"Clients",inbox:"Inbox",money:"Takings",settings:"Studio",closures:"Closures",services:"Services & prices",promos:"Promo codes"};
+function subline(){
+  if(S.view==="today") return S.dmode==="week"? "The next four open days" : longDate(parseKey(S.dayKey));
+  if(S.view==="clients") return S.clients.length+" on the books";
+  if(S.view==="inbox"){ var u=unread(); return u? u+" unread · "+S.requests.length+" requests" : S.requests.length+" requests waiting"; }
+  if(S.view==="money") return "Deposits and balances";
+  if(S.view==="closures") return "Tap a date to block it out";
+  if(S.view==="services") return bookable().length+" bookable of "+S.services.length;
+  if(S.view==="promos") return S.promos.filter(function(p){ return p.on!==false; }).length+" live";
+  return "";
+}
+function render(){
+  tabs();
+  $("ttl").textContent=TITLES[S.view]||"Diary";
+  $("sub").textContent=subline();
+  $("back").className = PARENT[S.view]? "navbtn" : "navbtn hide";
+  $("quick").className = (S.view==="settings"||PARENT[S.view])? "btn btn-l btn-sm hide" : "btn btn-l btn-sm";
+  $("view").innerHTML=(V[S.view]||V.today)();
+  $("aside").innerHTML=aside();
+  wire(document);
+}
+$("back").onclick=function(){ S.view=PARENT[S.view]||"settings"; save(); render(); };
 function tick(){
   var n=new Date();
   $("clock").textContent=n.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});
@@ -994,7 +1085,11 @@ function tick(){
 $("quick").onclick=function(){ newSheet(S.dayKey,""); };
 $("clock").onclick=function(){ closeSheet(); S.view="today"; S.dayKey=iso(nextOpen(0)); save(); render(); };
 tick(); setInterval(tick,20000);
-(async function(){ await loadAll(); render(); })();
+/* boot with Supabase data then render */
+(async function(){
+  await loadAll();
+  render();
+})();
 
 /* add to home screen */
 (function(){
@@ -1018,7 +1113,6 @@ tick(); setInterval(tick,20000);
     try{ localStorage.setItem("amai_studio_install","off"); }catch(e){}
   };
 })();
-(async function(){ await loadAll(); render(); })();
 </script>
 </body>
 </html>
