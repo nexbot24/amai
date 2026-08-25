@@ -108,24 +108,20 @@ button,input,textarea,select{font-family:inherit;font-size:16px}
     <section style="background:#3A322E;color:#E8D5C4;padding:34px 20px 44px;min-height:calc(100dvh - 148px);display:flex;flex-direction:column">
 
       <div id="p1">
-        <div class="lbl" style="color:#B39C88;margin-bottom:18px">Your account</div>
-        <h1 class="serif" style="font-size:38px;line-height:1.12;margin:0 0 16px">Sign in with your email.</h1>
-        <p style="font-size:15px;line-height:1.75;color:#CBB49E;margin:0 0 26px">No password. We email you a six-digit code — the same email you booked with.</p>
-        <label class="flab" style="margin-bottom:18px">Email address
-          <input id="email" class="field" type="email" autocomplete="email" placeholder="hello@example.com" style="font-size:19px;padding:17px 16px">
+        <div class="lbl" style="color:#B39C88;margin-bottom:16px">Step 1 of 2</div>
+        <h1 class="serif" style="font-size:34px;line-height:1.14;margin:0 0 12px">Sign in.</h1>
+        <p style="font-size:15px;line-height:1.75;color:#CBB49E;margin:0 0 24px">Your account is created when you book.</p>
+        
+        <label class="flab" style="margin-bottom:16px">Your first name
+          <input id="fname" class="field" placeholder="So we know what to call you">
         </label>
-        <button id="send" class="btn">Email me a code</button>
-        <div id="p1help" style="font-size:12.5px;line-height:1.7;color:#B39C88;margin-top:14px">We never email anything but codes and appointment reminders.</div>
-        <div style="margin-top:32px;padding-top:22px;border-top:1px solid rgba(232,213,196,.16)">
-          <div class="serif" style="font-size:19px;margin-bottom:8px">Not booked with us yet?</div>
-          <p style="font-size:14px;line-height:1.7;color:#CBB49E;margin:0 0 16px">Your account is created when you book — one number, no forms.</p>
-          <a class="btn btn-o" href="m-home.html#book">Book a visit</a>
-        </div>
-      </div>
 
-      <div id="p1b" class="hide">
-        <button id="edit1b" style="background:none;border:none;color:#B39C88;font-size:13.5px;padding:0 0 20px">← Change email</button>
-        <div class="lbl" style="color:#B39C88;margin-bottom:16px">Step 2 of 3</div>
+        <label class="flab" style="margin-bottom:16px">Email address
+          <input id="email" class="field" type="email" autocomplete="email" placeholder="hello@example.com">
+        </label>
+        
+        <button id="send" class="btn" style="background:rgba(232,213,196,.28)" disabled>Continue</button>
+      </div>
         <h1 class="serif" style="font-size:34px;line-height:1.14;margin:0 0 12px">Welcome.</h1>
         <p style="font-size:15px;line-height:1.75;color:#CBB49E;margin:0 0 24px">Your account is created when you book.</p>
         <label class="flab" style="margin-bottom:14px">Your first name<input id="fname" class="field" placeholder="So we know what to call you"></label>
@@ -195,7 +191,12 @@ var st={email:"",name:"",acct:null,isNew:false,left:0,tick:null};
 function stored(){ try{ return JSON.parse(localStorage.getItem(HUB_KEY))||null; }catch(e){ return null; } }
 
 function emailOk(){ var e=$("email").value; return e.includes("@") && e.includes("."); }
-function syncSend(){ $("send").style.background=emailOk()?"#E8D5C4":"rgba(232,213,196,.28)"; }
+function nameOk(){ return $("fname") && $("fname").value.trim().length > 0; }
+function syncSend(){ 
+  var ok = emailOk() && nameOk();
+  $("send").style.background = ok ? "#E8D5C4" : "rgba(232,213,196,.28)"; 
+  $("send").disabled = !ok;
+}
 
 function countdown(){
   st.left=30; clearInterval(st.tick);
@@ -209,15 +210,19 @@ function countdown(){
 }
 
 async function toStep2(){
-  st.email=$("email").value.trim().toLowerCase();
-  var h=stored();
+  st.email = $("email").value.trim().toLowerCase();
+  st.name = $("fname").value.trim();
+  
+  var btn = $("send");
+  var oldText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Sending...";
   
   // Lookup client in supabase
   try {
     let res = await sb.from('clients').select('id, name').eq('email', st.email);
     if (res.data && res.data.length > 0) {
       st.acct = res.data[0];
-      st.name = st.acct.name;
     } else {
       st.acct = null;
     }
@@ -225,23 +230,30 @@ async function toStep2(){
   
   st.isNew = !st.acct;
   
-  if (st.isNew) {
-    $("p1").className="hide"; $("p1b").className="";
-    $("fname").focus();
-  } else {
-    sendCode();
+  try {
+      const { data, error } = await sb.auth.signInWithOtp({ email: st.email });
+      if (error) {
+        alert("Error sending code: " + error.message);
+        btn.disabled = false;
+        btn.textContent = oldText;
+        return;
+      }
+  } catch(e) {
+      alert("Error: " + e);
+      btn.disabled = false;
+      btn.textContent = oldText;
+      return;
   }
-}
-
-async function sendCode() {
+  
+  btn.disabled = false;
+  btn.textContent = oldText;
+  
   $("p2title").textContent = st.isNew? "Enter your code." : "Welcome back, "+st.name+".";
-  $("p2step").textContent = st.isNew? "Step 3 of 3" : "Step 2 of 2";
+  $("p2step").textContent = "Step 2 of 2";
   $("p2sub").innerHTML = 'Emailed to <strong style="font-weight:600;color:#E8D5C4">'+st.email+'</strong>.';
   
-  $("p1").className="hide"; $("p1b").className="hide"; $("p2").className="";
+  $("p1").className="hide"; $("p2").className="";
   $("code").focus(); countdown();
-  
-  await sb.auth.signInWithOtp({ email: st.email });
 }
 
 function stampRow(n){
@@ -289,13 +301,11 @@ async function finish(){
 }
 
 $("email").oninput=syncSend;
-$("email").onkeydown=function(e){ if(e.key==="Enter"&&emailOk()) toStep2(); };
-$("send").onclick=function(){ if(emailOk()) toStep2(); };
+$("fname").oninput=syncSend;
+$("email").onkeydown=function(e){ if(e.key==="Enter"&&emailOk()&&nameOk()) toStep2(); };
+$("fname").onkeydown=function(e){ if(e.key==="Enter"&&emailOk()&&nameOk()) toStep2(); };
+$("send").onclick=function(){ if(emailOk()&&nameOk()) toStep2(); };
 $("edit").onclick=function(){ clearInterval(st.tick); $("p2").className="hide"; $("p1").className=""; };
-$("edit1b").onclick=function(){ $("p1b").className="hide"; $("p1").className=""; };
-$("fname").oninput=function(){ $("sendname").style.background = this.value.trim() ? "#E8D5C4" : "rgba(232,213,196,.28)"; };
-$("fname").onkeydown=function(e){ if(e.key==="Enter"&&this.value.trim()){ st.name=this.value.trim(); sendCode(); } };
-$("sendname").onclick=function(){ if($("fname").value.trim()){ st.name=$("fname").value.trim(); sendCode(); } };
 $("code").oninput=async function(){
   var codeVal = this.value.trim();
   var ok = codeVal.length === 6;
