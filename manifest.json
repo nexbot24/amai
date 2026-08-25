@@ -1,0 +1,16 @@
+{
+  "name": "Amai",
+  "short_name": "Amai",
+  "start_url": "/m-home.html",
+  "display": "standalone",
+  "background_color": "#241F1C",
+  "theme_color": "#241F1C",
+  "icons": [
+    {
+      "src": "/amai-favicon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
