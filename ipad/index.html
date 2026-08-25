@@ -379,7 +379,13 @@ V.settings=function(){
         '<div class="kv"><span style="color:#6E5B49">5 stamps</span><span>25% off a visit</span></div>'+
         '<div class="kv" style="border-bottom:1px solid #E0D2C2"><span style="color:#6E5B49">10 stamps</span><span>Visit free</span></div></div>'+
       '<div class="card"><div class="lbl" style="margin-bottom:14px">Services</div>'+
-        '<div style="font-size:14px;color:#5C5148;line-height:1.7">'+SERVICES.length+' services · '+money(12)+' to '+money(42)+'</div></div>'+
+        SERVICES.map(function(s){
+          return '<div class="kv" data-svc-id="'+s.dbId+'"><span style="color:#5C5148;flex:1;min-width:0">'+s.n+'</span>'+
+            '<span style="color:#6E5B49;width:50px;text-align:right">'+s.d+' min</span>'+
+            '<span style="font-weight:600;width:50px;text-align:right">'+money(s.p)+'</span>'+
+            '<button class="svc-edit" data-svc-edit="'+s.dbId+'" style="background:none;border:none;color:#B39C88;font-size:12px;cursor:pointer;padding:4px 8px">Edit</button></div>';
+        }).join('')+
+        '</div>'+
     '</div></div>';
 };
 
@@ -583,6 +589,24 @@ function wire(scope){
     saveView(); render(); };
   if(scope.getElementById&&scope.getElementById("csearch")) scope.getElementById("csearch").oninput=function(){
     $("clist").innerHTML=clientRows(this.value); wire(document); };
+  q("[data-svc-edit]").forEach(function(b){ b.onclick=function(){
+    var id=b.dataset.svcEdit;
+    var s=SERVICES.filter(function(x){return x.dbId===id||x.dbId===+id;})[0]; if(!s) return;
+    sheet('<div class="lbl" style="margin-bottom:14px">Edit service</div>'+
+      '<div class="serif" style="font-size:22px;margin-bottom:18px">'+s.n+'</div>'+
+      '<div style="display:flex;gap:12px;margin-bottom:16px">'+
+        '<label style="flex:1;font-size:13px;color:#6E5B49">Price (£)<input id="svc-price" type="number" value="'+s.p+'" style="width:100%;padding:10px;border:1px solid #D5C4B0;border-radius:10px;font-size:16px;margin-top:6px;background:#F7F1EA"></label>'+
+        '<label style="flex:1;font-size:13px;color:#6E5B49">Duration (min)<input id="svc-dur" type="number" value="'+s.d+'" style="width:100%;padding:10px;border:1px solid #D5C4B0;border-radius:10px;font-size:16px;margin-top:6px;background:#F7F1EA"></label>'+
+      '</div>'+
+      '<button id="svc-save" class="btn" style="width:100%;min-height:48px;font-size:16px;border-radius:12px">Save changes</button>');
+    $("svc-save").onclick=async function(){
+      var np=Number($("svc-price").value), nd=Number($("svc-dur").value);
+      if(!np||!nd) return;
+      await sb.from('services').update({price:np,duration_minutes:nd}).eq('id',id);
+      s.p=np; s.d=nd;
+      closeSheet(); render();
+    };
+  }; });
 }
 
 /* ---------- render ---------- */
