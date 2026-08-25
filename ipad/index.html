@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en-GB"><head>
+<html lang="en-GB">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Amai Studio</title>
@@ -11,63 +12,7 @@
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%233A322E'/%3E%3Ctext x='90' y='118' font-family='Georgia,serif' font-size='86' fill='%23E8D5C4' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E">
 <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Amai%20Studio%22%2C%22short_name%22%3A%22Amai%22%2C%22display%22%3A%22standalone%22%2C%22orientation%22%3A%22portrait%22%2C%22background_color%22%3A%22%23241F1C%22%2C%22theme_color%22%3A%22%23241F1C%22%2C%22start_url%22%3A%22.%22%7D">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Mulish:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>/* latin-ext */
-
-/* latin */
-
-/* cyrillic-ext */
-
-/* cyrillic */
-
-/* vietnamese */
-
-/* latin-ext */
-
-/* latin */
-
-/* cyrillic-ext */
-
-/* cyrillic */
-
-/* vietnamese */
-
-/* latin-ext */
-
-/* latin */
-
-/* cyrillic-ext */
-
-/* cyrillic */
-
-/* vietnamese */
-
-/* latin-ext */
-
-/* latin */
-
-/* cyrillic-ext */
-
-/* cyrillic */
-
-/* vietnamese */
-
-/* latin-ext */
-
-/* latin */
-
-/* cyrillic-ext */
-
-/* cyrillic */
-
-/* vietnamese */
-
-/* latin-ext */
-
-/* latin */
-
-</style>
 <style>
 *,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden}
@@ -84,7 +29,7 @@ button{font-family:Mulish,sans-serif;cursor:pointer;color:#241F1C}
 
 /* rail */
 .rail{background:#241F1C;display:flex;align-items:center;justify-content:space-between;padding:10px 18px calc(10px + env(safe-area-inset-bottom));gap:8px}
-.tab{flex:1;min-height:62px;border:none;background:none;color:#8A7361;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;border-radius:14px;position:relative}
+.tab{flex:1;min-width:0;min-height:62px;border:none;background:none;color:#8A7361;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;border-radius:14px;position:relative}
 .tab .g{width:22px;height:22px;border:1.5px solid currentColor;border-radius:6px}
 .tab.on{background:#3A322E;color:#E8D5C4}
 .tab:active{opacity:.7}
@@ -115,6 +60,7 @@ button{font-family:Mulish,sans-serif;cursor:pointer;color:#241F1C}
 .appt{border-left:3px solid #3A322E;background:#F7F1EA;border-top:1px solid #E0D2C2;border-right:1px solid #E0D2C2;border-bottom:1px solid #E0D2C2;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:64px;color:#241F1C;width:100%}
 .appt.done{border-left-color:#B39C88;background:#EFE5D8;color:#6E5B49;opacity:1}
 .appt.now{border-left-color:#E8D5C4;background:#3A322E;color:#E8D5C4}
+.appt.cont{border-left-color:#C9B8A4;background:#EFE9E1;min-height:44px}
 .free{border:1px dashed #D6C4B2;min-height:64px;display:flex;align-items:center;justify-content:space-between;padding:12px 14px;color:#8A7361;font-size:13.5px;background:transparent;width:100%}
 
 /* week grid */
@@ -129,6 +75,38 @@ button{font-family:Mulish,sans-serif;cursor:pointer;color:#241F1C}
 .kv{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-top:1px solid #E0D2C2;font-size:15px}
 .chip{min-height:44px;padding:0 16px;font-size:15px;background:transparent;border:1px solid #DED0C0;color:#241F1C}
 .chip[aria-pressed="true"]{background:#3A322E;color:#F7F1EA;border-color:#3A322E}
+.seg{display:grid;grid-auto-flow:column;border:1px solid #DED0C0;background:#F7F1EA}
+.seg button{min-height:42px;background:transparent;border:none;color:#6E5B49;font-size:14px;padding:0 10px}
+.seg button[aria-pressed="true"]{background:#3A322E;color:#F7F1EA;font-weight:600}
+.mgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.mhead{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding-bottom:5px}
+.mhead span{text-align:center;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#8A7361}
+.mcell{aspect-ratio:1/1;min-height:42px;border:1px solid #E5D8C9;background:#F7F1EA;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-family:Marcellus,serif;font-size:15px;color:#241F1C;padding:0}
+.mcell u{width:4px;height:4px;border-radius:50%;background:#8A7361}
+.mcell.shut{background:#3A322E;border-color:#3A322E;color:#E8D5C4}
+.mcell.shut u{background:#E8D5C4}
+.mcell.off{background:#EFE5D8;border-color:#EFE5D8;color:#C9B8A4}
+.mcell.past{opacity:.35}
+.mblank{aspect-ratio:1/1;min-height:42px}
+.unread{width:9px;height:9px;border-radius:50%;background:#3A322E;flex:none}
+.badge{position:absolute;top:9px;right:calc(50% - 21px);background:#E8D5C4;color:#3A322E;font-size:9px;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:Mulish,sans-serif;letter-spacing:0;font-weight:600}
+.navrow{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.navbtn{width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:transparent;border:1px solid #C9B8A4;color:#241F1C;font-size:16px}
+.navbtn[disabled]{opacity:.3}
+@media (max-width:520px){
+  .topbar{padding-left:16px;padding-right:16px}
+  .body{padding:16px 16px 30px}
+  .aside-inline{padding:0 16px 4px}
+  .slotline{grid-template-columns:52px 1fr;gap:10px}
+  .week{grid-template-columns:42px repeat(4,1fr);gap:3px}
+  .sheet{padding:22px 18px 26px}
+  #ttl{font-size:21px!important}
+  #sub{display:none}
+  .rail{padding-left:6px;padding-right:6px;gap:2px}
+  .tab{font-size:8.5px;letter-spacing:.03em}
+  .tab .g{width:20px;height:20px}
+  .badge{right:calc(50% - 18px)}
+}
 @media (max-width:860px),(max-height:1220px){ .ipad{width:100vw;height:100vh} }
 @media (display-mode:standalone){ .ipad{width:100vw;height:100vh} #install{display:none!important} }
 </style>
@@ -138,7 +116,8 @@ button{font-family:Mulish,sans-serif;cursor:pointer;color:#241F1C}
 <div class="ipad">
   <!-- HEADER -->
   <div class="topbar">
-    <div style="display:flex;align-items:baseline;gap:14px;min-width:0">
+    <div style="display:flex;align-items:baseline;gap:12px;min-width:0">
+      <button class="navbtn hide" id="back" style="width:38px;height:38px;align-self:center;flex:none">←</button>
       <span class="serif" id="ttl" style="font-size:26px;white-space:nowrap"></span>
       <span id="sub" style="font-size:13px;color:#6E5B49;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></span>
     </div>
@@ -170,76 +149,134 @@ button{font-family:Mulish,sans-serif;cursor:pointer;color:#241F1C}
   </div>
 </div>
 
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#241F1C"/><rect x="26" y="18" width="48" height="64" rx="5" fill="none" stroke="#E8D5C4" stroke-width="3"/></svg></template>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 var $=function(i){return document.getElementById(i);};
 var TIMES=["9.00","10.00","11.00","12.00","13.00","14.00","15.00","16.00","17.00"];
-var SERVICES=[];
-
-/* Supabase */
-var supabaseUrl='https://tphyrmweauzfletdlqvi.supabase.co';
-var supabaseKey='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwaHlybXdlYXV6ZmxldGRscXZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0NTIxOTQsImV4cCI6MjEwMzAyODE5NH0.Z_utKsxYquCoL2LfTjjL8QFB1tnLJZW9j3El7Sykk8o';
-var sb=supabase.createClient(supabaseUrl,supabaseKey);
-
+var DEFAULT_SERVICES=[
+  {n:"First visit — consultation & treatment",d:60,p:30},{n:"Full leg wax",d:45,p:38},
+  {n:"Half leg wax",d:30,p:26},{n:"Underarm wax",d:15,p:14},{n:"Arm wax",d:25,p:22},
+  {n:"Facial waxing",d:15,p:12},{n:"Brow shape & tidy",d:20,p:16},{n:"Bikini wax",d:30,p:28},
+  {n:"Brazilian wax",d:40,p:36},{n:"Hollywood wax",d:45,p:42},{n:"Maintenance visit",d:30,p:24}
+];
 function d0(){ var d=new Date(); d.setHours(0,0,0,0); return d; }
 function shift(base,n){ var d=new Date(base); d.setDate(d.getDate()+n); return d; }
 function iso(d){ return d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate(); }
 function parseKey(k){ var p=k.split("-"); return new Date(+p[0],+p[1],+p[2]); }
 function open(d){ return d.getDay()!==0&&d.getDay()!==1; }
-function nextOpen(n){ var d=shift(d0(),n); while(!open(d)) d=shift(d,1); return d; }
+function nextOpen(n){
+  var d=d0(), seen=0;
+  while(!open(d)) d=shift(d,1);
+  while(seen<n){ d=shift(d,1); while(!open(d)) d=shift(d,1); seen++; }
+  return d;
+}
 function back(n){ var d=d0(), c=0; while(c<n){ d=shift(d,-1); if(open(d)) c++; } return d; }
 function longDate(d){ return d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}); }
 function shortDate(d){ return d.toLocaleDateString("en-GB",{day:"numeric",month:"short"}); }
 function money(n){ return "£"+n; }
 
+
+/* Supabase */
+var supabaseUrl='https://tphyrmweauzfletdlqvi.supabase.co';
+var supabaseKey='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwaHlybXdlYXV6ZmxldGRscXZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0NTIxOTQsImV4cCI6MjEwMzAyODE5NH0.Z_utKsxYquCoL2LfTjjL8QFB1tnLJZW9j3El7Sykk8o';
+var sb=supabase.createClient(supabaseUrl,supabaseKey);
 function dateToDayKey(ds){ var d=new Date(ds+'T00:00:00'); return d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate(); }
 function dayKeyToDate(k){ var p=k.split('-'); var d=new Date(+p[0],+p[1],+p[2]); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 
-var KEY="amai_studio_v2";
-var S={view:"today",dayKey:iso(d0()),locked:false,clients:[],appts:[],requests:[],closed:{}};
+var KEY="amai_studio_v4";
 
-function saveView(){ try{ localStorage.setItem(KEY,JSON.stringify({view:S.view,dayKey:S.dayKey})); }catch(e){} }
+var S={view:"today",dayKey:iso(d0()),locked:false,clients:[],appts:[],requests:[],closed:{},messages:[],promos:[],services:[]};
 
 async function loadAll(){
   var r;
-  /* services */
   r=await sb.from('services').select('*').eq('available',true).order('sort_order');
-  if(r.data) SERVICES=r.data.map(function(s){ return {n:s.name,d:s.duration_minutes,p:Number(s.price),dbId:s.id,cat:s.category}; });
-  /* clients */
+  if(r.data) S.services=r.data.map(function(s){ return {n:s.name,d:s.duration_minutes,p:Number(s.price),dbId:s.id,id:s.id,on:true}; });
+  
   r=await sb.from('clients').select('*');
   if(r.data) S.clients=r.data.map(function(c){ return {id:c.id,name:c.name||'',phone:c.phone||'',email:c.email||'',since:c.created_at?new Date(c.created_at).toLocaleDateString('en-GB',{month:'short',year:'numeric'}):'Unknown',stamps:c.stamps||0,plan:c.plan||null,notes:c.notes||'',visits:0,spend:0}; });
-  /* bookings */
+  
   r=await sb.from('bookings').select('*').neq('status','cancelled');
   if(r.data){
     S.appts=r.data.map(function(b){ return {id:b.id,c:b.client_id,s:b.treatment_name,t:b.appointment_time,dur:b.duration_minutes||30,p:Number(b.price),dep:Number(b.deposit_amount)||10,day:dateToDayKey(b.appointment_date),st:b.status==='completed'?'done':'due'}; });
     S.appts.forEach(function(a){ if(a.st==='done'){ var c=client(a.c); if(c){c.visits++;c.spend+=a.p;} } });
   }
-  /* requests */
+  
   r=await sb.from('requests').select('*').eq('status','new').order('created_at',{ascending:false});
   if(r.data) S.requests=r.data.map(function(q){ return {id:q.id,name:q.name,phone:q.phone||'',email:q.email||'',s:q.service_name||'',want:q.preferred_time||'',note:q.message||''}; });
-  /* closed days */
+  
   r=await sb.from('closed_days').select('*');
   if(r.data){ S.closed={}; r.data.forEach(function(d){ S.closed[d.date_key]=true; }); }
-  /* restore view state */
+  
   try{ var loc=JSON.parse(localStorage.getItem(KEY)); if(loc&&loc.view) S.view=loc.view; if(loc&&loc.dayKey) S.dayKey=loc.dayKey; }catch(e){}
+  
+  if(!S.messages) S.messages=[];
+  if(!S.promos) S.promos=[];
+  if(!S.dmode) S.dmode="day";
+  if(!S.itab) S.itab="messages";
+  if(S.view==="requests") S.view="inbox";
+  if(S.view==="week"){ S.view="today"; S.dmode="week"; }
+}
+
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify({view:S.view,dayKey:S.dayKey})); }catch(e){} }catch(e){} }
+
+
+
+/* closures carry a reason; older saves stored a bare true */
+function closedInfo(k){ var v=S.closed[k]; if(!v) return null; return typeof v==="object"?v:{why:""}; }
+function shutDay(k,why){ S.closed[k]={why:why||""}; }
+function unread(){ return S.messages.filter(function(m){ return !m.read; }).length; }
+function inboxCount(){ return unread()+S.requests.length; }
+function monthOf(off){ var t=d0(); return new Date(t.getFullYear(),t.getMonth()+(off||0),1); }
+function inputDate(d){ var m=d.getMonth()+1, dd=d.getDate(); return d.getFullYear()+"-"+(m<10?"0":"")+m+"-"+(dd<10?"0":"")+dd; }
+function fromInput(v){ var p=String(v).split("-"); return new Date(+p[0],(+p[1])-1,+p[2]); }
+function upcomingClosures(){
+  var t=d0();
+  return Object.keys(S.closed).map(function(k){ return {k:k,d:parseKey(k),why:(closedInfo(k)||{}).why||""}; })
+    .filter(function(x){ return x.d>=t; })
+    .sort(function(a,b){ return a.d-b.d; });
 }
 
 /* ---------- helpers ---------- */
 function client(id){ return S.clients.filter(function(c){ return c.id===id; })[0]; }
 function dayAppts(k){ return S.appts.filter(function(a){ return a.day===k; }).sort(function(a,b){ return parseFloat(a.t)-parseFloat(b.t); }); }
 function takings(k){ return dayAppts(k).reduce(function(s,a){ return s+a.p; },0); }
+function bookable(){ return S.services.filter(function(s){ return s.on!==false; }); }
+function slotIndex(t){ return TIMES.indexOf(t); }
+function spanOf(dur){ return Math.max(1,Math.ceil((dur||60)/60)); }
+function occupancy(k){
+  var map={};
+  dayAppts(k).forEach(function(a){
+    var i=slotIndex(a.t); if(i<0) return;
+    for(var j=0;j<spanOf(a.dur)&&i+j<TIMES.length;j++) map[TIMES[i+j]]={appt:a,start:j===0};
+  });
+  return map;
+}
+function fitsAt(k,t,dur,ignoreId){
+  var i=slotIndex(t); if(i<0) return false;
+  var need=spanOf(dur); if(i+need>TIMES.length) return false;
+  var occ=occupancy(k);
+  for(var j=0;j<need;j++){
+    var cell=occ[TIMES[i+j]];
+    if(cell&&cell.appt.id!==ignoreId) return false;
+  }
+  return true;
+}
 function nowSlot(){ var h=new Date().getHours(); return h+".00"; }
 
-var TABS=[["today","Today"],["week","Week"],["clients","Clients"],["requests","Inbox"],["money","Takings"],["settings","Studio"]];
+var TABS=[["today","Diary"],["clients","Clients"],["inbox","Inbox"],["money","Takings"],["settings","Studio"]];
+var PARENT={closures:"settings",services:"settings",promos:"settings"};
 function tabs(){
   var box=$("tabs"); box.innerHTML="";
   TABS.forEach(function(t){
+    var on = S.view===t[0] || PARENT[S.view]===t[0];
     var b=document.createElement("button");
-    b.className="tab"+(S.view===t[0]?" on":"");
-    var badge=(t[0]==="requests"&&S.requests.length)?'<span style="position:absolute;top:8px;left:50%;margin-left:6px;background:#E8D5C4;color:#3A322E;font-size:9px;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center">'+S.requests.length+'</span>':"";
-    b.innerHTML='<div class="g" style="'+(t[0]==="today"?"border-radius:50%":t[0]==="clients"?"border-radius:11px 11px 4px 4px":"")+'"></div>'+t[1]+badge;
-    b.onclick=function(){ S.view=t[0]; saveView(); render(); };
+    b.className="tab"+(on?" on":"");
+    var n=t[0]==="inbox"?inboxCount():0;
+    b.innerHTML='<div class="g" style="'+(t[0]==="today"?"border-radius:50%":t[0]==="clients"?"border-radius:11px 11px 4px 4px":t[0]==="settings"?"border-radius:11px 11px 0 0;border-bottom:none":"")+'"></div>'+t[1]+
+      (n?'<span class="badge">'+n+'</span>':"");
+    b.onclick=function(){ S.view=t[0]; save(); render(); };
     box.appendChild(b);
   });
 }
@@ -248,9 +285,16 @@ function tabs(){
 var V={};
 
 V.today=function(){
-  var d=parseKey(S.dayKey), list=dayAppts(S.dayKey), now=nowSlot();
+  var d=parseKey(S.dayKey), list=dayAppts(S.dayKey), now=nowSlot(), occ=occupancy(S.dayKey);
   var rows=TIMES.map(function(tm){
-    var a=list.filter(function(x){ return x.t===tm; })[0];
+    var cell=occ[tm];
+    if(cell&&!cell.start){
+      var ca=cell.appt, cc=client(ca.c);
+      return '<div class="slotline"><div class="lbl" style="padding-top:22px">'+tm+'</div>'+
+        '<button class="appt cont" data-appt="'+ca.id+'" style="text-align:left;min-height:44px">'+
+          '<span style="font-size:13px;color:#6E5B49">'+cc.name+' — '+ca.s+' continues</span></button></div>';
+    }
+    var a=cell?cell.appt:null;
     if(!a) return '<div class="slotline"><div class="lbl" style="padding-top:22px">'+tm+'</div>'+
       '<button class="free" data-fill="'+tm+'"><span>Free</span><span style="font-size:19px;color:#C9B8A4">+</span></button></div>';
     var c=client(a.c);
@@ -265,21 +309,28 @@ V.today=function(){
           (a.st==="done"?'<span class="pill">Paid</span>':'<span style="font-size:15px;font-weight:600">'+money(a.p-a.dep)+'</span>')+
         '</span></button></div>';
   }).join("");
-  return '<div style="display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:18px">'+
-    '<div style="display:flex;gap:8px">'+
-      '<button class="btn btn-o btn-sm" data-day="-1">←</button>'+
-      '<button class="btn btn-o btn-sm" data-day="today">Today</button>'+
-      '<button class="btn btn-o btn-sm" data-day="1">→</button></div>'+
-    '<div style="display:flex;gap:10px;align-items:center">'+
-      '<span class="pill">'+list.length+' booked</span>'+
-      '<span class="pill">'+money(takings(S.dayKey))+' expected</span>'+
-      '<button class="btn btn-o btn-sm" id="closeday">'+(S.closed[S.dayKey]?"Reopen day":"Close day")+'</button></div>'+
-  '</div>'+
-  (S.closed[S.dayKey]?'<div class="card" style="margin-bottom:14px;border-color:#8A7361"><strong style="font-weight:600">This day is closed.</strong> Clients can\'t book it, and anyone already in the diary needs a call.</div>':'')+
-  '<div style="display:flex;flex-direction:column;gap:8px">'+rows+'</div>';
+  var info=closedInfo(S.dayKey);
+  return '<div class="seg" style="grid-template-columns:1fr 1fr;margin-bottom:16px">'+
+      '<button data-dmode="day" aria-pressed="'+(S.dmode==="day")+'">This day</button>'+
+      '<button data-dmode="week" aria-pressed="'+(S.dmode==="week")+'">Next four days</button></div>'+
+    (S.dmode==="week"? weekGrid() :
+    '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap">'+
+      '<div style="display:flex;gap:8px">'+
+        '<button class="btn btn-o btn-sm" data-day="-1">←</button>'+
+        '<button class="btn btn-o btn-sm" data-day="today">Today</button>'+
+        '<button class="btn btn-o btn-sm" data-day="1">→</button></div>'+
+      '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'+
+        '<span class="pill">'+list.length+' booked</span>'+
+        '<span class="pill">'+money(takings(S.dayKey))+' expected</span>'+
+        '<button class="btn btn-o btn-sm" id="closeday">'+(info?"Reopen":"Close day")+'</button></div>'+
+    '</div>'+
+    (info?'<div class="card" style="margin-bottom:14px;background:#3A322E;border-color:#3A322E;color:#E8D5C4">'+
+      '<div class="serif" style="font-size:19px;margin-bottom:5px">The studio is closed this day.</div>'+
+      '<div style="font-size:13.5px;line-height:1.7;color:#CBB49E">'+(info.why? info.why+" · " : "")+'Clients cannot book it. Anything already in the diary below needs a call.</div></div>':'')+
+    '<div style="display:flex;flex-direction:column;gap:8px">'+rows+'</div>');
 };
 
-V.week=function(){
+function weekGrid(){
   var start=d0(), days=[];
   for(var i=0;i<14&&days.length<4;i++){ var d=shift(start,i); if(open(d)) days.push(d); }
   var headRow='<div class="wcell" style="border:none;background:none"></div>'+days.map(function(d){
@@ -290,18 +341,22 @@ V.week=function(){
     return '<div class="wcell" style="border:none;background:none;justify-content:flex-end;padding-right:6px">'+tm+'</div>'+
       days.map(function(d){
         var k=iso(d);
-        if(S.closed[k]) return '<div class="wcell shut">closed</div>';
-        var a=dayAppts(k).filter(function(x){ return x.t===tm; })[0];
-        if(!a) return '<button class="wcell" data-new="'+k+'|'+tm+'">+</button>';
+        if(closedInfo(k)) return '<div class="wcell shut">closed</div>';
+        var cell=occupancy(k)[tm];
+        if(!cell) return '<button class="wcell" data-new="'+k+'|'+tm+'">+</button>';
+        if(!cell.start) return '<button class="wcell full" data-appt="'+cell.appt.id+'" style="opacity:.55;font-size:9.5px">cont.</button>';
+        var a=cell.appt;
         return '<button class="wcell full" data-appt="'+a.id+'">'+client(a.c).name.split(" ")[0]+'<br>'+a.s.split(" ")[0]+'</button>';
       }).join("");
   }).join("");
   var load=days.map(function(d){ return dayAppts(iso(d)).length; });
-  return '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px">'+
-    '<span style="font-size:14px;color:#5C5148">Next four open days · '+load.reduce(function(a,b){return a+b;},0)+' appointments</span>'+
-    '<span class="pill">'+Math.round(load.reduce(function(a,b){return a+b;},0)/(days.length*TIMES.length)*100)+'% full</span></div>'+
-    '<div class="week">'+headRow+body+'</div>';
-};
+  var total=load.reduce(function(a,b){ return a+b; },0);
+  return '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:12px">'+
+    '<span style="font-size:14px;color:#5C5148">'+total+' appointments</span>'+
+    '<span class="pill">'+Math.round(total/(days.length*TIMES.length)*100)+'% full</span></div>'+
+    '<div class="week">'+headRow+body+'</div>'+
+    '<div style="font-size:13px;line-height:1.7;color:#6E5B49;margin-top:14px">Tap a day name to open it, a gap to book into it.</div>';
+}
 
 V.clients=function(){
   return '<input class="field" id="csearch" placeholder="Search clients" style="margin-bottom:14px">'+
@@ -322,9 +377,30 @@ function clientRows(q){
   }).join("");
 }
 
-V.requests=function(){
-  if(!S.requests.length) return '<div class="card"><div class="serif" style="font-size:20px;margin-bottom:6px">Nothing waiting.</div><p style="font-size:14px;color:#5C5148;margin:0">New enquiries and booking requests land here.</p></div>';
-  return '<div style="display:flex;flex-direction:column;gap:10px">'+S.requests.map(function(r){
+V.inbox=function(){
+  var tab=S.itab, u=unread();
+  var head='<div class="seg" style="grid-template-columns:1fr 1fr;margin-bottom:16px">'+
+    '<button data-itab="messages" aria-pressed="'+(tab==="messages")+'">Messages'+(u?" ("+u+")":"")+'</button>'+
+    '<button data-itab="requests" aria-pressed="'+(tab==="requests")+'">Booking requests'+(S.requests.length?" ("+S.requests.length+")":"")+'</button></div>';
+
+  if(tab==="messages"){
+    if(!S.messages.length) return head+'<div class="card"><div class="serif" style="font-size:20px;margin-bottom:6px">No messages.</div>'+
+      '<p style="font-size:14px;color:#5C5148;margin:0">Enquiries sent from the website land here.</p></div>';
+    return head+'<div style="display:flex;flex-direction:column;gap:8px">'+
+      S.messages.map(function(m){
+        return '<button class="card" data-msg="'+m.id+'" style="text-align:left;display:flex;flex-direction:column;gap:8px;width:100%">'+
+          '<span style="display:flex;align-items:center;gap:10px;width:100%">'+
+            (m.read?'':'<span class="unread"></span>')+
+            '<span class="serif" style="font-size:19px;flex:1">'+m.name+'</span>'+
+            '<span style="font-size:12.5px;color:#6E5B49;flex:none">'+m.when+'</span></span>'+
+          '<span style="font-size:14px;line-height:1.65;color:'+(m.read?"#6E5B49":"#3A322E")+';display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%">'+m.body+'</span></button>';
+      }).join("")+'</div>'+
+      '<div style="font-size:13px;line-height:1.7;color:#6E5B49;margin-top:14px">Tap a message to read it in full, reply, or turn it into a booking.</div>';
+  }
+
+  if(!S.requests.length) return head+'<div class="card"><div class="serif" style="font-size:20px;margin-bottom:6px">Nothing waiting.</div>'+
+    '<p style="font-size:14px;color:#5C5148;margin:0">Booking requests from the website land here.</p></div>';
+  return head+'<div style="display:flex;flex-direction:column;gap:10px">'+S.requests.map(function(r){
     return '<div class="card">'+
       '<div style="display:flex;justify-content:space-between;gap:14px;margin-bottom:10px">'+
         '<span class="serif" style="font-size:20px">'+r.name+'</span>'+
@@ -366,33 +442,122 @@ V.money=function(){
 
 V.settings=function(){
   var days=["Tuesday","Wednesday","Thursday","Friday","Saturday"];
-  return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start">'+
-    '<div class="card"><div class="lbl" style="margin-bottom:14px">Opening hours</div>'+
-      days.map(function(d){ return '<div class="kv"><span style="color:#6E5B49">'+d+'</span><span>9.00 – 18.00</span></div>'; }).join("")+
-      '<div class="kv" style="border-bottom:1px solid #E0D2C2;color:#8A7361"><span>Sunday &amp; Monday</span><span>Closed</span></div></div>'+
-    '<div style="display:flex;flex-direction:column;gap:10px">'+
-      '<div class="card"><div class="lbl" style="margin-bottom:14px">Deposit</div>'+
-        '<div class="kv"><span style="color:#6E5B49">Amount</span><span>£10</span></div>'+
-        '<div class="kv"><span style="color:#6E5B49">Refund window</span><span>24 hours</span></div>'+
-        '<div class="kv" style="border-bottom:1px solid #E0D2C2"><span style="color:#6E5B49">Applied to</span><span>Every booking</span></div></div>'+
-      '<div class="card"><div class="lbl" style="margin-bottom:14px">Loyalty</div>'+
-        '<div class="kv"><span style="color:#6E5B49">5 stamps</span><span>25% off a visit</span></div>'+
-        '<div class="kv" style="border-bottom:1px solid #E0D2C2"><span style="color:#6E5B49">10 stamps</span><span>Visit free</span></div></div>'+
-      '<div class="card"><div class="lbl" style="margin-bottom:14px">Services</div>'+
-        SERVICES.map(function(s){
-          return '<div class="kv" data-svc-id="'+s.dbId+'"><span style="color:#5C5148;flex:1;min-width:0">'+s.n+'</span>'+
-            '<span style="color:#6E5B49;width:50px;text-align:right">'+s.d+' min</span>'+
-            '<span style="font-weight:600;width:50px;text-align:right">'+money(s.p)+'</span>'+
-            '<button class="svc-edit" data-svc-edit="'+s.dbId+'" style="background:none;border:none;color:#B39C88;font-size:12px;cursor:pointer;padding:4px 8px">Edit</button></div>';
-        }).join('')+
-        '</div>'+
-    '</div></div>';
+  var cl=upcomingClosures(), live=S.promos.filter(function(p){ return p.on!==false; });
+  var link=function(view,title,sub){
+    return '<button class="card" data-open="'+view+'" style="text-align:left;display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;min-height:78px">'+
+      '<span><span class="serif" style="display:block;font-size:20px;margin-bottom:4px">'+title+'</span>'+
+      '<span style="font-size:13px;color:#6E5B49">'+sub+'</span></span>'+
+      '<span style="font-size:17px;color:#8A7361;flex:none">→</span></button>';
+  };
+  return '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">'+
+      link("closures","Closures &amp; holidays", cl.length? cl.length+" day"+(cl.length>1?"s":"")+" closed ahead · next "+shortDate(cl[0].d) : "Nothing closed ahead")+
+      link("services","Services &amp; prices", bookable().length+" bookable of "+S.services.length)+
+      link("promos","Promo codes", live.length? live.length+" live · "+live.map(function(p){ return p.code; }).join(", ") : "None live")+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start">'+
+      '<div class="card"><div class="lbl" style="margin-bottom:14px">Opening hours</div>'+
+        days.map(function(d){ return '<div class="kv"><span style="color:#6E5B49">'+d+'</span><span>9.00 – 18.00</span></div>'; }).join("")+
+        '<div class="kv" style="border-bottom:1px solid #E0D2C2;color:#6E5B49"><span>Sunday &amp; Monday</span><span>Closed</span></div></div>'+
+      '<div style="display:flex;flex-direction:column;gap:10px">'+
+        '<div class="card"><div class="lbl" style="margin-bottom:14px">Deposit</div>'+
+          '<div class="kv"><span style="color:#6E5B49">Amount</span><span>£10</span></div>'+
+          '<div class="kv"><span style="color:#6E5B49">Refund window</span><span>24 hours</span></div>'+
+          '<div class="kv" style="border-bottom:1px solid #E0D2C2"><span style="color:#6E5B49">Applied to</span><span>Every booking</span></div></div>'+
+        '<div class="card"><div class="lbl" style="margin-bottom:14px">Loyalty</div>'+
+          '<div class="kv"><span style="color:#6E5B49">5 stamps</span><span>25% off a visit</span></div>'+
+          '<div class="kv" style="border-bottom:1px solid #E0D2C2"><span style="color:#6E5B49">10 stamps</span><span>Visit free</span></div></div>'+
+      '</div></div>';
+};
+
+V.closures=function(){
+  var v=monthOf(S.moff||0), t=d0();
+  var firstDow=(v.getDay()+6)%7, dim=new Date(v.getFullYear(),v.getMonth()+1,0).getDate(), cells="";
+  for(var i=0;i<firstDow;i++) cells+='<div class="mblank"></div>';
+  for(var n=1;n<=dim;n++){
+    var d=new Date(v.getFullYear(),v.getMonth(),n), k=iso(d);
+    var past=d<t, weekend=!open(d), shut=!!closedInfo(k), booked=dayAppts(k).length;
+    var cls="mcell"+(weekend?" off":shut?" shut":"")+(past?" past":"");
+    cells+= (weekend||past)
+      ? '<div class="'+cls+'">'+n+'</div>'
+      : '<button class="'+cls+'" data-shut="'+k+'">'+n+(booked?'<u></u>':'')+'</button>';
+  }
+  var cl=upcomingClosures();
+  return '<div class="navrow">'+
+      '<button class="navbtn" data-moff="-1"'+((S.moff||0)<=0?" disabled":"")+'>←</button>'+
+      '<span class="serif" style="font-size:19px">'+v.toLocaleDateString("en-GB",{month:"long",year:"numeric"})+'</span>'+
+      '<button class="navbtn" data-moff="1"'+((S.moff||0)>=6?" disabled":"")+'>→</button></div>'+
+    '<div class="mhead"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>'+
+    '<div class="mgrid">'+cells+'</div>'+
+    '<div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:14px 0 18px;font-size:12.5px;color:#6E5B49">'+
+      '<span style="display:flex;align-items:center;gap:7px"><span style="width:13px;height:13px;background:#3A322E"></span>Closed</span>'+
+      '<span style="display:flex;align-items:center;gap:7px"><span style="width:13px;height:13px;background:#EFE5D8"></span>Sunday &amp; Monday</span>'+
+      '<span style="display:flex;align-items:center;gap:7px"><span style="width:5px;height:5px;border-radius:50%;background:#8A7361"></span>Has bookings</span></div>'+
+    '<button class="btn btn-sm" id="closerange" style="margin-bottom:18px">Close a run of days</button>'+
+    '<div class="card">'+
+      '<div class="lbl" style="margin-bottom:'+(cl.length?"6px":"10px")+'">Closed ahead</div>'+
+      (cl.length? cl.map(function(x){
+        var n=dayAppts(x.k).length;
+        return '<div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 0;border-top:1px solid #E0D2C2">'+
+          '<span style="min-width:0"><span class="serif" style="display:block;font-size:18px;margin-bottom:3px">'+longDate(x.d)+'</span>'+
+          '<span style="font-size:12.5px;color:#6E5B49">'+(x.why||"No reason noted")+(n?" · "+n+" booking"+(n>1?"s":"")+" still in the diary":"")+'</span></span>'+
+          '<button class="btn btn-o btn-sm" data-reopen="'+x.k+'" style="flex:none">Reopen</button></div>';
+      }).join("") : '<p style="font-size:14px;line-height:1.7;color:#6E5B49;margin:0">Nothing closed. Tap a date above to block it out.</p>')+
+    '</div>';
+};
+
+V.services=function(){
+  return '<div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px">'+
+      '<span style="font-size:13.5px;line-height:1.7;color:#5C5148;max-width:44ch">The time you set here is the time held in the diary, so a 90-minute treatment blocks the hours after it.</span>'+
+      '<button class="btn btn-sm" id="addsvc" style="flex:none">Add a service</button></div>'+
+    '<div class="card">'+
+      S.services.map(function(s,i){
+        var off=s.on===false;
+        return '<div style="padding:16px 0;'+(i?"border-top:1px solid #E0D2C2":"")+';opacity:'+(off?".62":"1")+'">'+
+          '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin-bottom:10px">'+
+            '<span class="serif" style="font-size:19px;line-height:1.3;min-width:0">'+s.n+(off?' <span class="pill">Hidden</span>':'')+'</span>'+
+            '<span style="display:flex;align-items:baseline;gap:12px;flex:none">'+
+              '<span style="font-size:13.5px;color:#6E5B49">'+s.d+' min</span>'+
+              '<span style="font-size:16px;font-weight:600">'+money(s.p)+'</span></span></div>'+
+          '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+            '<button class="btn btn-o btn-sm" data-svcedit="'+s.id+'">Edit</button>'+
+            '<button class="btn btn-o btn-sm" data-svctoggle="'+s.id+'">'+(off?"Show":"Hide")+'</button>'+
+            '<button class="btn btn-o btn-sm" data-svcdel="'+s.id+'">Remove</button></div></div>';
+      }).join("")+
+    '</div>'+
+    '<div style="font-size:13px;line-height:1.7;color:#6E5B49;margin-top:14px">Hiding keeps a service out of new bookings without touching appointments already in the diary.</div>';
+};
+
+V.promos=function(){
+  return '<div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px">'+
+      '<span style="font-size:13.5px;line-height:1.7;color:#5C5148;max-width:44ch">Codes are typed at checkout. Turning one off stops it working without deleting what it has already done.</span>'+
+      '<button class="btn btn-sm" id="addpromo" style="flex:none">New code</button></div>'+
+    (S.promos.length? '<div style="display:flex;flex-direction:column;gap:8px">'+
+      S.promos.map(function(p){
+        var off=p.on===false, spent=p.cap?Math.min(100,Math.round(p.uses/p.cap*100)):0;
+        return '<div class="card" style="opacity:'+(off?".62":"1")+'">'+
+          '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin-bottom:8px">'+
+            '<span class="serif" style="font-size:22px;letter-spacing:.08em">'+p.code+'</span>'+
+            '<span class="pill'+(off?"":" on")+'">'+(off?"Off":"Live")+'</span></div>'+
+          '<div style="font-size:15px;margin-bottom:4px">'+(p.kind==="%"? p.val+"% off" : money(p.val)+" off")+
+            (p.note?' · <span style="color:#6E5B49">'+p.note+'</span>':'')+'</div>'+
+          '<div style="font-size:13px;color:#6E5B49;margin-bottom:14px">'+
+            'Used '+p.uses+' time'+(p.uses===1?"":"s")+(p.cap? ' of '+p.cap+' allowed':' · no limit')+
+            (p.until? ' · until '+shortDate(parseKey(p.until)) : '')+'</div>'+
+          (p.cap?'<div style="height:3px;background:#E0D2C2;margin-bottom:14px"><div style="height:3px;background:#3A322E;width:'+spent+'%"></div></div>':'')+
+          '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+            '<button class="btn btn-o btn-sm" data-promoedit="'+p.id+'">Edit</button>'+
+            '<button class="btn btn-o btn-sm" data-promotoggle="'+p.id+'">'+(off?"Turn on":"Turn off")+'</button>'+
+            '<button class="btn btn-o btn-sm" data-promodel="'+p.id+'">Delete</button></div></div>';
+      }).join("")+'</div>'
+      : '<div class="card"><div class="serif" style="font-size:20px;margin-bottom:6px">No codes yet.</div>'+
+        '<p style="font-size:14px;line-height:1.7;color:#5C5148;margin:0">A code is useful for a quiet fortnight, a first-visit offer, or a client you want to look after.</p></div>');
 };
 
 /* ---------- aside ---------- */
 function aside(){
-  if(S.view==="week"||S.view==="money"||S.view==="requests") return "";
-  if(S.view==="clients"||S.view==="settings"){
+  if(S.view==="money"||S.view==="inbox"||S.view==="closures"||S.view==="services"||S.view==="promos") return "";
+  if(S.view==="today"&&S.dmode==="week") return "";
+  if(S.view==="clients"){
     var busiest=S.clients.slice().sort(function(a,b){ return b.visits-a.visits; })[0];
     var due=S.clients.filter(function(c){ return c.stamps>=9; });
     return '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding-top:18px">'+
@@ -429,10 +594,11 @@ function sheet(html){
   $("sw").onclick=function(e){ if(e.target===this) closeSheet(); };
 }
 var draft={};
-function timeChips(dayKey,sel){
+function timeChips(dayKey,sel,dur){
+  var need=dur||draft.dur||60;
   return TIMES.map(function(t){
-    var taken=dayAppts(dayKey).some(function(a){ return a.t===t&&a.id!==draft.id; });
-    return '<button class="chip" data-time="'+t+'" aria-pressed="'+(sel===t)+'"'+(taken?' disabled style="opacity:.4;text-decoration:line-through"':'')+'>'+t+'</button>';
+    var ok=fitsAt(dayKey,t,need,draft.id)||sel===t;
+    return '<button class="chip" data-time="'+t+'" aria-pressed="'+(sel===t)+'"'+(ok?"":' disabled style="opacity:.4;text-decoration:line-through"')+'>'+t+'</button>';
   }).join("");
 }
 function apptSheet(a){
@@ -448,18 +614,19 @@ function apptSheet(a){
     '<div class="kv"><span style="color:#6E5B49">Due in studio</span><span>'+money(a.p-a.dep)+'</span></div>'+
     '<div class="kv" style="border-bottom:1px solid #E0D2C2"><span style="color:#6E5B49">Phone</span><span>'+c.phone+'</span></div>'+
     '<div class="lbl" style="margin:22px 0 10px">Move to another time on '+shortDate(parseKey(a.day))+'</div>'+
-    '<div style="display:flex;flex-wrap:wrap;gap:8px" id="chips">'+timeChips(a.day,a.t)+'</div>'+
+    '<div style="display:flex;flex-wrap:wrap;gap:8px" id="chips">'+timeChips(a.day,a.t,a.dur)+'</div>'+
     '<div style="display:flex;gap:10px;margin-top:24px;flex-wrap:wrap">'+
       (a.st==="done"?'<button class="btn btn-o btn-sm" data-undone="'+a.id+'">Mark unpaid</button>':'<button class="btn btn-sm" data-arrive="'+a.id+'">Mark arrived &amp; paid</button>')+
       '<button class="btn btn-o btn-sm" data-call="'+c.phone+'">Call</button>'+
       '<button class="btn btn-o btn-sm" data-cancelappt="'+a.id+'">Cancel visit</button>'+
       '<button class="btn btn-o btn-sm" id="sclose" style="margin-left:auto">Close</button></div>');
-  draft={id:a.id,time:a.t};
+  draft={id:a.id,time:a.t,dur:a.dur,day:a.day};
   bindSheet();
   $("sclose").onclick=closeSheet;
 }
 function newSheet(dayKey,time){
-  draft={id:null,day:dayKey,time:time||"",cid:S.clients[0].id,svc:0};
+  var first=bookable()[0]||{d:60};
+  draft={id:null,day:dayKey,time:time||"",cid:S.clients[0].id,svc:0,dur:first.d};
   sheet('<div class="lbl" style="margin-bottom:10px">New booking</div>'+
     '<div class="serif" style="font-size:28px;margin-bottom:20px">'+longDate(parseKey(dayKey))+'</div>'+
     '<div class="lbl" style="margin-bottom:10px">Client</div>'+
@@ -470,7 +637,7 @@ function newSheet(dayKey,time){
       '<input class="field" id="n-name" placeholder="Name"><input class="field" id="n-phone" placeholder="Phone"></div>'+
     '<div class="lbl" style="margin-bottom:10px">Treatment</div>'+
     '<select class="field" id="n-svc" style="margin-bottom:18px">'+
-      SERVICES.map(function(s,i){ return '<option value="'+i+'">'+s.n+' · '+s.d+' min · '+money(s.p)+'</option>'; }).join("")+'</select>'+
+      bookable().map(function(s,i){ return '<option value="'+i+'">'+s.n+' · '+s.d+' min · '+money(s.p)+'</option>'; }).join("")+'</select>'+
     '<div class="lbl" style="margin-bottom:10px">Time</div>'+
     '<div style="display:flex;flex-wrap:wrap;gap:8px" id="chips">'+timeChips(dayKey,draft.time)+'</div>'+
     '<div style="display:flex;gap:10px;margin-top:24px">'+
@@ -479,6 +646,12 @@ function newSheet(dayKey,time){
   bindSheet();
   $("sclose").onclick=closeSheet;
   $("n-client").onchange=function(){ $("newfields").className=this.value==="new"?"":"hide"; };
+  $("n-svc").onchange=function(){
+    var sv=bookable()[+this.value]; draft.dur=sv.d;
+    if(draft.time&&!fitsAt(dayKey,draft.time,draft.dur,null)) draft.time="";
+    $("chips").innerHTML=timeChips(dayKey,draft.time,draft.dur);
+    bindSheet();
+  };
   $("ssave").onclick=async function(){
     if(!draft.time) return;
     var sel=$("n-client").value, cid;
@@ -488,11 +661,57 @@ function newSheet(dayKey,time){
       var res=await sb.from('clients').insert([{name:nm,phone:ph}]).select().single();
       if(res.data) cid=res.data.id; else return;
     } else cid=sel;
-    var sv=SERVICES[+$("n-svc").value];
+    var sv=bookable()[+$("n-svc").value];
     await sb.from('bookings').insert([{client_id:cid,treatment_name:sv.n,appointment_date:dayKeyToDate(dayKey),appointment_time:draft.time,price:sv.p,deposit_amount:10,duration_minutes:sv.d,status:'confirmed'}]);
     await loadAll(); closeSheet(); render();
   };
 }
+var DURS=[15,20,25,30,40,45,60,75,90,120];
+function svcSheet(id){
+  var s = id? S.services.filter(function(x){ return x.id===id; })[0] : {n:"",d:30,p:0,on:true};
+  var isNew=!id;
+  svcDraft={d:s.d};
+  sheet('<div class="lbl" style="margin-bottom:10px">'+(isNew?"Add a service":"Edit service")+'</div>'+
+    '<div class="serif" style="font-size:28px;margin-bottom:22px">'+(isNew?"What do you offer?":s.n)+'</div>'+
+    '<div class="lbl" style="margin-bottom:10px">Name</div>'+
+    '<input class="field" id="s-name" placeholder="e.g. Underarm wax" value="'+String(s.n).replace(/"/g,"&quot;")+'" style="margin-bottom:20px">'+
+    '<div class="lbl" style="margin-bottom:10px">Time needed in the diary</div>'+
+    '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px" id="s-durs">'+
+      DURS.map(function(d){ return '<button class="chip" data-dur="'+d+'" aria-pressed="'+(d===s.d)+'">'+d+' min</button>'; }).join("")+'</div>'+
+    '<div id="s-span" style="font-size:13px;color:#6E5B49;margin-bottom:20px"></div>'+
+    '<div class="lbl" style="margin-bottom:10px">Price</div>'+
+    '<input class="field" id="s-price" inputmode="decimal" placeholder="28" value="'+(s.p||"")+'" style="margin-bottom:24px">'+
+    '<div style="display:flex;gap:10px">'+
+      '<button class="btn btn-o btn-sm" id="sclose">Cancel</button>'+
+      (isNew?"":'<button class="btn btn-o btn-sm" data-svcdel="'+s.id+'">Remove</button>')+
+      '<button class="btn btn-sm" id="s-save" style="flex:1">'+(isNew?"Add to my services":"Save changes")+'</button></div>');
+  $("sclose").onclick=closeSheet;
+  spanNote();
+  [].forEach.call($("s-durs").children,function(b){
+    b.onclick=function(){
+      svcDraft.d=+b.dataset.dur;
+      [].forEach.call($("s-durs").children,function(x){ x.setAttribute("aria-pressed",String(+x.dataset.dur===svcDraft.d)); });
+      spanNote();
+    };
+  });
+  $("s-save").onclick=async function(){
+    var nm=$("s-name").value.trim(), pr=parseFloat($("s-price").value)||0;
+    if(!nm) return;
+    if(isNew){
+      await sb.from('services').insert([{name:nm,duration_minutes:svcDraft.d,price:pr,available:true,sort_order:S.services.length+1}]);
+    } else {
+      await sb.from('services').update({name:nm,duration_minutes:svcDraft.d,price:pr}).eq('id',s.dbId);
+    }
+    await loadAll(); closeSheet(); render();
+  };
+  wire(document);
+}
+function spanNote(){
+  var slots=spanOf(svcDraft.d);
+  $("s-span").textContent = slots===1? "Holds one slot in the diary."
+    : "Holds "+slots+" slots — the hours after the start show as continuing.";
+}
+var svcDraft={d:30};
 function clientSheet(c){
   var hist=S.appts.filter(function(a){ return a.c===c.id; });
   sheet('<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:20px">'+
@@ -527,24 +746,160 @@ function bindSheet(){
       if(b.disabled) return;
       draft.time=b.dataset.time;
       [].forEach.call(document.querySelectorAll("[data-time]"),function(x){ x.setAttribute("aria-pressed",String(x.dataset.time===draft.time)); });
-      if(draft.id){ S.appts.forEach(function(a){ if(a.id===draft.id) a.t=draft.time; }); sb.from('bookings').update({appointment_time:draft.time}).eq('id',draft.id); saveView(); render(); }
+      if(draft.id){ S.appts.forEach(function(a){ if(a.id===draft.id) a.t=draft.time; }); sb.from('bookings').update({appointment_time:draft.time}).eq('id',draft.id); save(); render(); }
     };
   });
   wire(document);
 }
 
+function msgSheet(id){
+  var m=S.messages.filter(function(x){ return x.id===id; })[0]; if(!m) return;
+  if(!m.read){ m.read=true; save(); }
+  var known=S.clients.filter(function(c){ return c.phone===m.phone; })[0];
+  sheet('<div class="lbl" style="margin-bottom:10px">'+m.when+'</div>'+
+    '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:6px">'+
+      '<span class="serif" style="font-size:28px">'+m.name+'</span>'+
+      (known?'<span class="pill">'+known.visits+' visits</span>':'<span class="pill">New to us</span>')+'</div>'+
+    '<div style="font-size:14.5px;color:#5C5148;margin-bottom:20px">'+m.phone+'</div>'+
+    '<div class="card" style="margin-bottom:20px"><div style="font-size:15.5px;line-height:1.8">'+m.body+'</div></div>'+
+    '<div class="lbl" style="margin-bottom:10px">Reply by text</div>'+
+    '<textarea class="field" id="m-reply" rows="3" placeholder="A sentence is plenty." style="resize:vertical;margin-bottom:8px"></textarea>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">'+
+      '<button class="btn btn-o btn-sm" data-canned="Happy to talk it through before anything begins — your first visit has extra time built in for exactly that.">Reassure</button>'+
+      '<button class="btn btn-o btn-sm" data-canned="I have space that week — shall I hold you an hour?">Offer a time</button></div>'+
+    '<div style="display:flex;gap:10px;flex-wrap:wrap">'+
+      '<button class="btn btn-sm" id="m-send" style="flex:1">Send reply</button>'+
+      '<button class="btn btn-o btn-sm" data-msgbook="'+m.id+'">Book them in</button>'+
+      '<button class="btn btn-o btn-sm" data-call="'+m.phone+'">Call</button>'+
+      '<button class="btn btn-o btn-sm" data-msgdel="'+m.id+'">Delete</button>'+
+      '<button class="btn btn-o btn-sm" id="sclose">Close</button></div>');
+  $("sclose").onclick=function(){ closeSheet(); render(); };
+  $("m-send").onclick=function(){
+    var t=$("m-reply").value.trim();
+    if(!t){ $("m-reply").focus(); return; }
+    m.replied=true; save(); closeSheet(); render();
+  };
+  wire(document);
+}
+function closureSheet(k){
+  var d=parseKey(k), n=dayAppts(k).length, info=closedInfo(k);
+  if(info){
+    S.closed[k]=undefined; delete S.closed[k]; save(); render(); return;
+  }
+  sheet('<div class="lbl" style="margin-bottom:10px">Close a day</div>'+
+    '<div class="serif" style="font-size:28px;margin-bottom:'+(n?"10px":"20px")+'">'+longDate(d)+'</div>'+
+    (n?'<div class="card" style="margin-bottom:20px;border-color:#8A7361"><div style="font-size:14.5px;line-height:1.75;color:#5C5148">'+
+      'There '+(n===1?"is 1 appointment":"are "+n+" appointments")+' already booked. Closing the day hides it from new bookings but does not cancel anyone — those clients need a call.</div></div>':'')+
+    '<div class="lbl" style="margin-bottom:10px">Reason (only you see this)</div>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px" id="whys">'+
+      ["Annual leave","Training","Personal","Studio maintenance"].map(function(w){
+        return '<button class="chip" data-why="'+w+'">'+w+'</button>'; }).join("")+'</div>'+
+    '<input class="field" id="c-why" placeholder="Or type your own" style="margin-bottom:22px">'+
+    '<div style="display:flex;gap:10px">'+
+      '<button class="btn btn-o btn-sm" id="sclose">Cancel</button>'+
+      '<button class="btn btn-sm" id="c-go" style="flex:1">Close this day</button></div>');
+  $("sclose").onclick=closeSheet;
+  [].forEach.call($("whys").children,function(b){
+    b.onclick=function(){ $("c-why").value=b.dataset.why;
+      [].forEach.call($("whys").children,function(x){ x.setAttribute("aria-pressed",String(x===b)); }); };
+  });
+  $("c-go").onclick=function(){ shutDay(k,$("c-why").value.trim()); save(); closeSheet(); render(); };
+}
+function rangeSheet(){
+  var a=inputDate(d0()), b=inputDate(shift(d0(),6));
+  sheet('<div class="lbl" style="margin-bottom:10px">Close a run of days</div>'+
+    '<div class="serif" style="font-size:28px;margin-bottom:8px">Going away?</div>'+
+    '<p style="font-size:14.5px;line-height:1.75;color:#5C5148;margin:0 0 20px;max-width:52ch">Pick the first and last day. Sundays and Mondays are already closed, so they are skipped.</p>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px">'+
+      '<label class="lbl" style="display:flex;flex-direction:column;gap:8px">From<input class="field" type="date" id="r-from" value="'+a+'"></label>'+
+      '<label class="lbl" style="display:flex;flex-direction:column;gap:8px">To<input class="field" type="date" id="r-to" value="'+b+'"></label></div>'+
+    '<div class="lbl" style="margin-bottom:10px">Reason</div>'+
+    '<input class="field" id="r-why" placeholder="Annual leave" style="margin-bottom:8px">'+
+    '<div id="r-count" style="font-size:13.5px;color:#6E5B49;margin-bottom:22px"></div>'+
+    '<div style="display:flex;gap:10px">'+
+      '<button class="btn btn-o btn-sm" id="sclose">Cancel</button>'+
+      '<button class="btn btn-sm" id="r-go" style="flex:1">Close these days</button></div>');
+  $("sclose").onclick=closeSheet;
+  function span(){
+    var f1=fromInput($("r-from").value), t1=fromInput($("r-to").value), out=[];
+    if(isNaN(f1)||isNaN(t1)||t1<f1) return out;
+    for(var d=new Date(f1); d<=t1; d=shift(d,1)) if(open(d)) out.push(iso(d));
+    return out;
+  }
+  function count(){
+    var l=span(), booked=l.reduce(function(s,k){ return s+dayAppts(k).length; },0);
+    $("r-count").textContent = l.length? l.length+" working day"+(l.length>1?"s":"")+" will close"+(booked? ", with "+booked+" appointment"+(booked>1?"s":"")+" already booked in them":"")+"."
+      : "Pick a first day on or before the last day.";
+  }
+  $("r-from").onchange=count; $("r-to").onchange=count; count();
+  $("r-go").onclick=function(){
+    var l=span(); if(!l.length) return;
+    var why=$("r-why").value.trim()||"Annual leave";
+    l.forEach(function(k){ shutDay(k,why); });
+    save(); closeSheet(); render();
+  };
+}
+function promoSheet(id){
+  var p = id? S.promos.filter(function(x){ return x.id===id; })[0] : {code:"",kind:"%",val:10,note:"",uses:0,cap:0,until:"",on:true};
+  var isNew=!id;
+  promoDraft={kind:p.kind,until:p.until||""};
+  sheet('<div class="lbl" style="margin-bottom:10px">'+(isNew?"New promo code":"Edit code")+'</div>'+
+    '<div class="serif" style="font-size:28px;margin-bottom:22px">'+(isNew?"What is the offer?":p.code)+'</div>'+
+    '<div class="lbl" style="margin-bottom:10px">Code clients type</div>'+
+    '<input class="field" id="p-code" placeholder="AUGUST25" value="'+String(p.code).replace(/"/g,"&quot;")+'" style="margin-bottom:20px;text-transform:uppercase;letter-spacing:.08em">'+
+    '<div class="lbl" style="margin-bottom:10px">Kind of discount</div>'+
+    '<div class="seg" style="grid-template-columns:1fr 1fr;margin-bottom:20px" id="p-kind">'+
+      '<button data-kind="%" aria-pressed="'+(p.kind==="%")+'">Percentage off</button>'+
+      '<button data-kind="£" aria-pressed="'+(p.kind==="£")+'">Pounds off</button></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">'+
+      '<label class="lbl" style="display:flex;flex-direction:column;gap:8px"><span id="p-vlbl">Amount</span>'+
+        '<input class="field" id="p-val" inputmode="decimal" value="'+(p.val||"")+'"></label>'+
+      '<label class="lbl" style="display:flex;flex-direction:column;gap:8px">Times it can be used'+
+        '<input class="field" id="p-cap" inputmode="numeric" placeholder="Leave blank for no limit" value="'+(p.cap||"")+'"></label></div>'+
+    '<div class="lbl" style="margin-bottom:10px">Last day it works</div>'+
+    '<input class="field" type="date" id="p-until" value="'+(p.until?inputDate(parseKey(p.until)):"")+'" style="margin-bottom:20px">'+
+    '<div class="lbl" style="margin-bottom:10px">Note to yourself</div>'+
+    '<input class="field" id="p-note" placeholder="Quiet weeks in August" value="'+String(p.note||"").replace(/"/g,"&quot;")+'" style="margin-bottom:24px">'+
+    '<div style="display:flex;gap:10px;flex-wrap:wrap">'+
+      '<button class="btn btn-o btn-sm" id="sclose">Cancel</button>'+
+      (isNew?"":'<button class="btn btn-o btn-sm" data-promodel="'+p.id+'">Delete</button>')+
+      '<button class="btn btn-sm" id="p-save" style="flex:1">'+(isNew?"Create code":"Save changes")+'</button></div>');
+  $("sclose").onclick=closeSheet;
+  function vlbl(){ $("p-vlbl").textContent = promoDraft.kind==="%"?"Percent off":"Pounds off"; }
+  vlbl();
+  [].forEach.call($("p-kind").children,function(b){
+    b.onclick=function(){ promoDraft.kind=b.dataset.kind;
+      [].forEach.call($("p-kind").children,function(x){ x.setAttribute("aria-pressed",String(x===b)); }); vlbl(); };
+  });
+  $("p-save").onclick=function(){
+    var code=$("p-code").value.trim().toUpperCase().replace(/\s+/g,"");
+    if(!code) { $("p-code").focus(); return; }
+    var val=parseFloat($("p-val").value)||0, cap=parseInt($("p-cap").value,10)||0;
+    var u=$("p-until").value? iso(fromInput($("p-until").value)) : "";
+    if(isNew){
+      var nid=S.promos.reduce(function(m,x){ return Math.max(m,x.id); },50)+1;
+      S.promos.push({id:nid,code:code,kind:promoDraft.kind,val:val,note:$("p-note").value.trim(),uses:0,cap:cap,until:u,on:true});
+    } else {
+      S.promos.forEach(function(x){ if(x.id===p.id){ x.code=code; x.kind=promoDraft.kind; x.val=val; x.cap=cap; x.until=u; x.note=$("p-note").value.trim(); } });
+    }
+    save(); closeSheet(); render();
+  };
+  wire(document);
+}
+var promoDraft={kind:"%",until:""};
+
 /* ---------- wiring ---------- */
 function wire(scope){
   var q=function(s){ return [].slice.call(scope.querySelectorAll(s)); };
-  q("[data-appt]").forEach(function(b){ b.onclick=function(){ var a=S.appts.filter(function(x){ return x.id===b.dataset.appt||x.id===+b.dataset.appt; })[0]; if(a) apptSheet(a); }; });
-  q("[data-client]").forEach(function(b){ b.onclick=function(){ clientSheet(client(b.dataset.client)); }; });
+  q("[data-appt]").forEach(function(b){ b.onclick=function(){ var a=S.appts.filter(function(x){ return x.id===+b.dataset.appt; })[0]; if(a) apptSheet(a); }; });
+  q("[data-client]").forEach(function(b){ b.onclick=function(){ clientSheet(client(+b.dataset.client)); }; });
   q("[data-fill]").forEach(function(b){ b.onclick=function(){ newSheet(S.dayKey,b.dataset.fill); }; });
   q("[data-new]").forEach(function(b){ b.onclick=function(){ var p=b.dataset.new.split("|"); newSheet(p[0],p[1]); }; });
-  q("[data-jump]").forEach(function(b){ b.onclick=function(){ S.dayKey=b.dataset.jump; S.view="today"; saveView(); render(); }; });
+  q("[data-jump]").forEach(function(b){ b.onclick=function(){ S.dayKey=b.dataset.jump; S.view="today"; save(); render(); }; });
   q("[data-day]").forEach(function(b){ b.onclick=function(){
     if(b.dataset.day==="today"){ S.dayKey=iso(nextOpen(0)); }
     else { var d=shift(parseKey(S.dayKey),+b.dataset.day); while(!open(d)) d=shift(d,+b.dataset.day); S.dayKey=iso(d); }
-    saveView(); render(); }; });
+    save(); render(); }; });
   q("[data-arrive]").forEach(function(b){ b.onclick=async function(){
     var a=S.appts.filter(function(x){ return x.id===b.dataset.arrive||x.id===+b.dataset.arrive; })[0];
     a.st="done"; var c=client(a.c); c.stamps=Math.min(10,c.stamps+1); c.visits++; c.spend+=a.p;
@@ -561,6 +916,27 @@ function wire(scope){
     var aid=b.dataset.cancelappt;
     await sb.from('bookings').update({status:'cancelled'}).eq('id',aid);
     S.appts=S.appts.filter(function(x){ return x.id!==aid&&x.id!==+aid; }); closeSheet(); render(); }; });
+  q("[data-svcedit]").forEach(function(b){ b.onclick=function(){ svcSheet(+b.dataset.svcedit); }; });
+  q("[data-svctoggle]").forEach(function(b){ b.onclick=function(){
+    S.services.forEach(function(s){ if(s.id===+b.dataset.svctoggle) s.on = s.on===false; });
+    save(); render(); }; });
+  q("[data-svcdel]").forEach(function(b){ b.onclick=function(){
+    var id=+b.dataset.svcdel, s=S.services.filter(function(x){ return x.id===id; })[0];
+    if(!s) return;
+    var booked=S.appts.filter(function(a){ return a.s===s.n&&a.st!=="done"; }).length;
+    sheet('<div class="lbl" style="margin-bottom:10px">Remove a service</div>'+
+      '<div class="serif" style="font-size:26px;margin-bottom:12px">Remove &ldquo;'+s.n+'&rdquo;?</div>'+
+      '<p style="font-size:15px;line-height:1.75;color:#5C5148;margin:0 0 22px;max-width:60ch">'+
+        (booked? "It is on "+booked+" appointment"+(booked>1?"s":"")+" still in the diary. Those stay exactly as they are — this only stops it being booked again. Hiding it does the same and keeps the record."
+               : "It will no longer appear when you make a booking. Past appointments keep their names.")+'</p>'+
+      '<div style="display:flex;gap:10px">'+
+        '<button class="btn btn-o btn-sm" id="sclose">Keep it</button>'+
+        '<button class="btn btn-o btn-sm" id="r-hide">Hide instead</button>'+
+        '<button class="btn btn-sm" id="r-yes" style="flex:1">Remove</button></div>');
+    $("sclose").onclick=closeSheet;
+    $("r-hide").onclick=function(){ S.services.forEach(function(x){ if(x.id===id) x.on=false; }); save(); closeSheet(); render(); };
+    $("r-yes").onclick=function(){ S.services=S.services.filter(function(x){ return x.id!==id; }); save(); closeSheet(); render(); };
+  }; });
   q("[data-stamp]").forEach(function(b){ b.onclick=async function(){ var c=client(b.dataset.stamp)||client(+b.dataset.stamp); c.stamps=Math.min(10,c.stamps+1); await sb.from('clients').update({stamps:c.stamps}).eq('id',c.id); clientSheet(c); }; });
   q("[data-bookfor]").forEach(function(b){ b.onclick=function(){ closeSheet(); newSheet(S.dayKey,""); setTimeout(function(){ $("n-client").value=b.dataset.bookfor; },0); }; });
   q("[data-dismiss]").forEach(function(b){ b.onclick=async function(){ await sb.from('requests').update({status:'dismissed'}).eq('id',b.dataset.dismiss); S.requests=S.requests.filter(function(r){ return r.id!==b.dataset.dismiss&&r.id!==+b.dataset.dismiss; }); render(); }; });
@@ -573,61 +949,50 @@ function wire(scope){
       var res=await sb.from('clients').insert([{name:r.name,phone:r.phone,notes:r.note}]).select().single();
       if(res.data) S.clients.push({id:res.data.id,name:res.data.name,phone:res.data.phone||'',email:'',since:'Now',stamps:0,plan:null,notes:res.data.notes||'',visits:0,spend:0});
     }
-    saveView(); newSheet(iso(nextOpen(1)),"");
+    save(); newSheet(iso(nextOpen(1)),"");
     setTimeout(function(){
       var c=S.clients.filter(function(x){ return x.phone===r.phone; })[0];
       if(c&&$("n-client")) $("n-client").value=c.id;
-      var i=SERVICES.map(function(s){ return s.n; }).indexOf(r.s);
+      var i=S.services.map(function(s){ return s.n; }).indexOf(r.s);
       if(i>-1&&$("n-svc")) $("n-svc").value=i;
     },0);
   }; });
   q("[data-call]").forEach(function(b){ b.onclick=function(){ location.href="tel:"+b.dataset.call.replace(/\s/g,""); }; });
-  q("[data-tab]").forEach(function(b){ b.onclick=function(){ S.view=b.dataset.tab; saveView(); render(); }; });
+  q("[data-dmode]").forEach(function(b){ b.onclick=function(){ S.dmode=b.dataset.dmode; save(); render(); }; });
+  q("[data-itab]").forEach(function(b){ b.onclick=function(){ S.itab=b.dataset.itab; save(); render(); }; });
+  q("[data-open]").forEach(function(b){ b.onclick=function(){ S.view=b.dataset.open; S.moff=0; save(); render(); }; });
+  q("[data-msg]").forEach(function(b){ b.onclick=function(){ msgSheet(+b.dataset.msg); }; });
+  q("[data-msgdel]").forEach(function(b){ b.onclick=function(){
+    S.messages=S.messages.filter(function(m){ return m.id!==+b.dataset.msgdel; }); save(); closeSheet(); render(); }; });
+  q("[data-msgbook]").forEach(function(b){ b.onclick=function(){
+    var m=S.messages.filter(function(x){ return x.id===+b.dataset.msgbook; })[0]; if(!m) return;
+    var c=S.clients.filter(function(x){ return x.phone===m.phone; })[0];
+    if(!c){ c={id:Date.now(),name:m.name,phone:m.phone,since:new Date().toLocaleDateString("en-GB",{month:"short",year:"numeric"}),stamps:0,plan:null,notes:"",visits:0,spend:0}; S.clients.push(c); save(); }
+    closeSheet(); newSheet(iso(nextOpen(1)),"");
+    setTimeout(function(){ if($("n-client")) $("n-client").value=c.id; },0); }; });
+  q("[data-canned]").forEach(function(b){ b.onclick=function(){ $("m-reply").value=b.dataset.canned; $("m-reply").focus(); }; });
+  q("[data-shut]").forEach(function(b){ b.onclick=function(){ closureSheet(b.dataset.shut); }; });
+  q("[data-reopen]").forEach(function(b){ b.onclick=function(){ delete S.closed[b.dataset.reopen]; save(); render(); }; });
+  q("[data-moff]").forEach(function(b){ b.onclick=function(){ S.moff=Math.min(6,Math.max(0,(S.moff||0)+ +b.dataset.moff)); save(); render(); }; });
+  q("[data-promoedit]").forEach(function(b){ b.onclick=function(){ promoSheet(+b.dataset.promoedit); }; });
+  q("[data-promotoggle]").forEach(function(b){ b.onclick=function(){
+    S.promos.forEach(function(p){ if(p.id===+b.dataset.promotoggle) p.on = p.on===false; }); save(); render(); }; });
+  q("[data-promodel]").forEach(function(b){ b.onclick=function(){
+    S.promos=S.promos.filter(function(p){ return p.id!==+b.dataset.promodel; }); save(); closeSheet(); render(); }; });
+  if(scope.getElementById&&scope.getElementById("addpromo")) scope.getElementById("addpromo").onclick=function(){ promoSheet(null); };
+  if(scope.getElementById&&scope.getElementById("closerange")) scope.getElementById("closerange").onclick=rangeSheet;
+  q("[data-tab]").forEach(function(b){ b.onclick=function(){ S.view=b.dataset.tab; save(); render(); }; });
+  if(scope.getElementById&&scope.getElementById("addsvc")) scope.getElementById("addsvc").onclick=function(){ svcSheet(null); };
   if(scope.getElementById&&scope.getElementById("closeday")) scope.getElementById("closeday").onclick=async function(){
     if(S.closed[S.dayKey]){ delete S.closed[S.dayKey]; await sb.from('closed_days').delete().eq('date_key',S.dayKey); }
-    else { S.closed[S.dayKey]=true; await sb.from('closed_days').insert([{date_key:S.dayKey}]); }
-    saveView(); render(); };
-  if(scope.getElementById&&scope.getElementById("csearch")) scope.getElementById("csearch").oninput=function(){
-    $("clist").innerHTML=clientRows(this.value); wire(document); };
-  q("[data-svc-edit]").forEach(function(b){ b.onclick=function(){
-    var id=b.dataset.svcEdit;
-    var s=SERVICES.filter(function(x){return x.dbId===id||x.dbId===+id;})[0]; if(!s) return;
-    sheet('<div class="lbl" style="margin-bottom:14px">Edit service</div>'+
-      '<div class="serif" style="font-size:22px;margin-bottom:18px">'+s.n+'</div>'+
-      '<div style="display:flex;gap:12px;margin-bottom:16px">'+
-        '<label style="flex:1;font-size:13px;color:#6E5B49">Price (£)<input id="svc-price" type="number" value="'+s.p+'" style="width:100%;padding:10px;border:1px solid #D5C4B0;border-radius:10px;font-size:16px;margin-top:6px;background:#F7F1EA"></label>'+
-        '<label style="flex:1;font-size:13px;color:#6E5B49">Duration (min)<input id="svc-dur" type="number" value="'+s.d+'" style="width:100%;padding:10px;border:1px solid #D5C4B0;border-radius:10px;font-size:16px;margin-top:6px;background:#F7F1EA"></label>'+
-      '</div>'+
-      '<button id="svc-save" class="btn" style="width:100%;min-height:48px;font-size:16px;border-radius:12px">Save changes</button>');
-    $("svc-save").onclick=async function(){
-      var np=Number($("svc-price").value), nd=Number($("svc-dur").value);
-      if(!np||!nd) return;
-      await sb.from('services').update({price:np,duration_minutes:nd}).eq('id',id);
-      s.p=np; s.d=nd;
-      closeSheet(); render();
-    };
-  }; });
-}
-
-/* ---------- render ---------- */
-var TITLES={today:"Diary",week:"The week",clients:"Clients",requests:"Inbox",money:"Takings",settings:"Studio"};
-function render(){
-  tabs();
-  $("ttl").textContent=TITLES[S.view];
-  $("sub").textContent = S.view==="today" ? longDate(parseKey(S.dayKey))
-    : S.view==="clients" ? S.clients.length+" on the books"
-    : S.view==="requests" ? S.requests.length+" waiting"
-    : S.view==="money" ? "Deposits and balances" : "";
-  $("view").innerHTML=V[S.view]();
-  $("aside").innerHTML=aside();
-  wire(document);
-}
+    else { shutDay(S.dayKey); await sb.from('closed_days').insert([{date_key:S.dayKey}]); }
+    save(); render(); };
 function tick(){
   var n=new Date();
   $("clock").textContent=n.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});
 }
 $("quick").onclick=function(){ newSheet(S.dayKey,""); };
-$("clock").onclick=function(){ closeSheet(); S.view="today"; S.dayKey=iso(nextOpen(0)); saveView(); render(); };
+$("clock").onclick=function(){ closeSheet(); S.view="today"; S.dayKey=iso(nextOpen(0)); save(); render(); };
 tick(); setInterval(tick,20000);
 (async function(){ await loadAll(); render(); })();
 
@@ -653,7 +1018,7 @@ tick(); setInterval(tick,20000);
     try{ localStorage.setItem("amai_studio_install","off"); }catch(e){}
   };
 })();
+(async function(){ await loadAll(); render(); })();
 </script>
-
-
-</body></html>
+</body>
+</html>
