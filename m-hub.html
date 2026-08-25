@@ -198,6 +198,11 @@ function slotsFor(d){ return ["9.00","10.30","12.00","13.30","15.00","16.30"].ma
 function money(n){ return "£"+n; }
 function daysTo(k){ return Math.round((parseK(k)-d0())/86400000); }
 function svc(n){ return SERVICES.filter(function(s){ return s.n===n; })[0]; }
+function getDuration(name){
+  var t=svc(name); if(!t) return 60;
+  var m=String(t.t).match(/(\d+)/);
+  return m?parseInt(m[1],10):60;
+}
 
 var DEFAULTS={
   signedIn:true, name:"Nadia", phone:"07700 900123", email:"nadia@example.com", since:"January 2026",
@@ -680,8 +685,10 @@ function wire(scope){
     startBook(S.plan?S.plan.treat:(last?last.treat:"")); }; });
   q("[data-move]").forEach(function(b){ b.onclick=function(){ closeSheet(); startMove(+b.dataset.move); }; });
   q("[data-cancel]").forEach(function(b){ b.onclick=function(){ cancelSheet(+b.dataset.cancel); }; });
-  q("[data-dropit]").forEach(function(b){ b.onclick=function(){
-    S.upcoming=S.upcoming.filter(function(x){ return x.id!==+b.dataset.dropit; });
+  q("[data-dropit]").forEach(function(b){ b.onclick=async function(){
+    var bid=b.dataset.dropit;
+    S.upcoming=S.upcoming.filter(function(x){ return String(x.id)!==bid&&x.id!==+bid; });
+    if(sb) await sb.from('bookings').update({status:'cancelled'}).eq('id',bid);
     save(); closeSheet(); render(); toast("Cancelled. Your deposit is on its way back."); }; });
   q("[data-prep]").forEach(function(b){ b.onclick=function(){
     var v=S.upcoming.filter(function(x){ return x.id===+b.dataset.prep; })[0]; if(v) prepSheet(v.treat); }; });
@@ -705,18 +712,31 @@ function wire(scope){
 
   var sq=one("s-q"); if(sq) sq.oninput=function(){
     draft.q=this.value; if($("s-pick")) $("s-pick").innerHTML=pickHTML(); wire($("host")); };
-  var ok=one("s-ok"); if(ok) ok.onclick=function(){
+  var ok=one("s-ok"); if(ok) ok.onclick=async function(){
     if(!(draft.treat&&draft.dateKey&&draft.time)) return;
     if(draft.mode==="move"){
       var was=S.upcoming.filter(function(x){ return x.id===draft.id; })[0];
       var same=was&&was.dateKey===draft.dateKey&&was.time===draft.time;
       S.upcoming.forEach(function(x){ if(x.id===draft.id){ x.dateKey=draft.dateKey; x.time=draft.time; } });
+      if(sb&&!same) await sb.from('bookings').update({appointment_date:draft.dateKey,appointment_time:draft.time}).eq('id',draft.id);
       save(); closeSheet(); render();
       toast(same?"Nothing changed — you're still on "+shortD(parseK(draft.dateKey))+" at "+draft.time+"."
                 :"Moved to "+longD(parseK(draft.dateKey))+", "+draft.time+".");
     } else {
       var s=svc(draft.treat);
-      S.upcoming.push({id:Date.now(),treat:draft.treat,dateKey:draft.dateKey,time:draft.time,price:s?s.p:0,deposit:10});
+      var price=s?s.p:0;
+      if(sb&&S.clientId){
+        var ins=await sb.from('bookings').insert([{
+          client_id:S.clientId,treatment_name:draft.treat,
+          appointment_date:draft.dateKey,appointment_time:draft.time,
+          price:price,deposit_amount:10,
+          duration_minutes:getDuration(draft.treat),status:'confirmed'
+        }]).select().single();
+        var newId=ins.data?ins.data.id:Date.now();
+        S.upcoming.push({id:newId,treat:draft.treat,dateKey:draft.dateKey,time:draft.time,price:price,deposit:10});
+      } else {
+        S.upcoming.push({id:Date.now(),treat:draft.treat,dateKey:draft.dateKey,time:draft.time,price:price,deposit:10});
+      }
       save(); closeSheet(); go("home");
       toast("Booked — "+longD(parseK(draft.dateKey))+", "+draft.time+".");
     }
@@ -810,9 +830,26 @@ async function initSupabase() {
     S.name = "Demo";
   } else {
     S.email = session.user.email;
-    let res = await sb.from('clients').select('name').eq('email', S.email);
+    let res = await sb.from('clients').select('*').eq('email', S.email);
     if (res.data && res.data.length > 0) {
-      S.name = res.data[0].name;
+      var c = res.data[0];
+      S.name = c.name || S.name;
+      S.stamps = c.stamps || 0;
+      S.notes = c.notes || "";
+      S.clientId = c.id;
+      // Load upcoming bookings from DB
+      var today = new Date(); today.setHours(0,0,0,0);
+      var todayStr = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+      var bk = await sb.from('bookings').select('*').eq('client_id',c.id).neq('status','cancelled');
+      if(bk.data){
+        S.upcoming=[]; S.past=[];
+        bk.data.forEach(function(b){
+          var v={id:b.id,treat:b.treatment_name,dateKey:b.appointment_date,time:b.appointment_time,price:Number(b.price),deposit:Number(b.deposit_amount||10)};
+          var d=parseK(b.appointment_date);
+          if(b.status==='completed'||d<today) S.past.push(v);
+          else S.upcoming.push(v);
+        });
+      }
     }
   }
   

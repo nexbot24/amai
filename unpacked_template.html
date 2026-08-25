@@ -969,7 +969,13 @@ function confirmPay(how){
   }
   finish(false);
 }
-function finish(acct){
+function getDuration(name){
+  var t=BOOKABLE.find(function(i){return i.n===name;});
+  if(!t) return 60;
+  var m=String(t.t).match(/(\d+)/);
+  return m?parseInt(m[1],10):60;
+}
+async function finish(acct){
   var nm=$("f-name").value.trim()||"Thank you";
   $("d-title").textContent = acct? (B.returning? nm+", you're booked and signed in." : nm+", your account is ready.") : nm+", you're booked in.";
   $("d-treat").textContent=B.treat; $("d-when").textContent=whenLbl();
@@ -978,6 +984,26 @@ function finish(acct){
   $("d-hub").className = acct?"btn":"hide";
   ["s1","s2","s3","s4","verify"].forEach(function(id){ $(id).className="hide"; });
   $("navrow").className="hide"; $("help").textContent=""; $("done").className="";
+  if(sb){
+    try{
+      var phone=$("f-tel").value.trim(), name=$("f-name").value.trim();
+      var r=await sb.from('clients').select('id').eq('phone',phone);
+      var clientId;
+      if(r.data&&r.data.length>0){ clientId=r.data[0].id; }
+      else {
+        var ins=await sb.from('clients').insert([{name:name,phone:phone}]).select().single();
+        if(ins.data) clientId=ins.data.id;
+      }
+      if(clientId){
+        await sb.from('bookings').insert([{
+          client_id:clientId,treatment_name:B.treat,
+          appointment_date:B.dayKey,appointment_time:B.time,
+          price:priceNum(B.treat),deposit_amount:10,
+          duration_minutes:getDuration(B.treat),status:'confirmed'
+        }]);
+      }
+    }catch(e){ console.warn('booking save error',e); }
+  }
 }
 
 $("q").oninput=function(){ B.q=this.value; renderPicker(); };
