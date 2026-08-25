@@ -88,7 +88,7 @@ section[id]{scroll-margin-top:84px}
       <a href="services.html" style="color:#CBB49E">Services</a>
       <a href="contact.html" style="color:#CBB49E">Contact</a>
       <a href="index.html#book" style="color:#3A322E;background:#E8D5C4;padding:12px 26px;border-radius:20px 20px 0 0;font-family:Marcellus,serif;font-size:15px;letter-spacing:.02em;text-transform:none">Book a visit</a>
-      <a href="login.html" class="loginmark" title="Sign in to your account" aria-label="Sign in to your account" style="display:flex;align-items:center;gap:9px;color:#CBB49E;text-transform:none;letter-spacing:normal">
+      <a href="hub.html" class="loginmark" title="Sign in to your account" aria-label="Sign in to your account" style="display:flex;align-items:center;gap:9px;color:#CBB49E;text-transform:none;letter-spacing:normal">
         <span style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border:1px solid rgba(232,213,196,.42);border-radius:18px 18px 4px 4px">
           <svg width="17" height="18" viewBox="0 0 17 18" fill="none" aria-hidden="true">
             <circle cx="8.5" cy="5.4" r="3.6" stroke="currentColor" stroke-width="1.3"></circle>
@@ -406,7 +406,7 @@ section[id]{scroll-margin-top:84px}
 
       <div class="fnav" style="display:flex;flex-direction:column;gap:13px;font-size:14px">
         <span style="font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:#8A7361;margin-bottom:4px">Your account</span>
-        <a href="login.html">Sign in</a>
+        <a href="hub.html">Sign in</a>
         <a href="hub.html">Your dashboard</a>
         <a href="hub.html">Move or cancel a visit</a>
         <a href="hub.html">Stamps &amp; rewards</a>
@@ -811,9 +811,7 @@ renderTabs(); renderPanel(); renderPicker(); renderCalendar(); renderSlots(); ch
   try {
     var raw = localStorage.getItem("amai_hub_v2"), h = raw ? JSON.parse(raw) : null;
     if (h && h.signedIn) {
-      document.querySelectorAll("a[href*='login.html']").forEach(function(el) {
-        el.href = "hub.html";
-      });
+      
       
       var emailInput = document.getElementById("f-contact");
       var nameInput = document.getElementById("f-name");

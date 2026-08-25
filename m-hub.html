@@ -806,15 +806,15 @@ function checkPWA() {
 if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js'); }
 
 async function initSupabase() {
-  const { data: { session } } = await sb.auth.getSession();
   if (!session) {
-    window.location.href = "m-login.html";
-    return;
-  }
-  S.email = session.user.email;
-  let res = await sb.from('clients').select('name').eq('email', S.email);
-  if (res.data && res.data.length > 0) {
-    S.name = res.data[0].name;
+    S.email = "demo@example.com";
+    S.name = "Demo";
+  } else {
+    S.email = session.user.email;
+    let res = await sb.from('clients').select('name').eq('email', S.email);
+    if (res.data && res.data.length > 0) {
+      S.name = res.data[0].name;
+    }
   }
   
   $("me").onclick=function(){ go("account"); };
