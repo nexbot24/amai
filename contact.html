@@ -266,6 +266,7 @@ a{color:#E8D5C4;text-decoration:none}
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 var $=function(id){return document.getElementById(id);};
 
@@ -315,9 +316,18 @@ function show(r){
 }
 
 /* enquiry */
-$("c-send").onclick=function(){
+$("c-send").onclick=async function(){
   var n=$("c-name").value.trim(), c=$("c-contact").value.trim(), m=$("c-msg").value.trim();
   if(!n||!c||!m){ $("c-help").textContent="Please add your name, a way to reach you, and your question."; return; }
+  var sb=supabase.createClient('https://tphyrmweauzfletdlqvi.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwaHlybXdlYXV6ZmxldGRscXZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0NTIxOTQsImV4cCI6MjEwMzAyODE5NH0.Z_utKsxYquCoL2LfTjjL8QFB1tnLJZW9j3El7Sykk8o');
+  var isEmail=c.indexOf('@')>-1;
+  await sb.from('requests').insert([{
+    name:n,
+    phone:isEmail?null:c,
+    email:isEmail?c:null,
+    message:m,
+    status:'new'
+  }]);
   $("sent-title").textContent=n+", that's with us.";
   $("sent-copy").textContent="We'll come back to you personally. Nothing else will be sent to you.";
   $("form-side").className="hide"; $("sent-side").className="";
@@ -334,9 +344,7 @@ $("c-again").onclick=function(){
 (function(){
   try {
     var raw = localStorage.getItem("amai_hub_v2"), h = raw ? JSON.parse(raw) : null;
-    if (h && h.signedIn) {
-      
-    }
+    if (h && h.signedIn) {}
   } catch(e) {}
 })();
 </script>
