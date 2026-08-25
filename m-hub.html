@@ -187,6 +187,8 @@ var AFTER={
 
 function d0(){ var d=new Date(); d.setHours(0,0,0,0); return d; }
 function key(d){ return d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate(); }
+function dayKeyToDate(k){ var p=k.split('-'); var d=new Date(+p[0],+p[1],+p[2]); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function dateToDayKey(ds){ var d=new Date(ds+'T00:00:00'); return d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate(); }
 function parseK(k){ var p=String(k).split("-"); return new Date(+p[0],+p[1],+p[2]); }
 function isOpen(d){ return d.getDay()!==0&&d.getDay()!==1; }
 function freeDay(d){ return (d.getDate()*7+d.getMonth()*3)%6!==0; }
@@ -718,7 +720,7 @@ function wire(scope){
       var was=S.upcoming.filter(function(x){ return x.id===draft.id; })[0];
       var same=was&&was.dateKey===draft.dateKey&&was.time===draft.time;
       S.upcoming.forEach(function(x){ if(x.id===draft.id){ x.dateKey=draft.dateKey; x.time=draft.time; } });
-      if(sb&&!same) await sb.from('bookings').update({appointment_date:draft.dateKey,appointment_time:draft.time}).eq('id',draft.id);
+      if(sb&&!same) await sb.from('bookings').update({appointment_date:dayKeyToDate(draft.dateKey),appointment_time:draft.time}).eq('id',draft.id);
       save(); closeSheet(); render();
       toast(same?"Nothing changed — you're still on "+shortD(parseK(draft.dateKey))+" at "+draft.time+"."
                 :"Moved to "+longD(parseK(draft.dateKey))+", "+draft.time+".");
@@ -728,7 +730,7 @@ function wire(scope){
       if(sb&&S.clientId){
         var ins=await sb.from('bookings').insert([{
           client_id:S.clientId,treatment_name:draft.treat,
-          appointment_date:draft.dateKey,appointment_time:draft.time,
+          appointment_date:dayKeyToDate(draft.dateKey),appointment_time:draft.time,
           price:price,deposit_amount:10,
           duration_minutes:getDuration(draft.treat),status:'confirmed'
         }]).select().single();
@@ -844,7 +846,7 @@ async function initSupabase() {
       if(bk.data){
         S.upcoming=[]; S.past=[];
         bk.data.forEach(function(b){
-          var v={id:b.id,treat:b.treatment_name,dateKey:b.appointment_date,time:b.appointment_time,price:Number(b.price),deposit:Number(b.deposit_amount||10)};
+          var v={id:b.id,treat:b.treatment_name,dateKey:dateToDayKey(b.appointment_date),time:b.appointment_time,price:Number(b.price),deposit:Number(b.deposit_amount||10)};
           var d=parseK(b.appointment_date);
           if(b.status==='completed'||d<today) S.past.push(v);
           else S.upcoming.push(v);

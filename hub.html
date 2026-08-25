@@ -185,6 +185,8 @@ function load(){ try{ return JSON.parse(localStorage.getItem(KEY))||null; }catch
 function save(){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
 
 function iso(d){ return d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate(); }
+function dayKeyToDate(k){ var p=k.split('-'); var d=new Date(+p[0],+p[1],+p[2]); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function dateToDayKey(ds){ var d=new Date(ds+'T00:00:00'); return d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate(); }
 function addDays(n){ var d=new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()+n); return d; }
 function openDay(n){ var d=addDays(n); while(d.getDay()===0||d.getDay()===1){ d.setDate(d.getDate()+1); } return d; }
 function pastDay(n){ var d=addDays(n); while(d.getDay()===0||d.getDay()===1){ d.setDate(d.getDate()-1); } return d; }
@@ -269,7 +271,7 @@ async function boot(){
         if(bk.data){
           S.upcoming=[]; S.past=[];
           bk.data.forEach(function(b){
-            var v={id:b.id,treat:b.treatment_name,dateKey:b.appointment_date,time:b.appointment_time,price:Number(b.price),deposit:Number(b.deposit_amount||10)};
+            var v={id:b.id,treat:b.treatment_name,dateKey:dateToDayKey(b.appointment_date),time:b.appointment_time,price:Number(b.price),deposit:Number(b.deposit_amount||10)};
             var d=parseKey(b.appointment_date);
             if(b.status==='completed'||d<today) S.past.push(v);
             else S.upcoming.push(v);
@@ -752,7 +754,7 @@ function bindBookingModal(cta){
         await sb.from('bookings').insert([{
           client_id: clientId,
           treatment_name: draft.treat,
-          appointment_date: draft.dateKey,
+          appointment_date: dayKeyToDate(draft.dateKey),
           appointment_time: draft.time,
           price: parseFloat(String(draft.price).replace(/[^0-9.]/g,"")) || 0,
           deposit_amount: 10,

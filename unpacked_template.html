@@ -830,6 +830,7 @@ function dig(v){ return String(v).replace(/\D/g,""); }
 function d0(){ var d=new Date(); d.setHours(0,0,0,0); return d; }
 function addD(n){ var d=d0(); d.setDate(d.getDate()+n); return d; }
 function key(d){ return d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate(); }
+function dayKeyToDate(k){ var p=k.split('-'); var d=new Date(+p[0],+p[1],+p[2]); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function parseK(k){ var p=k.split("-"); return new Date(+p[0],+p[1],+p[2]); }
 function isOpen(d){ return d.getDay()!==0&&d.getDay()!==1; }
 function free(d){ return (d.getDate()*7+d.getMonth()*3)%6!==0; }
@@ -997,7 +998,7 @@ async function finish(acct){
       if(clientId){
         await sb.from('bookings').insert([{
           client_id:clientId,treatment_name:B.treat,
-          appointment_date:B.dayKey,appointment_time:B.time,
+          appointment_date:dayKeyToDate(B.dayKey),appointment_time:B.time,
           price:priceNum(B.treat),deposit_amount:10,
           duration_minutes:getDuration(B.treat),status:'confirmed'
         }]);

@@ -481,6 +481,7 @@ var HUB_KEY = "amai_hub_v2";
 var S = { group:0, step:1, treatment:"", monthOffset:0, dateKey:"", time:"", query:"", paid:"", how:"", sent:false, returning:false };
 var $ = function(id){ return document.getElementById(id); };
 var el = function(tag, attrs, html){ var n=document.createElement(tag); for(var k in attrs){ if(k==="style")n.setAttribute("style",attrs[k]); else if(k.indexOf("on")===0)n[k]=attrs[k]; else n.setAttribute(k,attrs[k]); } if(html!=null)n.innerHTML=html; return n; };
+function dayKeyToDate(k){ var p=k.split('-'); var d=new Date(+p[0],+p[1],+p[2]); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 
 /* treatments tabs */
 function renderTabs(){
@@ -762,7 +763,7 @@ async function showDone(how,acct){
     await sb.from('bookings').insert([{
       client_id: clientId,
       treatment_name: S.treatment,
-      appointment_date: S.dateKey,
+      appointment_date: dayKeyToDate(S.dateKey),
       appointment_time: S.time,
       price: parseFloat(String(priceOf(S.treatment)).replace(/[^0-9.]/g,"")),
       deposit_amount: 10,
