@@ -123,9 +123,18 @@ button,input,textarea,select{font-family:inherit;font-size:16px}
         </div>
       </div>
 
+      <div id="p1b" class="hide">
+        <button id="edit1b" style="background:none;border:none;color:#B39C88;font-size:13.5px;padding:0 0 20px">← Change email</button>
+        <div class="lbl" style="color:#B39C88;margin-bottom:16px">Step 2 of 3</div>
+        <h1 class="serif" style="font-size:34px;line-height:1.14;margin:0 0 12px">Welcome.</h1>
+        <p style="font-size:15px;line-height:1.75;color:#CBB49E;margin:0 0 24px">Your account is created when you book.</p>
+        <label class="flab" style="margin-bottom:14px">Your first name<input id="fname" class="field" placeholder="So we know what to call you"></label>
+        <button id="sendname" class="btn" style="background:rgba(232,213,196,.28)">Next</button>
+      </div>
+
       <div id="p2" class="hide">
         <button id="edit" style="background:none;border:none;color:#B39C88;font-size:13.5px;padding:0 0 20px">← Change number</button>
-        <div class="lbl" style="color:#B39C88;margin-bottom:16px">Step 2 of 2</div>
+        <div id="p2step" class="lbl" style="color:#B39C88;margin-bottom:16px">Step 2 of 2</div>
         <h1 class="serif" style="font-size:34px;line-height:1.14;margin:0 0 12px" id="p2title">Enter your code.</h1>
         <p style="font-size:15px;line-height:1.75;color:#CBB49E;margin:0 0 24px" id="p2sub"></p>
         <input id="code" class="field code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="——————" style="margin-bottom:14px">
@@ -134,9 +143,7 @@ button,input,textarea,select{font-family:inherit;font-size:16px}
           <span id="timer"></span>
           <button id="resend" style="background:none;border:none;color:#B39C88;font-size:13px;padding:6px 0;text-decoration:underline">Resend</button>
         </div>
-        <div id="newname" class="hide" style="margin-top:26px;padding-top:22px;border-top:1px solid rgba(232,213,196,.16)">
-          <label class="flab">Your first name<input id="fname" class="field" placeholder="So we know what to call you"></label>
-        </div>
+
       </div>
 
       <div id="p3" class="hide">
@@ -218,10 +225,20 @@ async function toStep2(){
   
   st.isNew = !st.acct;
   
+  if (st.isNew) {
+    $("p1").className="hide"; $("p1b").className="";
+    $("fname").focus();
+  } else {
+    sendCode();
+  }
+}
+
+async function sendCode() {
   $("p2title").textContent = st.isNew? "Enter your code." : "Welcome back, "+st.name+".";
+  $("p2step").textContent = st.isNew? "Step 3 of 3" : "Step 2 of 2";
   $("p2sub").innerHTML = 'Emailed to <strong style="font-weight:600;color:#E8D5C4">'+st.email+'</strong>.';
-  $("newname").className = st.isNew? "" : "hide";
-  $("p1").className="hide"; $("p2").className="";
+  
+  $("p1").className="hide"; $("p1b").className="hide"; $("p2").className="";
   $("code").focus(); countdown();
   
   await sb.auth.signInWithOtp({ email: st.email });
@@ -275,6 +292,10 @@ $("email").oninput=syncSend;
 $("email").onkeydown=function(e){ if(e.key==="Enter"&&emailOk()) toStep2(); };
 $("send").onclick=function(){ if(emailOk()) toStep2(); };
 $("edit").onclick=function(){ clearInterval(st.tick); $("p2").className="hide"; $("p1").className=""; };
+$("edit1b").onclick=function(){ $("p1b").className="hide"; $("p1").className=""; };
+$("fname").oninput=function(){ $("sendname").style.background = this.value.trim() ? "#E8D5C4" : "rgba(232,213,196,.28)"; };
+$("fname").onkeydown=function(e){ if(e.key==="Enter"&&this.value.trim()){ st.name=this.value.trim(); sendCode(); } };
+$("sendname").onclick=function(){ if($("fname").value.trim()){ st.name=$("fname").value.trim(); sendCode(); } };
 $("code").oninput=async function(){
   var codeVal = this.value.trim();
   var ok = codeVal.length === 6;
