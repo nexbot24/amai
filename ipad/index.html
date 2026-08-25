@@ -263,7 +263,7 @@ async function loadAll(){
     var sr=await sb.from('services').select('*').order('id');
     if(sr.data&&sr.data.length){
       S.services=sr.data.map(function(r){
-        return {id:r.id,n:r.name,d:r.duration_minutes||30,p:r.price||0,on:r.active!==false};
+        return {id:r.id,n:r.name,d:r.duration_minutes||30,p:r.price||0,on:r.available!==false,cat:r.category||'Waxing'};
       });
     }
     /* clients */
@@ -583,11 +583,12 @@ V.closures=function(){
 };
 
 V.services=function(){
-  return '<div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px">'+
-      '<span style="font-size:13.5px;line-height:1.7;color:#5C5148;max-width:44ch">The time you set here is the time held in the diary, so a 90-minute treatment blocks the hours after it.</span>'+
-      '<button class="btn btn-sm" id="addsvc" style="flex:none">Add a service</button></div>'+
-    '<div class="card">'+
-      S.services.map(function(s,i){
+  var groups={};
+  S.services.forEach(function(s){ var c=s.cat||'Uncategorised'; if(!groups[c]) groups[c]=[]; groups[c].push(s); });
+  var cards=Object.keys(groups).map(function(cat){
+    return '<div class="lbl" style="margin:18px 0 8px">'+cat+'</div>'+
+      '<div class="card">'+
+      groups[cat].map(function(s,i){
         var off=s.on===false;
         return '<div style="padding:16px 0;'+(i?"border-top:1px solid #E0D2C2":"")+';opacity:'+(off?".62":"1")+'">'+
           '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin-bottom:10px">'+
@@ -600,7 +601,12 @@ V.services=function(){
             '<button class="btn btn-o btn-sm" data-svctoggle="'+s.id+'">'+(off?"Show":"Hide")+'</button>'+
             '<button class="btn btn-o btn-sm" data-svcdel="'+s.id+'">Remove</button></div></div>';
       }).join("")+
-    '</div>'+
+      '</div>';
+  }).join("");
+  return '<div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px">'+
+      '<span style="font-size:13.5px;line-height:1.7;color:#5C5148;max-width:44ch">The time you set here is the time held in the diary, so a 90-minute treatment blocks the hours after it.</span>'+
+      '<button class="btn btn-sm" id="addsvc" style="flex:none">Add a service</button></div>'+
+    cards+
     '<div style="font-size:13px;line-height:1.7;color:#6E5B49;margin-top:14px">Hiding keeps a service out of new bookings without touching appointments already in the diary.</div>';
 };
 
@@ -743,24 +749,29 @@ function newSheet(dayKey,time){
   };
 }
 var DURS=[15,20,25,30,40,45,60,75,90,120];
+var CATS=['Waxing','Intimate Care','Skin, Body & Wellness'];
 function svcSheet(id){
-  var s = id? S.services.filter(function(x){ return x.id===id; })[0] : {n:"",d:30,p:0,on:true};
-  var isNew=!id;
+  var s = id? S.services.filter(function(x){ return String(x.id)===String(id); })[0] : null;
+  var isNew=!s;
+  if(!s) s={n:'',d:30,p:0,on:true,cat:'Waxing'};
   svcDraft={d:s.d};
-  sheet('<div class="lbl" style="margin-bottom:10px">'+(isNew?"Add a service":"Edit service")+'</div>'+
-    '<div class="serif" style="font-size:28px;margin-bottom:22px">'+(isNew?"What do you offer?":s.n)+'</div>'+
+  sheet('<div class="lbl" style="margin-bottom:10px">'+(isNew?'Add a service':'Edit service')+'</div>'+
+    '<div class="serif" style="font-size:28px;margin-bottom:22px">'+(isNew?'What do you offer?':s.n)+'</div>'+
     '<div class="lbl" style="margin-bottom:10px">Name</div>'+
-    '<input class="field" id="s-name" placeholder="e.g. Underarm wax" value="'+String(s.n).replace(/"/g,"&quot;")+'" style="margin-bottom:20px">'+
+    '<input class="field" id="s-name" placeholder="e.g. Underarm wax" value="'+String(s.n).replace(/"/g,'&quot;')+'" style="margin-bottom:20px">'+
+    '<div class="lbl" style="margin-bottom:10px">Section</div>'+
+    '<select class="field" id="s-cat" style="margin-bottom:20px">'+
+      CATS.map(function(c){ return '<option value="'+c+'"'+(c===s.cat?' selected':'')+'>'+c+'</option>'; }).join('')+'</select>'+
     '<div class="lbl" style="margin-bottom:10px">Time needed in the diary</div>'+
     '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px" id="s-durs">'+
-      DURS.map(function(d){ return '<button class="chip" data-dur="'+d+'" aria-pressed="'+(d===s.d)+'">'+d+' min</button>'; }).join("")+'</div>'+
+      DURS.map(function(d){ return '<button class="chip" data-dur="'+d+'" aria-pressed="'+(d===s.d)+'">'+d+' min</button>'; }).join('')+'</div>'+
     '<div id="s-span" style="font-size:13px;color:#6E5B49;margin-bottom:20px"></div>'+
     '<div class="lbl" style="margin-bottom:10px">Price</div>'+
-    '<input class="field" id="s-price" inputmode="decimal" placeholder="28" value="'+(s.p||"")+'" style="margin-bottom:24px">'+
+    '<input class="field" id="s-price" inputmode="decimal" placeholder="28" value="'+(s.p||'')+'" style="margin-bottom:24px">'+
     '<div style="display:flex;gap:10px">'+
       '<button class="btn btn-o btn-sm" id="sclose">Cancel</button>'+
-      (isNew?"":'<button class="btn btn-o btn-sm" data-svcdel="'+s.id+'">Remove</button>')+
-      '<button class="btn btn-sm" id="s-save" style="flex:1">'+(isNew?"Add to my services":"Save changes")+'</button></div>');
+      (isNew?'':'<button class="btn btn-o btn-sm" data-svcdel="'+s.id+'">Remove</button>')+
+      '<button class="btn btn-sm" id="s-save" style="flex:1">'+(isNew?'Add to my services':'Save changes')+'</button></div>');
   $("sclose").onclick=closeSheet;
   spanNote();
   [].forEach.call($("s-durs").children,function(b){
@@ -770,14 +781,17 @@ function svcSheet(id){
       spanNote();
     };
   });
-  $("s-save").onclick=function(){
-    var nm=$("s-name").value.trim(), pr=parseFloat($("s-price").value)||0;
+  $("s-save").onclick=async function(){
+    var nm=$("s-name").value.trim(), pr=parseFloat($("s-price").value)||0, cat=$("s-cat").value;
     if(!nm) return;
     if(isNew){
-      var nid=S.services.reduce(function(m,x){ return Math.max(m,x.id); },0)+1;
-      S.services.push({id:nid,n:nm,d:svcDraft.d,p:pr,on:true});
+      var res=await sb.from('services').insert({name:nm,category:cat,duration_minutes:svcDraft.d,price:pr,available:true}).select();
+      if(res.data&&res.data[0]){
+        S.services.push({id:res.data[0].id,n:nm,d:svcDraft.d,p:pr,on:true,cat:cat});
+      }
     } else {
-      S.services.forEach(function(x){ if(x.id===s.id){ x.n=nm; x.d=svcDraft.d; x.p=pr; } });
+      await sb.from('services').update({name:nm,category:cat,duration_minutes:svcDraft.d,price:pr}).eq('id',s.id);
+      S.services.forEach(function(x){ if(String(x.id)===String(s.id)){ x.n=nm; x.d=svcDraft.d; x.p=pr; x.cat=cat; } });
     }
     save(); closeSheet(); render();
   };
@@ -987,26 +1001,29 @@ function wire(scope){
     save(); closeSheet(); render(); }; });
   q("[data-cancelappt]").forEach(function(b){ b.onclick=function(){
     S.appts=S.appts.filter(function(x){ return x.id!==+b.dataset.cancelappt; }); save(); closeSheet(); render(); }; });
-  q("[data-svcedit]").forEach(function(b){ b.onclick=function(){ svcSheet(+b.dataset.svcedit); }; });
-  q("[data-svctoggle]").forEach(function(b){ b.onclick=function(){
-    S.services.forEach(function(s){ if(s.id===+b.dataset.svctoggle) s.on = s.on===false; });
+  q("[data-svcedit]").forEach(function(b){ b.onclick=function(){ svcSheet(b.dataset.svcedit); }; });
+  q("[data-svctoggle]").forEach(function(b){ b.onclick=async function(){
+    var tid=b.dataset.svctoggle;
+    S.services.forEach(function(s){ if(String(s.id)===tid) s.on = s.on===false; });
+    var svc=S.services.filter(function(s){ return String(s.id)===tid; })[0];
+    if(svc) await sb.from('services').update({available:svc.on}).eq('id',tid);
     save(); render(); }; });
   q("[data-svcdel]").forEach(function(b){ b.onclick=function(){
-    var id=+b.dataset.svcdel, s=S.services.filter(function(x){ return x.id===id; })[0];
+    var id=b.dataset.svcdel, s=S.services.filter(function(x){ return String(x.id)===id; })[0];
     if(!s) return;
     var booked=S.appts.filter(function(a){ return a.s===s.n&&a.st!=="done"; }).length;
     sheet('<div class="lbl" style="margin-bottom:10px">Remove a service</div>'+
       '<div class="serif" style="font-size:26px;margin-bottom:12px">Remove &ldquo;'+s.n+'&rdquo;?</div>'+
       '<p style="font-size:15px;line-height:1.75;color:#5C5148;margin:0 0 22px;max-width:60ch">'+
         (booked? "It is on "+booked+" appointment"+(booked>1?"s":"")+" still in the diary. Those stay exactly as they are — this only stops it being booked again. Hiding it does the same and keeps the record."
-               : "It will no longer appear when you make a booking. Past appointments keep their names.")+'</p>'+
+               : "It will no longer appear when you make a booking. Past appointments keep their names.")+"</p>"+
       '<div style="display:flex;gap:10px">'+
         '<button class="btn btn-o btn-sm" id="sclose">Keep it</button>'+
         '<button class="btn btn-o btn-sm" id="r-hide">Hide instead</button>'+
         '<button class="btn btn-sm" id="r-yes" style="flex:1">Remove</button></div>');
     $("sclose").onclick=closeSheet;
-    $("r-hide").onclick=function(){ S.services.forEach(function(x){ if(x.id===id) x.on=false; }); save(); closeSheet(); render(); };
-    $("r-yes").onclick=function(){ S.services=S.services.filter(function(x){ return x.id!==id; }); save(); closeSheet(); render(); };
+    $("r-hide").onclick=async function(){ S.services.forEach(function(x){ if(String(x.id)===id) x.on=false; }); await sb.from('services').update({available:false}).eq('id',id); save(); closeSheet(); render(); };
+    $("r-yes").onclick=async function(){ S.services=S.services.filter(function(x){ return String(x.id)!==id; }); await sb.from('services').delete().eq('id',id); save(); closeSheet(); render(); };
   }; });
   q("[data-stamp]").forEach(function(b){ b.onclick=function(){ var c=client(+b.dataset.stamp); c.stamps=Math.min(10,c.stamps+1); save(); clientSheet(c); }; });
   q("[data-bookfor]").forEach(function(b){ b.onclick=function(){ closeSheet(); newSheet(S.dayKey,""); setTimeout(function(){ $("n-client").value=b.dataset.bookfor; },0); }; });
