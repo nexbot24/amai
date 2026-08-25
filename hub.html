@@ -104,10 +104,10 @@ button{font-family:Mulish,sans-serif}
     <div style="width:100%;max-width:400px">
       <div id="step-phone">
         <div class="lbl" style="margin-bottom:16px">Sign in</div>
-        <h2 class="serif" style="font-size:30px;margin:0 0 12px">Your number is your account.</h2>
-        <p style="font-size:14.5px;line-height:1.7;color:#5C5148;margin:0 0 28px">No password to forget. We'll text you a six-digit code — it's the same number we'd call you on.</p>
-        <label class="flab" style="margin-bottom:20px">Mobile number
-          <input id="a-email" class="field" type="email" placeholder="hello@example.com" value="nadia@example.com">
+        <h2 class="serif" style="font-size:30px;margin:0 0 12px">Your email is your account.</h2>
+        <p style="font-size:14.5px;line-height:1.7;color:#5C5148;margin:0 0 28px">No password to forget. We'll email you a six-digit code — enter it and you're in.</p>
+        <label class="flab" style="margin-bottom:20px">Email address
+          <input id="a-email" class="field" type="email" placeholder="hello@example.com">
         </label>
         <button id="a-send" class="btn" style="width:100%;min-height:52px;font-size:16px;border-radius:26px 26px 0 0">Send my code</button>
         <p style="font-size:12.5px;line-height:1.6;color:#6E5B49;margin:16px 0 0">First time? Book a visit and your hub is created automatically.</p>
@@ -222,22 +222,30 @@ var S=(function(){
 })();
 
 /* ---------- auth ---------- */
-$("a-send").onclick=function(){
+$("a-send").onclick=async function(){
   var p=$("a-email").value.trim().toLowerCase();
-  if(p.length<9){ return; }
+  if(!p||p.length<5||!p.includes("@")){ $("a-hint")&&($("a-hint").textContent="Please enter a valid email."); return; }
+  $("a-send").disabled=true; $("a-send").textContent="Sending…";
+  var res=await sb.auth.signInWithOtp({email:p,options:{shouldCreateUser:true}});
+  $("a-send").disabled=false; $("a-send").textContent="Send my code";
+  if(res.error){ $("a-hint")&&($("a-hint").textContent=res.error.message); return; }
   S.email=p;
-  $("a-sent").textContent="We've sent a code to "+p+". It lasts ten minutes.";
-  $("a-hint").textContent="Demo code: 000000";
-  if(p.includes("@")) { $("step-phone").className="hide"; $("step-code").className=""; }
+  $("a-sent").textContent="We've sent a six-digit code to "+p+". It lasts ten minutes.";
+  $("a-hint").textContent="";
+  $("step-phone").className="hide"; $("step-code").className="";
   $("a-code").focus();
 };
 $("a-back").onclick=function(){ $("step-code").className="hide"; $("step-phone").className=""; };
-$("a-verify").onclick=function(){
+$("a-verify").onclick=async function(){
   var c=$("a-code").value.replace(/\D/g,"");
   if(c.length<6){ $("a-hint").textContent="Six digits, please."; return; }
+  $("a-verify").disabled=true; $("a-verify").textContent="Verifying…";
+  var res=await sb.auth.verifyOtp({email:S.email,token:c,type:'email'});
+  $("a-verify").disabled=false; $("a-verify").textContent="Sign in";
+  if(res.error){ $("a-hint").textContent=res.error.message; return; }
   S.signedIn=true; save(); boot();
 };
-$("signout").onclick=function(){ S.signedIn=false; save(); location.reload(); };
+$("signout").onclick=async function(){ await sb.auth.signOut(); S.signedIn=false; save(); location.reload(); };
 
 /* ---------- shell ---------- */
 var VIEWS=[
@@ -256,6 +264,12 @@ function nav(){
 }
 async function boot(){
   await loadServices();
+  /* check Supabase session first */
+  var sess=null;
+  try{ var sr=await sb.auth.getSession(); sess=sr.data.session; }catch(e){}
+  if(sess){
+    S.signedIn=true; S.email=sess.user.email; save();
+  }
   if(!S.signedIn){ $("auth").className=""; $("hub").className="shell hide"; return; }
   $("auth").className="hide"; $("hub").className="shell";
   /* load bookings from Supabase */

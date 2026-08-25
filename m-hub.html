@@ -157,6 +157,31 @@ a{color:#E8D5C4;text-decoration:none}
 
 <template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#241F1C"/><path d="M36 72 L36 46 A14 14 0 0 1 64 46 L64 72" fill="none" stroke="#E8D5C4" stroke-width="4"/></svg></template>
 
+<div id="m-auth" style="position:fixed;inset:0;z-index:10000;background:#241F1C;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center">
+  <div style="max-width:340px;width:100%">
+    <div style="margin-bottom:32px">
+      <div style="width:24px;height:34px;border:1.5px solid #E8D5C4;border-bottom:none;border-radius:999px 999px 0 0;margin:0 auto 14px"></div>
+      <div class="serif" style="font-size:16px;letter-spacing:.3em;color:#E8D5C4">AMAI</div>
+    </div>
+    <div id="m-step-email">
+      <h2 class="serif" style="color:#E8D5C4;font-size:26px;margin:0 0 10px">Sign in to your hub</h2>
+      <p style="font-size:14px;line-height:1.7;color:#8A7361;margin:0 0 24px">We'll email you a six-digit code. No password needed.</p>
+      <input id="m-email" type="email" placeholder="your@email.com" style="width:100%;padding:14px 16px;border:1px solid #5C5148;border-radius:12px;font-size:16px;background:#3A322E;color:#E8D5C4;margin-bottom:14px;font-family:inherit;outline:none">
+      <button id="m-send" style="width:100%;padding:14px;border:none;border-radius:12px;font-size:16px;font-family:Marcellus,serif;background:#E8D5C4;color:#241F1C;cursor:pointer">Send my code</button>
+      <div id="m-send-err" style="font-size:13px;color:#B39C88;margin-top:12px"></div>
+      <a href="mobile.html" style="display:inline-block;margin-top:24px;font-size:13px;color:#5C5148;text-decoration:none;border-bottom:1px solid #5C5148">Back to the site</a>
+    </div>
+    <div id="m-step-code" style="display:none">
+      <h2 class="serif" style="color:#E8D5C4;font-size:26px;margin:0 0 10px">Enter your code</h2>
+      <p id="m-code-msg" style="font-size:14px;line-height:1.7;color:#8A7361;margin:0 0 24px"></p>
+      <input id="m-code" inputmode="numeric" maxlength="6" placeholder="••••••" style="width:100%;padding:14px 16px;border:1px solid #5C5148;border-radius:12px;font-size:22px;letter-spacing:.4em;text-align:center;background:#3A322E;color:#E8D5C4;margin-bottom:14px;font-family:inherit;outline:none">
+      <button id="m-verify" style="width:100%;padding:14px;border:none;border-radius:12px;font-size:16px;font-family:Marcellus,serif;background:#E8D5C4;color:#241F1C;cursor:pointer">Sign in</button>
+      <div id="m-code-err" style="font-size:13px;color:#B39C88;margin-top:12px"></div>
+      <button id="m-code-back" style="display:inline-block;margin-top:20px;font-size:13px;color:#5C5148;background:none;border:none;border-bottom:1px solid #5C5148;cursor:pointer">Change email</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const supabaseUrl = 'https://tphyrmweauzfletdlqvi.supabase.co';
@@ -828,9 +853,43 @@ async function initSupabase() {
   await loadServices();
   const { data: { session } } = await sb.auth.getSession();
   if (!session) {
-    S.email = "demo@example.com";
-    S.name = "Demo";
-  } else {
+    /* show login overlay */
+    document.getElementById("m-auth").style.display="flex";
+    document.getElementById("m-send").onclick=async function(){
+      var email=document.getElementById("m-email").value.trim().toLowerCase();
+      if(!email||!email.includes("@")){ document.getElementById("m-send-err").textContent="Please enter a valid email."; return; }
+      this.disabled=true; this.textContent="Sending\u2026";
+      var res=await sb.auth.signInWithOtp({email:email,options:{shouldCreateUser:true}});
+      this.disabled=false; this.textContent="Send my code";
+      if(res.error){ document.getElementById("m-send-err").textContent=res.error.message; return; }
+      window.__pendingEmail=email;
+      document.getElementById("m-code-msg").textContent="Code sent to "+email+". It lasts ten minutes.";
+      document.getElementById("m-step-email").style.display="none";
+      document.getElementById("m-step-code").style.display="block";
+      document.getElementById("m-code").focus();
+    };
+    document.getElementById("m-code-back").onclick=function(){
+      document.getElementById("m-step-code").style.display="none";
+      document.getElementById("m-step-email").style.display="block";
+    };
+    document.getElementById("m-verify").onclick=async function(){
+      var code=document.getElementById("m-code").value.replace(/\D/g,"");
+      if(code.length<6){ document.getElementById("m-code-err").textContent="Six digits, please."; return; }
+      this.disabled=true; this.textContent="Verifying\u2026";
+      var res=await sb.auth.verifyOtp({email:window.__pendingEmail,token:code,type:'email'});
+      this.disabled=false; this.textContent="Sign in";
+      if(res.error){ document.getElementById("m-code-err").textContent=res.error.message; return; }
+      document.getElementById("m-auth").style.display="none";
+      location.reload();
+    };
+    await loadServices();
+    $("me").onclick=function(){ go("account"); };
+    [].forEach.call(document.querySelectorAll(".tab"),function(t){ t.onclick=function(){ go(t.dataset.go); }; });
+    render();
+    return;
+  }
+  /* session exists — hide login, load data */
+  document.getElementById("m-auth").style.display="none";
     S.email = session.user.email;
     let res = await sb.from('clients').select('*').eq('email', S.email);
     if (res.data && res.data.length > 0) {
@@ -839,9 +898,7 @@ async function initSupabase() {
       S.stamps = c.stamps || 0;
       S.notes = c.notes || "";
       S.clientId = c.id;
-      // Load upcoming bookings from DB
       var today = new Date(); today.setHours(0,0,0,0);
-      var todayStr = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
       var bk = await sb.from('bookings').select('*').eq('client_id',c.id).neq('status','cancelled');
       if(bk.data){
         S.upcoming=[]; S.past=[];
@@ -853,7 +910,6 @@ async function initSupabase() {
         });
       }
     }
-  }
   
   $("me").onclick=function(){ go("account"); };
   [].forEach.call(document.querySelectorAll(".tab"),function(t){ t.onclick=function(){ go(t.dataset.go); }; });
