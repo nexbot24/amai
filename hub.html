@@ -725,7 +725,7 @@ function bindBookingModal(cta){
       toast("Moved to "+longDate(parseKey(draft.dateKey))+", "+draft.time+".");
     } else {
       
-      let { data: clients } = await sb.from('clients').select('id').eq('email', email);
+      let { data: clients } = await sb.from('clients').select('id').eq('email', S.email);
       let clientId;
       if (!clients || clients.length === 0) {
         const { data: newClient } = await sb.from('clients').insert([{ name: S.name, email: S.email }]).select().single();
