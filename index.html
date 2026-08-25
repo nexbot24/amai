@@ -728,16 +728,21 @@ function saveToHub(){
     localStorage.setItem(HUB_KEY,JSON.stringify(h));
   }catch(e){}
 }
-function confirm(how){
+async function confirm(how){
   S.how=how;
   var name=$("f-name").value.trim()||"Thank you";
   if(wantsAccount()){
+    var email=$("f-contact").value.trim().toLowerCase();
     $("v-title").textContent=name+", you're booked in.";
     $("v-sub").textContent = S.returning? "One code and you're back in your account." : "One code and your account is open.";
     $("v-treat").textContent=S.treatment;
     $("v-when").textContent=whenLabel();
-    $("v-code-label").textContent="Code emailed to "+$("f-contact").value.trim();
+    $("v-code-label").textContent="Sending code to "+email+"…";
     $("form-side").className="hide"; $("verify-side").className="";
+    /* send real OTP */
+    var res=await sb.auth.signInWithOtp({email:email,options:{shouldCreateUser:true}});
+    if(res.error){ $("v-code-label").textContent="Could not send code: "+res.error.message; }
+    else { $("v-code-label").textContent="Code emailed to "+email; }
     setTimeout(function(){ $("v-code").focus(); },60);
     return;
   }
@@ -795,7 +800,15 @@ $("v-code").oninput=function(){
   b.style.background=ok?"#E8D5C4":"rgba(232,213,196,.28)";
   b.style.cursor=ok?"pointer":"default";
 };
-$("v-go").onclick=function(){ if(digits($("v-code").value).length!==6) return; saveToHub(); showDone(S.how,true); };
+$("v-go").onclick=async function(){
+  if(digits($("v-code").value).length!==6) return;
+  var email=$("f-contact").value.trim().toLowerCase();
+  $("v-go").textContent="Verifying…";
+  var res=await sb.auth.verifyOtp({email:email,token:$("v-code").value.trim(),type:'email'});
+  $("v-go").textContent="Open my account";
+  if(res.error){ $("v-code-label").textContent=res.error.message; return; }
+  saveToHub(); showDone(S.how,true);
+};
 $("v-skip").onclick=function(){ showDone(S.how,false); };
 $("again").onclick=function(){
   S={group:S.group,step:1,treatment:(BOOKABLE.length?BOOKABLE[0].name:""),monthOffset:0,dateKey:"",time:"",query:"",paid:"",how:"",sent:false,returning:false};
