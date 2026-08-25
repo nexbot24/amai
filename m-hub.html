@@ -806,6 +806,7 @@ function checkPWA() {
 if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js'); }
 
 async function initSupabase() {
+  const { data: { session } } = await sb.auth.getSession();
   if (!session) {
     S.email = "demo@example.com";
     S.name = "Demo";
