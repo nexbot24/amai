@@ -132,7 +132,7 @@ a{color:#E8D5C4;text-decoration:none}
 <div class="app" id="root">
   <div class="top">
     <div class="topin">
-      <a class="mark" href="m-home.html"><i></i><span>AMAI</span></a>
+      <a class="mark" href="mobile.html"><i></i><span>AMAI</span></a>
       <button class="avatar" id="me" aria-label="Account"></button>
     </div>
   </div>
@@ -501,7 +501,7 @@ V.account=function(){
         '<p style="font-size:14px;line-height:1.7;color:#CBB49E;margin:0 0 16px">Opens full screen like an app, straight into your bookings. Nothing to download.</p>'+
         '<button class="btn" style="background:#E8D5C4" id="a-pwa">Add to home screen</button></div></div>'+
     '<div class="sec last" style="display:flex;flex-direction:column;gap:8px">'+
-      '<a class="btn btn-o" href="m-home.html">Back to the site</a>'+
+      '<a class="btn btn-o" href="mobile.html">Back to the site</a>'+
       '<button class="btn btn-o" id="signout">Sign out</button></div>';
 };
 
@@ -747,7 +747,7 @@ function wire(scope){
     S.notes=$("a-notes").value.trim();
     S.prefs={room:$("a-room").value.trim(),music:$("a-music").value.trim()};
     save(); toast("Saved. Your practitioner sees this before you arrive."); };
-  var so=one("signout"); if(so) so.onclick=async function(){ await sb.auth.signOut(); S.signedIn=false; save(); location.href="m-home.html"; };
+  var so=one("signout"); if(so) so.onclick=async function(){ await sb.auth.signOut(); S.signedIn=false; save(); location.href="mobile.html"; };
 
   var apwa = one("a-pwa"); if(apwa) apwa.onclick = async function() {
     if (deferredPrompt) {
