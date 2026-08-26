@@ -784,22 +784,11 @@ async function sendMsg(text){
       last_message_at: new Date().toISOString(),
       last_message_preview: body,
       last_sender: 'client',
-      admin_unread: 1,
+      admin_unread: 0,
       client_unread: 0
     }]).select().single();
     if(newConv) {
       S.conversation_id = newConv.id;
-    }
-  } else {
-    await sb.from('conversations').update({
-      last_message_at: new Date().toISOString(),
-      last_message_preview: body,
-      last_sender: 'client'
-    }).eq('id', S.conversation_id);
-    
-    let { data: c } = await sb.from('conversations').select('admin_unread').eq('id', S.conversation_id).single();
-    if (c) {
-      await sb.from('conversations').update({ admin_unread: (c.admin_unread || 0) + 1 }).eq('id', S.conversation_id);
     }
   }
   

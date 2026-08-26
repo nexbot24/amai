@@ -1200,16 +1200,16 @@ function wire(scope){
   q("[data-dmode]").forEach(function(b){ b.onclick=function(){ S.dmode=b.dataset.dmode; save(); render(); }; });
   q("[data-itab]").forEach(function(b){ b.onclick=function(){ S.itab=b.dataset.itab; save(); render(); }; });
   q("[data-open]").forEach(function(b){ b.onclick=function(){ S.view=b.dataset.open; S.moff=0; save(); render(); }; });
-  q("[data-msg]").forEach(function(b){ b.onclick=function(){ msgSheet(+b.dataset.msg); }; });
+  q("[data-msg]").forEach(function(b){ b.onclick=function(){ msgSheet(b.dataset.msg); }; });
   q("[data-msgdel]").forEach(function(b){ b.onclick=async function(){
-    var id=+b.dataset.msgdel;
+    var id=b.dataset.msgdel;
     await sb.from('chat_messages').delete().eq('conversation_id', id);
     await sb.from('conversations').delete().eq('id', id);
     S.conversations=S.conversations.filter(function(m){ return m.id!==id; }); 
     save(); closeSheet(); render(); 
   }; });
   q("[data-msgbook]").forEach(function(b){ b.onclick=function(){
-    var m=S.conversations.filter(function(x){ return x.id===+b.dataset.msgbook; })[0]; if(!m) return;
+    var m=S.conversations.filter(function(x){ return x.id===b.dataset.msgbook; })[0]; if(!m) return;
     var c=S.clients.filter(function(x){ return x.phone===m.client_phone; })[0];
     if(!c){ c={id:Date.now(),name:m.client_name,phone:m.client_phone,since:new Date().toLocaleDateString("en-GB",{month:"short",year:"numeric"}),stamps:0,plan:null,notes:"",visits:0,spend:0}; S.clients.push(c); save(); }
     closeSheet(); newSheet(iso(nextOpen(1)),"");
