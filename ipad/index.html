@@ -346,6 +346,12 @@ async function loadAll(){
           loadAll().then(render);
         }
       }).subscribe();
+      /* Reload conversations when iPad wakes / app returns to foreground */
+      document.addEventListener('visibilitychange', function(){
+        if(!document.hidden) loadAll().then(render);
+      });
+      /* Backup poll every 30s in case WebSocket disconnects */
+      setInterval(function(){ loadAll().then(render); }, 30000);
     }
 
     save();
