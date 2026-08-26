@@ -827,10 +827,14 @@ async function loadMobileServices(){
   if(cd.data){
     cd.data.forEach(function(r){ CLOSED_DAYS[r.date_key]=true; });
   }
+  /* load opening hours */
+  var sh=await sb.from('studio_settings').select('value').eq('key','opening_hours').single();
+  if(sh.data && sh.data.value) OPENING_HOURS=sh.data.value;
   console.log('CLOSED_DAYS map:', JSON.stringify(CLOSED_DAYS));
 }
 var KNOWN={"07700900123":"Nadia","07700900456":"Priya","07700900789":"Hannah"};
 var CLOSED_DAYS={};
+var OPENING_HOURS={tue:{open:'9.00',close:'18.00'},wed:{open:'9.00',close:'18.00'},thu:{open:'9.00',close:'18.00'},fri:{open:'9.00',close:'18.00'},sat:{open:'9.00',close:'18.00'}};
 var HUB_KEY="amai_hub_v2";
 var B={step:1,treat:"",dayKey:"",time:"",q:"",how:"",returning:false};
 
@@ -847,7 +851,14 @@ function priceOf(n){ for(var i=0;i<BOOKABLE.length;i++) if(BOOKABLE[i].n===n) re
 function priceNum(n){ return parseFloat(String(priceOf(n)).replace(/[^0-9.]/g,""))||0; }
 function balOf(n){ var p=priceOf(n), v=priceNum(n); if(!v) return "Balance"; return (String(p).indexOf("from")===0?"from £":"£")+(v-10); }
 function whenLbl(){ if(!B.dayKey) return "Not chosen yet"; var d=parseK(B.dayKey); return B.time? longD(d)+", "+B.time : longD(d); }
-function slotsFor(d){ return ["9.00","10.30","12.00","13.30","15.00","16.30"].map(function(l,i){ return {l:l,open:(d.getDate()+i*3)%4!==0}; }); }
+function slotsFor(d){
+  var dayMap=['sun','mon','tue','wed','thu','fri','sat'];
+  var dk=dayMap[d.getDay()]; var hrs=OPENING_HOURS[dk]||{open:'9.00',close:'18.00'};
+  var op=hrs.open.split('.'),cl=hrs.close.split('.');
+  var start=parseInt(op[0])*60+parseInt(op[1]||0),end=parseInt(cl[0])*60+parseInt(cl[1]||0),slots=[];
+  for(var m=start;m<end;m+=15){ var h=Math.floor(m/60),mm=m%60; slots.push({l:h+'.'+String(mm).padStart(2,'0'),open:true}); }
+  return slots;
+}
 function wantsAcct(){ return $("f-acct").checked; }
 
 function renderPicker(){

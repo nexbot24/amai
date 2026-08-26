@@ -555,6 +555,7 @@ async function fetchMonthBookings(v) {
   return CAL_CACHE[key];
 }
 
+function dotTimeToMins(t){ var p=t.split('.'); return parseInt(p[0])*60+parseInt(p[1]||0); }
 function calcSlots(d) {
   var y = d.getFullYear(), m = d.getMonth(), day = d.getDate();
   var key = y + "-" + m;
@@ -564,8 +565,11 @@ function calcSlots(d) {
   var dayBookings = bookings.filter(function(b){ return b.appointment_date === dateStr; });
   
   var dur = getDuration(S.treatment);
-  var start = 9 * 60; // 9:00
-  var end = 18 * 60; // 18:00
+  var dayMap=['sun','mon','tue','wed','thu','fri','sat'];
+  var dk=dayMap[d.getDay()];
+  var hrs=OPENING_HOURS[dk]||{open:'9.00',close:'18.00'};
+  var start = dotTimeToMins(hrs.open);
+  var end = dotTimeToMins(hrs.close);
   var step = 15;
   
   var slots = [];
@@ -588,6 +592,7 @@ function calcSlots(d) {
 }
 
 var CLOSED_DAYS={};
+var OPENING_HOURS={tue:{open:'9.00',close:'18.00'},wed:{open:'9.00',close:'18.00'},thu:{open:'9.00',close:'18.00'},fri:{open:'9.00',close:'18.00'},sat:{open:'9.00',close:'18.00'}};
 function dayOpen(d){ var w=d.getDay(); if(w===0||w===1) return false; var k=d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate(); return !CLOSED_DAYS[k]; }
 function dayFree(d){ return calcSlots(d).length > 0; }
 function slotList(d){ return calcSlots(d); }
@@ -826,6 +831,10 @@ $("again").onclick=function(){
   try {
     var cd=await sb.from('closed_days').select('date_key');
     if(cd.data) cd.data.forEach(function(r){ CLOSED_DAYS[r.date_key]=true; });
+  } catch(e){}
+  try {
+    var sh=await sb.from('studio_settings').select('value').eq('key','opening_hours').single();
+    if(sh.data && sh.data.value) OPENING_HOURS=sh.data.value;
   } catch(e){}
   if(BOOKABLE.length) S.treatment=BOOKABLE[0].name;
   renderTabs(); renderPanel(); renderPicker(); renderCalendar(); renderSlots(); checkKnown(); showStep();

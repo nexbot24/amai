@@ -238,6 +238,7 @@ var S=load()||seed();
 if(!S.clients) S=seed();
 if(!S.services||!S.services.length) S.services=DEFAULT_SERVICES.map(function(s,i){ return {id:i+1,n:s.n,d:s.d,p:s.p,on:true}; });
 if(!S.messages) S.messages=[];
+if(!S.hours) S.hours={tue:{open:'9.00',close:'18.00'},wed:{open:'9.00',close:'18.00'},thu:{open:'9.00',close:'18.00'},fri:{open:'9.00',close:'18.00'},sat:{open:'9.00',close:'18.00'}};
 if(!S.promos) S.promos=[];
 if(!S.dmode) S.dmode="day";
 if(!S.itab) S.itab="messages";
@@ -296,6 +297,9 @@ async function loadAll(){
         S.closed[r.date_key]={why:r.reason||''};
       });
     }
+    /* opening hours */
+    var sh=await sb.from('studio_settings').select('value').eq('key','opening_hours').single();
+    if(sh.data && sh.data.value) S.hours=sh.data.value;
     save();
   } catch(e){ console.warn('Supabase load error',e); }
 }
@@ -533,7 +537,7 @@ V.settings=function(){
     '</div>'+
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start">'+
       '<div class="card"><div class="lbl" style="margin-bottom:14px">Opening hours</div>'+
-        days.map(function(d){ return '<div class="kv"><span style="color:#6E5B49">'+d+'</span><span>9.00 – 18.00</span></div>'; }).join("")+
+        [{n:"Tuesday",k:"tue"},{n:"Wednesday",k:"wed"},{n:"Thursday",k:"thu"},{n:"Friday",k:"fri"},{n:"Saturday",k:"sat"}].map(function(d){ var h=S.hours[d.k]||{open:"9.00",close:"18.00"}; return '<button class="kv" data-editday="'+d.k+'" style="cursor:pointer;background:none;border:none;width:100%;text-align:left;padding:14px 0;border-top:1px solid #E0D2C2;display:flex;justify-content:space-between;font:inherit;color:inherit"><span style="color:#6E5B49">'+d.n+'</span><span>'+h.open+' \u2013 '+h.close+'</span></button>'; }).join("")+
         '<div class="kv" style="border-bottom:1px solid #E0D2C2;color:#6E5B49"><span>Sunday &amp; Monday</span><span>Closed</span></div></div>'+
       '<div style="display:flex;flex-direction:column;gap:10px">'+
         '<div class="card"><div class="lbl" style="margin-bottom:14px">Deposit</div>'+
@@ -802,6 +806,26 @@ function spanNote(){
   $("s-span").textContent = slots===1? "Holds one slot in the diary."
     : "Holds "+slots+" slots — the hours after the start show as continuing.";
 }
+var HR_OPTS=['7.00','7.30','8.00','8.30','9.00','9.30','10.00','10.30','11.00','11.30','12.00','12.30','13.00','13.30','14.00','14.30','15.00','15.30','16.00','16.30','17.00','17.30','18.00','18.30','19.00','19.30','20.00','20.30','21.00'];
+var DAY_NAMES={tue:'Tuesday',wed:'Wednesday',thu:'Thursday',fri:'Friday',sat:'Saturday'};
+function hoursSheet(dayKey){
+  var h=S.hours[dayKey]||{open:'9.00',close:'18.00'};
+  sheet('<div class="lbl" style="margin-bottom:10px">Opening hours</div>'+
+    '<div class="serif" style="font-size:28px;margin-bottom:22px">'+DAY_NAMES[dayKey]+'</div>'+
+    '<div class="lbl" style="margin-bottom:10px">Opens at</div>'+
+    '<select class="field" id="h-open" style="margin-bottom:20px">'+HR_OPTS.map(function(t){return '<option'+(t===h.open?' selected':'')+'>'+t+'</option>';}).join('')+'</select>'+
+    '<div class="lbl" style="margin-bottom:10px">Closes at</div>'+
+    '<select class="field" id="h-close" style="margin-bottom:24px">'+HR_OPTS.map(function(t){return '<option'+(t===h.close?' selected':'')+'>'+t+'</option>';}).join('')+'</select>'+
+    '<div style="display:flex;gap:10px">'+
+      '<button class="btn btn-o btn-sm" id="sclose">Cancel</button>'+
+      '<button class="btn btn-sm" id="h-save" style="flex:1">Save</button></div>');
+  $("sclose").onclick=closeSheet;
+  $("h-save").onclick=async function(){
+    S.hours[dayKey]={open:$("h-open").value,close:$("h-close").value};
+    await sb.from('studio_settings').upsert({key:'opening_hours',value:S.hours,updated_at:new Date().toISOString()},{onConflict:'key'});
+    save(); closeSheet(); render();
+  };
+}
 var svcDraft={d:30};
 function clientSheet(c){
   var hist=S.appts.filter(function(a){ return a.c===c.id; });
@@ -1025,6 +1049,7 @@ function wire(scope){
     $("r-hide").onclick=async function(){ S.services.forEach(function(x){ if(String(x.id)===id) x.on=false; }); await sb.from('services').update({available:false}).eq('id',id); save(); closeSheet(); render(); };
     $("r-yes").onclick=async function(){ S.services=S.services.filter(function(x){ return String(x.id)!==id; }); await sb.from('services').delete().eq('id',id); save(); closeSheet(); render(); };
   }; });
+  q("[data-editday]").forEach(function(b){ b.onclick=function(){ hoursSheet(b.dataset.editday); }; });
   q("[data-stamp]").forEach(function(b){ b.onclick=function(){ var c=client(+b.dataset.stamp); c.stamps=Math.min(10,c.stamps+1); save(); clientSheet(c); }; });
   q("[data-bookfor]").forEach(function(b){ b.onclick=function(){ closeSheet(); newSheet(S.dayKey,""); setTimeout(function(){ $("n-client").value=b.dataset.bookfor; },0); }; });
   q("[data-dismiss]").forEach(function(b){ b.onclick=function(){ S.requests=S.requests.filter(function(r){ return r.id!==+b.dataset.dismiss; }); save(); render(); }; });
