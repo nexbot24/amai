@@ -587,7 +587,8 @@ function calcSlots(d) {
   return slots;
 }
 
-function dayOpen(d){ var w=d.getDay(); return w!==0&&w!==1; }
+var CLOSED_DAYS={};
+function dayOpen(d){ var w=d.getDay(); if(w===0||w===1) return false; var k=d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate(); return !CLOSED_DAYS[k]; }
 function dayFree(d){ return calcSlots(d).length > 0; }
 function slotList(d){ return calcSlots(d); }
 
@@ -821,6 +822,11 @@ $("again").onclick=function(){
 
 (async function(){
   await loadServicesIntoGroups();
+  /* load closed days */
+  try {
+    var cd=await sb.from('closed_days').select('date_key');
+    if(cd.data) cd.data.forEach(function(r){ CLOSED_DAYS[r.date_key]=true; });
+  } catch(e){}
   if(BOOKABLE.length) S.treatment=BOOKABLE[0].name;
   renderTabs(); renderPanel(); renderPicker(); renderCalendar(); renderSlots(); checkKnown(); showStep();
 })();

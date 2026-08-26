@@ -1048,11 +1048,6 @@ $("again").onclick=function(){
 (async function(){
   await loadSupabaseSDK();
   await loadMobileServices();
-  /* temporary debug banner */
-  var dbg=document.createElement('div');
-  dbg.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:red;color:white;padding:8px;font:12px monospace;word-break:break-all';
-  dbg.textContent='CLOSED_DAYS='+JSON.stringify(CLOSED_DAYS)+' | sb='+(sb?'yes':'no');
-  document.body.appendChild(dbg);
   renderPicker(); renderDays(); renderSlots(); checkKnown(); show();
 })();
 /* treatments */
