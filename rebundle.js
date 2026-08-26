@@ -36,7 +36,9 @@ if (endIdx === -1) {
 const before = mobile.substring(0, startIdx + startTag.length);
 const after = mobile.substring(endIdx);
 
-const newMobile = before + '\n' + JSON.stringify(template) + '\n  ' + after;
+// Escape </script> inside JSON to prevent browser from terminating the script tag
+const jsonStr = JSON.stringify(template).replace(/<\/script>/gi, '<\\/script>');
+const newMobile = before + '\n' + jsonStr + '\n  ' + after;
 
 fs.writeFileSync(mobilePath, newMobile, 'utf8');
 console.log('Rebundled mobile.html (' + Math.round(newMobile.length / 1024) + 'KB)');
