@@ -906,7 +906,7 @@ async function loadConversation() {
     } else {
       S.chat = [];
     }
-    
+
     if (!chatSub) {
       chatSub = sb.channel('client-inbox').on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_messages',filter:'conversation_id=eq.'+convId},function(payload){
         if(payload.new.sender==='studio'){
@@ -928,13 +928,14 @@ async function loadConversation() {
         }
       }).subscribe();
     }
-    
-    renderThread(true);
-    badge();
   } else {
+    convId = null;
+    chatUnreadCount = 0;
     S.chat = [];
-    renderThread(true);
   }
+  save();
+  renderThread(true);
+  badge();
 }
 function renderThread(stick){
   var t=$("thread"); if(!t) return;
