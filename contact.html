@@ -146,7 +146,7 @@ a{color:#E8D5C4;text-decoration:none}
     <div>
       <div class="lbl" style="margin-bottom:20px">The studio</div>
       <h2 class="h2" style="font-size:32px;margin-bottom:28px;max-width:16ch">Where to find us, and when.</h2>
-      <div style="display:flex;flex-direction:column">
+      <div style="display:flex;flex-direction:column" id="hours-list">
         <div style="display:flex;justify-content:space-between;gap:24px;padding:15px 0;border-top:1px solid #E0D2C2;font-size:14.5px"><span style="color:#6E5B49">Tuesday</span><span>9.00 – 18.00</span></div>
         <div style="display:flex;justify-content:space-between;gap:24px;padding:15px 0;border-top:1px solid #E0D2C2;font-size:14.5px"><span style="color:#6E5B49">Wednesday</span><span>9.00 – 18.00</span></div>
         <div style="display:flex;justify-content:space-between;gap:24px;padding:15px 0;border-top:1px solid #E0D2C2;font-size:14.5px"><span style="color:#6E5B49">Thursday</span><span>9.00 – 18.00</span></div>
@@ -249,7 +249,7 @@ a{color:#E8D5C4;text-decoration:none}
 
       <div style="display:flex;flex-direction:column;gap:16px;font-size:14px;line-height:1.7">
         <span style="font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:#8A7361">Studio</span>
-        <span style="color:#CBB49E">Tuesday to Saturday<br>9.00 – 18.00</span>
+        <span style="color:#CBB49E" id="footer-hours">Tuesday to Saturday<br>9.00 – 18.00</span>
         <span style="color:#CBB49E">North London, by appointment<br>Full address sent on booking</span>
         <div class="fnav" style="display:flex;flex-direction:column;gap:9px">
           <a href="tel:+442000000000">020 0000 0000</a>
@@ -316,10 +316,32 @@ function show(r){
 }
 
 /* enquiry */
+var sb=supabase.createClient('https://tphyrmweauzfletdlqvi.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwaHlybXdlYXV6ZmxldGRscXZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0NTIxOTQsImV4cCI6MjEwMzAyODE5NH0.Z_utKsxYquCoL2LfTjjL8QFB1tnLJZW9j3El7Sykk8o');
+
+/* Load opening hours from Supabase */
+(async function(){
+  try {
+    var r=await sb.from('studio_settings').select('value').eq('key','opening_hours').single();
+    if(!r.data||!r.data.value) return;
+    var h=r.data.value;
+    var days=[{n:'Tuesday',k:'tue'},{n:'Wednesday',k:'wed'},{n:'Thursday',k:'thu'},{n:'Friday',k:'fri'},{n:'Saturday',k:'sat'}];
+    var el=$('hours-list'); if(!el) return;
+    el.innerHTML=days.map(function(d){
+      var hrs=h[d.k]||{open:'9.00',close:'18.00'};
+      return '<div style="display:flex;justify-content:space-between;gap:24px;padding:15px 0;border-top:1px solid #E0D2C2;font-size:14.5px"><span style="color:#6E5B49">'+d.n+'</span><span>'+hrs.open+' \u2013 '+hrs.close+'</span></div>';
+    }).join('')+'<div style="display:flex;justify-content:space-between;gap:24px;padding:15px 0;border-top:1px solid #E0D2C2;border-bottom:1px solid #E0D2C2;font-size:14.5px;color:#6E5B49"><span>Sunday &amp; Monday</span><span>Closed</span></div>';
+    /* Also update footer hours */
+    var fh=document.getElementById('footer-hours');
+    if(fh){
+      var first=h.tue||{open:'9.00',close:'18.00'};
+      fh.innerHTML='Tuesday to Saturday<br>'+first.open+' \u2013 '+first.close;
+    }
+  } catch(e){}
+})();
+
 $("c-send").onclick=async function(){
   var n=$("c-name").value.trim(), c=$("c-contact").value.trim(), m=$("c-msg").value.trim();
   if(!n||!c||!m){ $("c-help").textContent="Please add your name, a way to reach you, and your question."; return; }
-  var sb=supabase.createClient('https://tphyrmweauzfletdlqvi.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwaHlybXdlYXV6ZmxldGRscXZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0NTIxOTQsImV4cCI6MjEwMzAyODE5NH0.Z_utKsxYquCoL2LfTjjL8QFB1tnLJZW9j3El7Sykk8o');
   var isEmail=c.indexOf('@')>-1;
   await sb.from('requests').insert([{
     name:n,

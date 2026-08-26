@@ -415,7 +415,7 @@ section[id]{scroll-margin-top:84px}
 
       <div style="display:flex;flex-direction:column;gap:16px;font-size:14px;line-height:1.7">
         <span style="font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:#8A7361">Studio</span>
-        <span style="color:#CBB49E">Tuesday to Saturday<br>9.00 – 18.00</span>
+        <span style="color:#CBB49E" id="footer-hours">Tuesday to Saturday<br>9.00 – 18.00</span>
         <span style="color:#CBB49E">North London, by appointment<br>Full address sent on booking</span>
         <div class="fnav" style="display:flex;flex-direction:column;gap:9px">
           <a href="tel:+442000000000">020 0000 0000</a>
@@ -834,7 +834,11 @@ $("again").onclick=function(){
   } catch(e){}
   try {
     var sh=await sb.from('studio_settings').select('value').eq('key','opening_hours').single();
-    if(sh.data && sh.data.value) OPENING_HOURS=sh.data.value;
+    if(sh.data && sh.data.value){
+      OPENING_HOURS=sh.data.value;
+      var fh=document.getElementById('footer-hours');
+      if(fh){ var t=OPENING_HOURS.tue||{open:'9.00',close:'18.00'}; fh.innerHTML='Tuesday to Saturday<br>'+t.open+' \u2013 '+t.close; }
+    }
   } catch(e){}
   if(BOOKABLE.length) S.treatment=BOOKABLE[0].name;
   renderTabs(); renderPanel(); renderPicker(); renderCalendar(); renderSlots(); checkKnown(); showStep();
