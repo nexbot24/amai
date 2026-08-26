@@ -823,9 +823,11 @@ async function loadMobileServices(){
   }
   /* load closed days */
   var cd=await sb.from('closed_days').select('date_key');
+  console.log('closed_days raw:', JSON.stringify(cd));
   if(cd.data){
     cd.data.forEach(function(r){ CLOSED_DAYS[r.date_key]=true; });
   }
+  console.log('CLOSED_DAYS map:', JSON.stringify(CLOSED_DAYS));
 }
 var KNOWN={"07700900123":"Nadia","07700900456":"Priya","07700900789":"Hannah"};
 var CLOSED_DAYS={};
@@ -838,8 +840,8 @@ function addD(n){ var d=d0(); d.setDate(d.getDate()+n); return d; }
 function key(d){ return d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate(); }
 function dayKeyToDate(k){ var p=k.split('-'); var d=new Date(+p[0],+p[1],+p[2]); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function parseK(k){ var p=k.split("-"); return new Date(+p[0],+p[1],+p[2]); }
-function isOpen(d){ if(d.getDay()===0||d.getDay()===1) return false; var k=key(d); return !CLOSED_DAYS[k]; }
-function free(d){ return (d.getDate()*7+d.getMonth()*3)%6!==0; }
+function isOpen(d){ if(d.getDay()===0||d.getDay()===1) return false; var k=key(d); if(CLOSED_DAYS[k]) console.log('BLOCKED closed day:',k); return !CLOSED_DAYS[k]; }
+function free(d){ return true; /* was fake mock logic */ }
 function longD(d){ return d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}); }
 function priceOf(n){ for(var i=0;i<BOOKABLE.length;i++) if(BOOKABLE[i].n===n) return BOOKABLE[i].p; return ""; }
 function priceNum(n){ return parseFloat(String(priceOf(n)).replace(/[^0-9.]/g,""))||0; }
