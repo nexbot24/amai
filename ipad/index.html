@@ -343,6 +343,14 @@ async function loadAll(){
       window._realtimeInited = true;
       sb.channel('inbox').on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_messages'},function(payload){
         if(payload.new.sender==='client'){
+          /* If the thread sheet is open for this conversation, push the message in */
+          if(openThread && openThread.id === payload.new.conversation_id){
+            if(!openThread.chat) openThread.chat = [];
+            openThread.chat.push({who:'client', at:new Date(payload.new.created_at).getTime(), body:payload.new.body});
+            refreshMsg(true);
+            /* Mark as read since we're looking at it */
+            sb.from('conversations').update({admin_unread:0}).eq('id', openThread.id);
+          }
           loadAll().then(render);
         }
       }).subscribe();
