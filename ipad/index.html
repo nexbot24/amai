@@ -302,7 +302,7 @@ async function loadAll(){
 
 /* closures carry a reason; older saves stored a bare true */
 function closedInfo(k){ var v=S.closed[k]; if(!v) return null; return typeof v==="object"?v:{why:""}; }
-function shutDay(k,why){ S.closed[k]={why:why||""}; sb.from('closed_days').upsert({date_key:k,reason:why||'Closed'}).then(function(){}); }
+function shutDay(k,why){ S.closed[k]={why:why||""}; sb.from('closed_days').upsert({date_key:k,reason:why||'Closed'},{onConflict:'date_key'}).then(function(r){ if(r.error) console.error('shutDay error',r.error); else console.log('shutDay OK',k); }); }
 function unread(){ return S.messages.filter(function(m){ return !m.read; }).length; }
 function inboxCount(){ return unread()+S.requests.length; }
 function monthOf(off){ var t=d0(); return new Date(t.getFullYear(),t.getMonth()+(off||0),1); }
