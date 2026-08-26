@@ -80,7 +80,44 @@ button{font-family:Mulish,sans-serif}
   .nav button{white-space:nowrap;padding:12px 16px}
   .main{padding:24px 20px 48px}
   .grid2,.grid3{grid-template-columns:1fr}
+  .chatbox{height:calc(100vh - 190px)}
+  .bub{max-width:82%}
+  .thread,.chathead,.sugg,.composer{padding-left:18px;padding-right:18px}
 }
+.nav .tally{margin-left:auto;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:#E8D5C4;color:#3A322E;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+
+/* chat */
+.chatbox{display:flex;flex-direction:column;height:calc(100vh - 230px);min-height:360px;background:#F7F1EA;border:1px solid #E0D2C2}
+.chathead{display:flex;align-items:center;gap:14px;padding:20px 28px;border-bottom:1px solid #E0D2C2;background:#EFE5D8}
+.chathead .ring{width:44px;height:44px;border-radius:50%;border:1px solid #C9B8A4;display:flex;align-items:center;justify-content:center;flex:none}
+.chathead .ring i{display:block;width:15px;height:20px;border:1.4px solid #3A322E;border-bottom:none;border-radius:999px 999px 0 0}
+.thread{flex:1;min-height:0;overflow-y:auto;padding:24px 28px 10px;display:flex;flex-direction:column;gap:3px}
+.dayline{display:flex;align-items:center;gap:14px;margin:16px 0 14px}
+.dayline span{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:#8A7361;flex:none}
+.dayline b{flex:1;height:1px;background:#E0D2C2}
+.bub{max-width:62%;padding:13px 18px;font-size:15px;line-height:1.6;text-wrap:pretty}
+.bub.them{align-self:flex-start;background:#EFE5D8;color:#241F1C;border-radius:2px 16px 16px 16px}
+.bub.mine{align-self:flex-end;background:#3A322E;color:#F7F1EA;border-radius:16px 2px 16px 16px}
+.bub.run.them{border-top-left-radius:16px}
+.bub.run.mine{border-top-right-radius:16px}
+.tstamp{font-size:11.5px;color:#8A7361;padding:4px 4px 12px}
+.tstamp.mine{align-self:flex-end}
+.tstamp.them{align-self:flex-start}
+.typing{align-self:flex-start;display:flex;gap:5px;padding:16px 18px;background:#EFE5D8;border-radius:2px 16px 16px 16px;margin-top:3px}
+.typing i{width:6px;height:6px;border-radius:50%;background:#8A7361;animation:blip 1.2s infinite}
+.typing i:nth-child(2){animation-delay:.18s}
+.typing i:nth-child(3){animation-delay:.36s}
+@keyframes blip{0%,60%,100%{opacity:.28;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+.sugg{display:flex;flex:none;gap:8px;flex-wrap:wrap;padding:0 28px 12px}
+.sugg button{min-height:38px;padding:0 16px;border-radius:19px 19px 0 0;background:transparent;border:1px solid #C9B8A4;color:#5C5148;font-size:14px;cursor:pointer;font-family:Mulish,sans-serif}
+.sugg button:hover{border-color:#3A322E;color:#241F1C}
+.composer{display:flex;flex:none;align-items:flex-end;gap:12px;padding:18px 28px;border-top:1px solid #E0D2C2;background:#EFE5D8}
+.composer textarea{flex:1;min-height:48px;max-height:120px;resize:none;background:#F7F1EA;border:1px solid #DED0C0;color:#241F1C;padding:14px 16px;outline:none;font-family:Mulish,sans-serif;font-size:15px;line-height:1.5}
+.composer textarea:focus{border-color:#8A7361}
+.composer textarea::placeholder{color:#8A7361}
+.send{min-height:48px;padding:0 26px;border:none;background:#3A322E;color:#F7F1EA;font-family:Marcellus,serif;font-size:15px;cursor:pointer;border-radius:24px 24px 0 0}
+.send:hover{background:#241F1C}
+.send:disabled{background:#DED0C0;color:#8A7361;cursor:default}
 </style>
   <link rel="icon" type="image/png" href="amai-favicon-512.png">
 </head>
@@ -141,7 +178,7 @@ button{font-family:Mulish,sans-serif}
     </div>
     <div class="foot" style="padding:0 26px">
       <div style="border-top:1px solid rgba(232,213,196,.18);padding-top:20px;display:flex;flex-direction:column;gap:12px">
-        <a href="contact.html" style="font-size:13.5px;color:#B39C88">Need a person?</a>
+        <button data-go="inbox" style="background:none;border:none;cursor:pointer;color:#B39C88;font-size:13.5px;padding:0;text-align:left">Need a person?</button>
         <button id="signout" style="background:none;border:none;cursor:pointer;color:#B39C88;font-size:13.5px;padding:0;text-align:left">Sign out</button>
       </div>
     </div>
@@ -196,7 +233,7 @@ function parseKey(k){ var p=k.split("-"); return new Date(+p[0],+p[1],+p[2]); }
 function money(n){ return "£"+n; }
 
 var DEFAULTS={
-  signedIn:false, name:"Nadia",  email:"nadia@example.com", since:"January 2026",
+  signedIn:false, name:"Nadia", phone:"07700 900123", email:"nadia@example.com", since:"January 2026",
   view:"home", stamps:4, plan:null, notes:"Sensitive skin on legs — patch test done Feb 2026.",
   prefs:{room:"Warm, low light",music:"Quiet",chat:"Happy to chat"},
   notify:{reminder:true,aftercare:true,openings:false,news:false},
@@ -249,7 +286,7 @@ $("signout").onclick=async function(){ await sb.auth.signOut(); S.signedIn=false
 
 /* ---------- shell ---------- */
 var VIEWS=[
-  ["home","Overview"],["bookings","Your bookings"],["book","Book a visit"],
+  ["home","Overview"],["bookings","Your bookings"],["book","Book a visit"],["inbox","Messages"],
   ["loyalty","Stamps & rewards"],["plan","Subscription"],["care","Aftercare"],
   ["refer","Refer a friend"],["account","Account"]
 ];
@@ -257,7 +294,9 @@ function nav(){
   var n=$("nav"); n.innerHTML="";
   VIEWS.forEach(function(v){
     var b=document.createElement("button");
-    b.textContent=v[1]; b.className=(S.view===v[0]?"on":"");
+    b.className=(S.view===v[0]?"on":"");
+    var cnt=v[0]==="inbox"?unreadChat():0;
+    b.innerHTML='<span>'+v[1]+'</span>'+(cnt?'<span class="tally">'+cnt+'</span>':"");
     b.onclick=function(){ S.view=v[0]; save(); render(); };
     n.appendChild(b);
   });
@@ -294,11 +333,81 @@ async function boot(){
       }
     }catch(e){ console.warn('hub booking load',e); }
   }
+
+  /* Chat Supabase Setup */
+  S.chat = S.chat || [];
+  if(S.phone) {
+    try {
+      var convRes = await sb.from('conversations').select('*').eq('client_phone', S.phone);
+      if(convRes.data && convRes.data.length > 0) {
+        var conv = convRes.data[0];
+        S.conversation_id = conv.id;
+        S.client_unread = conv.client_unread || 0;
+        var msgRes = await sb.from('chat_messages').select('*').eq('conversation_id', conv.id).order('created_at', {ascending: true});
+        if(msgRes.data) {
+          S.chat = msgRes.data.map(m => ({
+            id: m.id,
+            who: m.sender === 'client' ? 'me' : 'them',
+            at: new Date(m.created_at).getTime(),
+            body: m.body,
+            seen: m.seen
+          }));
+        }
+      }
+      
+      sb.channel('public:chat_messages')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages' }, payload => {
+          var m = payload.new;
+          if (S.conversation_id && m.conversation_id === S.conversation_id && m.sender === 'studio') {
+            S.chat.push({id: m.id, who: "them", at: new Date(m.created_at).getTime(), body: m.body, seen: m.seen});
+            if (S.view === "inbox") {
+               sb.from('chat_messages').update({seen: true}).eq('id', m.id).then();
+            }
+            save();
+            if (S.view === "inbox") { refreshThread(true); } else { render(); }
+          }
+        })
+        .subscribe();
+        
+      sb.channel('public:conversations')
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'conversations' }, payload => {
+          var c = payload.new;
+          if (c.client_phone === S.phone) {
+            S.client_unread = c.client_unread || 0;
+            save();
+            render();
+          }
+        })
+        .subscribe();
+        
+    } catch(e) { console.warn('chat load', e); }
+  }
+  
   render();
 }
-function render(){ if(typeof VIEW[S.view]!=="function") S.view="home"; nav(); $("view").innerHTML=VIEW[S.view](); wire(); window.scrollTo(0,0); }
+function render(){ 
+  if(typeof VIEW[S.view]!=="function") S.view="home"; 
+  if(S.view==="inbox" && S.client_unread > 0 && S.conversation_id) {
+    sb.from('conversations').update({client_unread: 0}).eq('id', S.conversation_id).then();
+    S.client_unread = 0;
+  }
+  nav(); $("view").innerHTML=VIEW[S.view](); wire(); window.scrollTo(0,0); 
+  if(S.view==="inbox") refreshThread(true);
+}
 
 /* ---------- helpers ---------- */
+function agoDays(n,h,m){ var d=new Date(); d.setDate(d.getDate()-n); d.setHours(h,m,0,0); return d.getTime(); }
+function agoHours(n){ return Date.now()-n*3600000; }
+function clock(ts){ return new Date(ts).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}); }
+function dayStamp(ts){
+  var d=new Date(ts); d.setHours(0,0,0,0);
+  var diff=Math.round((addDays(0)-d)/86400000);
+  if(diff===0) return "Today";
+  if(diff===1) return "Yesterday";
+  if(diff<7) return new Date(ts).toLocaleDateString("en-GB",{weekday:"long"});
+  return new Date(ts).toLocaleDateString("en-GB",{day:"numeric",month:"long"});
+}
+function unreadChat(){ return S.client_unread || 0; }
 function nextBooking(){
   if(!S.upcoming.length) return null;
   return S.upcoming.slice().sort(function(a,b){ return parseKey(a.dateKey)-parseKey(b.dateKey); })[0];
@@ -568,7 +677,7 @@ VIEW.account=function(){
       '<div class="lbl" style="margin-bottom:18px">Your details</div>'+
       '<div style="display:flex;flex-direction:column;gap:16px">'+
         '<label class="flab">Name<input class="field" id="f-name" value="'+S.name+'"></label>'+
-        '<label class="flab">Email<input class="field" id="f-email" value="'+S.email+'"></label>'+
+        '<label class="flab">Mobile<input class="field" id="f-phone" value="'+S.phone+'"></label>'+
         '<label class="flab">Email<input class="field" id="f-email" value="'+S.email+'"></label>'+
         '<label class="flab">Notes for your practitioner<textarea class="field" id="f-notes" rows="3" style="resize:vertical">'+S.notes+'</textarea></label>'+
         '<div style="display:flex;gap:12px;align-items:center"><button class="btn btn-sm" id="savedetails">Save changes</button>'+
@@ -602,6 +711,107 @@ VIEW.account=function(){
     '</div>'+
   '</div>';
 };
+
+var chatDraft="", typing=false;
+VIEW.inbox=function(){
+  return head("Messages","Talk to the practitioner who treats you. No call centre, no ticket number.","")+
+  '<div class="chatbox">'+
+    '<div class="chathead">'+
+      '<span class="ring"><i></i></span>'+
+      '<span style="flex:1;min-width:0">'+
+        '<span class="serif" style="display:block;font-size:20px;line-height:1.3">Amai Studio</span>'+
+        '<span id="c-status" style="font-size:13px;color:#6E5B49">Replies within the hour</span></span>'+
+      '<a class="btn btn-o btn-sm" href="tel:+442000000000">Call instead</a>'+
+    '</div>'+
+    '<div class="thread" id="thread"></div>'+
+    '<div class="sugg" id="sugg"></div>'+
+    '<div class="composer">'+
+      '<textarea id="c-in" rows="1" placeholder="Message the studio">'+chatDraft.replace(/</g,"&lt;")+'</textarea>'+
+      '<button class="send" id="c-send" disabled>Send</button>'+
+    '</div>'+
+  '</div>';
+};
+function refreshThread(stick){
+  var t=$("thread"); if(!t) return;
+  var atBottom = stick || (t.scrollHeight-t.scrollTop-t.clientHeight)<90;
+  var last="", out="";
+  (S.chat||[]).forEach(function(m,i){
+    var day=dayStamp(m.at);
+    if(day!==last){ out+='<div class="dayline"><b></b><span>'+day+'</span><b></b></div>'; last=day; }
+    var prev=S.chat[i-1], next=S.chat[i+1];
+    var run = prev && prev.who===m.who && dayStamp(prev.at)===day && (m.at-prev.at)<600000;
+    var lastOfRun = !(next && next.who===m.who && dayStamp(next.at)===day && (next.at-m.at)<600000);
+    out+='<div class="bub '+(m.who==="me"?"mine":"them")+(run?" run":"")+'">'+m.body+'</div>';
+    if(lastOfRun) out+='<div class="tstamp '+(m.who==="me"?"mine":"them")+'">'+clock(m.at)+
+      (m.who==="me"?' · '+(m.seen?"Read":"Sent"):'')+'</div>';
+  });
+  if(typing) out+='<div class="typing"><i></i><i></i><i></i></div>';
+  t.innerHTML=out;
+  if($("c-status")) $("c-status").textContent = typing? "Typing…" : "Replies within the hour";
+  refreshSugg();
+  if(atBottom) t.scrollTop=t.scrollHeight;
+}
+function refreshSugg(){
+  var box=$("sugg"); if(!box) return;
+  var lastMine=(S.chat||[]).length&&(S.chat||[])[S.chat.length-1].who==="me";
+  var opts=[];
+  if(!lastMine){
+    if(nextBooking()) opts.push("Could I move my appointment?");
+    opts.push("What should I do beforehand?");
+    if(!nextBooking()) opts.push("Do you have anything this week?");
+    opts.push("Thank you!");
+  }
+  box.style.display=opts.length?"flex":"none";
+  box.innerHTML=opts.map(function(o){ return '<button data-quick="'+o.replace(/"/g,"&quot;")+'">'+o+'</button>'; }).join("");
+  [].forEach.call(box.querySelectorAll("[data-quick]"),function(b){
+    b.onclick=function(){ sendMsg(b.dataset.quick); };
+  });
+}
+async function sendMsg(text){
+  var body=(text||"").trim(); if(!body) return;
+  var tempId = Date.now();
+  S.chat = S.chat || [];
+  S.chat.push({id:tempId,who:"me",at:Date.now(),body:body});
+  chatDraft="";
+  var ta=$("c-in"); if(ta){ ta.value=""; ta.style.height="auto"; }
+  if($("c-send")) $("c-send").disabled=true;
+  save(); refreshThread(true);
+  
+  if (!S.conversation_id) {
+    let { data: newConv } = await sb.from('conversations').insert([{
+      client_phone: S.phone,
+      client_name: S.name,
+      last_message_at: new Date().toISOString(),
+      last_message_preview: body,
+      last_sender: 'client',
+      admin_unread: 1,
+      client_unread: 0
+    }]).select().single();
+    if(newConv) {
+      S.conversation_id = newConv.id;
+    }
+  } else {
+    await sb.from('conversations').update({
+      last_message_at: new Date().toISOString(),
+      last_message_preview: body,
+      last_sender: 'client'
+    }).eq('id', S.conversation_id);
+    
+    let { data: c } = await sb.from('conversations').select('admin_unread').eq('id', S.conversation_id).single();
+    if (c) {
+      await sb.from('conversations').update({ admin_unread: (c.admin_unread || 0) + 1 }).eq('id', S.conversation_id);
+    }
+  }
+  
+  if (S.conversation_id) {
+    await sb.from('chat_messages').insert([{
+      conversation_id: S.conversation_id,
+      sender: 'client',
+      body: body,
+      seen: false
+    }]);
+  }
+}
 
 /* ---------- modals ---------- */
 function closeModal(){ $("modal-host").innerHTML=""; }
@@ -812,6 +1022,15 @@ function toast(msg){
 
 /* ---------- wiring ---------- */
 function wire(){
+  var ta=$("c-in");
+  if(ta){
+    var grow=function(){ ta.style.height="auto"; ta.style.height=Math.min(120,ta.scrollHeight)+"px"; };
+    grow();
+    if($("c-send")) $("c-send").disabled=!ta.value.trim();
+    ta.oninput=function(){ chatDraft=this.value; grow(); $("c-send").disabled=!this.value.trim(); };
+    ta.onkeydown=function(e){ if(e.key==="Enter"&&!e.shiftKey&&this.value.trim()){ e.preventDefault(); sendMsg(this.value); } };
+    if($("c-send")) $("c-send").onclick=function(){ sendMsg(ta.value); };
+  }
   [].forEach.call(document.querySelectorAll("[data-go]"),function(b){
     b.onclick=function(){ S.view=b.dataset.go; save(); render(); };
   });
@@ -887,7 +1106,7 @@ function wire(){
     b.onclick=function(){ var k=b.dataset.toggle; S.notify[k]=!S.notify[k]; b.setAttribute("aria-checked",String(S.notify[k])); save(); };
   });
   if($("savedetails")) $("savedetails").onclick=function(){
-    S.name=$("f-name").value.trim()||S.name; S.phone=$("f-email").value.trim();
+    S.name=$("f-name").value.trim()||S.name; S.phone=($("f-phone")?$("f-phone").value.trim():S.phone);
     S.email=$("f-email").value.trim(); S.notes=$("f-notes").value.trim();
     save(); $("saved").textContent="Saved."; setTimeout(function(){ if($("saved")) $("saved").textContent=""; },2200);
   };
