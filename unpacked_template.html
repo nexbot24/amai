@@ -1099,9 +1099,14 @@ $("again").onclick=function(){
 /* docked CTA once the hero has passed, hidden over the form */
 (function(){
   var dock=$("dock"), book=$("book");
+  if(!dock||!book) return;
   addEventListener("scroll",function(){
-    var y=scrollY, top=book.offsetTop-innerHeight*0.9;
-    dock.className = (y>innerHeight*0.75 && y<top) ? "dock up" : "dock";
+    var y=scrollY;
+    var bookTop=book.offsetTop;
+    var bookBot=bookTop+book.offsetHeight;
+    var pastHero = y > innerHeight*0.5;
+    var inOrPastForm = (y + innerHeight) > (bookTop + 100);
+    dock.className = (pastHero && !inOrPastForm) ? "dock up" : "dock";
   },{passive:true});
 })();
 
