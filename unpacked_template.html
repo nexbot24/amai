@@ -370,6 +370,16 @@ button,input,textarea,select{font-family:inherit;font-size:16px}
 
 .view{display:none}
 .view.on{display:block;animation:fade .38s ease both}
+/* iPad / tablet - expand layout to fill wider screens */
+@media (min-width:768px){
+  .app{max-width:100%;margin:0}
+  .tabin{max-width:100%}
+  .dockin{max-width:100%}
+  .hero .copy{max-width:680px}
+  .pad{padding:0 40px}
+  .sec{padding:44px 40px}
+  .rail>*{flex:0 0 44%}
+}
 </style>
 </head>
 <body>
