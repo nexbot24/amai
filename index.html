@@ -574,8 +574,14 @@ function calcSlots(d) {
   var end = dotTimeToMins(hrs.close);
   var step = 15;
   
+  /* If booking for today, skip any slots that have already passed */
+  var now = new Date();
+  var isToday = d.getFullYear()===now.getFullYear() && d.getMonth()===now.getMonth() && d.getDate()===now.getDate();
+  var nowMins = isToday ? now.getHours()*60+now.getMinutes() : 0;
+  
   var slots = [];
   for (var t = start; t + dur <= end; t += step) {
+    if (isToday && t <= nowMins) continue;
     var t_end = t + dur;
     var overlap = false;
     for (var i=0; i<dayBookings.length; i++) {

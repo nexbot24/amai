@@ -213,7 +213,7 @@ var AFTER={
 function d0(){ var d=new Date(); d.setHours(0,0,0,0); return d; }
 function key(d){ return d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate(); }
 function dayKeyToDate(k){ var p=k.split('-'); var d=new Date(+p[0],+p[1],+p[2]); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
-function dateToDayKey(ds){ var d=new Date(ds+'T00:00:00'); return d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate(); }
+function dateToDayKey(ds){ var d=new Date(String(ds).split('T')[0]+'T00:00:00'); return d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate(); }
 function parseK(k){ var p=String(k).split("-"); return new Date(+p[0],+p[1],+p[2]); }
 function isOpen(d){ return d.getDay()!==0&&d.getDay()!==1; }
 function freeDay(d){ return (d.getDate()*7+d.getMonth()*3)%6!==0; }

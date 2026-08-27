@@ -223,7 +223,7 @@ function save(){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
 
 function iso(d){ return d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate(); }
 function dayKeyToDate(k){ var p=k.split('-'); var d=new Date(+p[0],+p[1],+p[2]); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
-function dateToDayKey(ds){ var d=new Date(ds+'T00:00:00'); return d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate(); }
+function dateToDayKey(ds){ var d=new Date(String(ds).split('T')[0]+'T00:00:00'); return d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate(); }
 function addDays(n){ var d=new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()+n); return d; }
 function openDay(n){ var d=addDays(n); while(d.getDay()===0||d.getDay()===1){ d.setDate(d.getDate()+1); } return d; }
 function pastDay(n){ var d=addDays(n); while(d.getDay()===0||d.getDay()===1){ d.setDate(d.getDate()-1); } return d; }

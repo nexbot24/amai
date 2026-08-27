@@ -256,7 +256,8 @@ function dayKeyToDate(k){
   return p[0]+"-"+(m<10?"0":"")+m+"-"+(d<10?"0":"")+d;
 }
 function dateToDayKey(ds){
-  var p=String(ds).split("-");
+  var s=String(ds).split('T')[0];
+  var p=s.split("-");
   return p[0]+"-"+(+p[1]-1)+"-"+(+p[2]);
 }
 async function loadAll(){
@@ -324,6 +325,12 @@ async function loadAll(){
           loadAll().then(render);
         }
       }).subscribe();
+      /* Listen for new bookings so they appear in the diary immediately */
+      sb.channel('diary').on('postgres_changes',{event:'*',schema:'public',table:'bookings'},function(){
+        loadAll().then(render);
+      }).on('postgres_changes',{event:'*',schema:'public',table:'clients'},function(){
+        loadAll().then(render);
+      }).subscribe();
       /* Reload conversations when iPad wakes / app returns to foreground */
       document.addEventListener('visibilitychange', function(){
         if(!document.hidden) loadAll().then(render);
@@ -352,7 +359,7 @@ function upcomingClosures(){
 }
 
 /* ---------- helpers ---------- */
-function client(id){ return S.clients.filter(function(c){ return String(c.id)===String(id); })[0]; }
+function client(id){ return S.clients.filter(function(c){ return String(c.id)===String(id); })[0] || {id:id,name:'Unknown',phone:'',since:'',stamps:0,plan:null,notes:'',visits:0,spend:0,email:''}; }
 function dayAppts(k){ return S.appts.filter(function(a){ return a.day===k; }).sort(function(a,b){ return parseFloat(a.t)-parseFloat(b.t); }); }
 function promoOf(code){ if(!code) return null; return S.promos.filter(function(p){ return p.code===code; })[0]||null; }
 function bill(a){
@@ -705,8 +712,8 @@ function aside(){
       '<div style="font-size:12.5px;color:#6E5B49;margin-top:3px">'+S.clients.filter(function(c){ return c.plan; }).length+' on a subscription</div></div>'+
       '<div class="card"><div class="lbl" style="margin-bottom:6px">Rewards due</div><div class="serif" style="font-size:22px">'+due.length+'</div>'+
       '<div style="font-size:12.5px;color:#6E5B49;margin-top:3px">'+(due.length?due.map(function(c){ return c.name.split(" ")[0]; }).join(", "):"None this month")+'</div></div>'+
-      '<div class="card"><div class="lbl" style="margin-bottom:6px">Most loyal</div><div class="serif" style="font-size:18px;line-height:1.25">'+busiest.name+'</div>'+
-      '<div style="font-size:12.5px;color:#6E5B49;margin-top:3px">'+busiest.visits+' visits · '+money(busiest.spend)+'</div></div></div>';
+      '<div class="card"><div class="lbl" style="margin-bottom:6px">Most loyal</div><div class="serif" style="font-size:18px;line-height:1.25">'+(busiest?busiest.name:"—")+'</div>'+
+      '<div style="font-size:12.5px;color:#6E5B49;margin-top:3px">'+(busiest?busiest.visits+' visits · '+money(busiest.spend):"No clients yet")+'</div></div></div>';
   }
   var list=dayAppts(S.dayKey), next=list.filter(function(a){ return a.st!=="done"; })[0];
   return '<div style="padding-top:18px">'+
