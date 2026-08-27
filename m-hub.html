@@ -895,11 +895,18 @@ function buildChat(){
   loadConversation();
 }
 async function loadConversation() {
-  if (!S.phone) return;
-  var {data} = await sb.from('conversations').select('id, client_unread').eq('client_phone', S.phone).maybeSingle();
+  if (!S.clientId && !S.phone) return;
+  var data = null;
+  if(S.clientId) { var r1 = await sb.from('conversations').select('id, client_unread').eq('client_id', S.clientId).maybeSingle(); data = r1.data; }
+  if(!data && S.phone) { var r2 = await sb.from('conversations').select('id, client_unread').eq('client_phone', S.phone).maybeSingle(); data = r2.data; }
   if (data) {
     convId = data.id;
     chatUnreadCount = data.client_unread || 0;
+    /* Backfill missing fields */
+    var patch = {};
+    if(S.clientId) patch.client_id = S.clientId;
+    if(S.phone && !data.client_phone) patch.client_phone = S.phone;
+    if(Object.keys(patch).length) sb.from('conversations').update(patch).eq('id', convId).then(function(){});
     
     var {data: msgs} = await sb.from('chat_messages').select('*').eq('conversation_id', convId).order('created_at', {ascending: true});
     if (msgs) {
@@ -978,7 +985,7 @@ async function sendMsg(text){
     var {data, error} = await sb.from('conversations').insert({
       client_phone: S.phone,
       client_name: S.name || '',
-      client_id: null,
+      client_id: S.clientId || null,
       last_message_at: new Date().toISOString(),
       last_message_preview: body,
       last_sender: 'client',

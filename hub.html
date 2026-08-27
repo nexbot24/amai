@@ -330,13 +330,26 @@ async function boot(){
 
   /* Chat Supabase Setup */
   S.chat = S.chat || [];
-  if(S.phone) {
+  if(S.clientId || S.phone) {
     try {
-      var convRes = await sb.from('conversations').select('*').eq('client_phone', S.phone);
-      if(convRes.data && convRes.data.length > 0) {
-        var conv = convRes.data[0];
+      /* Look up by client_id first, then by phone */
+      var conv = null;
+      if(S.clientId) {
+        var r1 = await sb.from('conversations').select('*').eq('client_id', S.clientId);
+        if(r1.data && r1.data.length > 0) conv = r1.data[0];
+      }
+      if(!conv && S.phone) {
+        var r2 = await sb.from('conversations').select('*').eq('client_phone', S.phone);
+        if(r2.data && r2.data.length > 0) conv = r2.data[0];
+      }
+      if(conv) {
         S.conversation_id = conv.id;
         S.client_unread = conv.client_unread || 0;
+        /* Backfill client_id/phone if missing */
+        var patch = {};
+        if(!conv.client_id && S.clientId) patch.client_id = S.clientId;
+        if(!conv.client_phone && S.phone) patch.client_phone = S.phone;
+        if(Object.keys(patch).length) sb.from('conversations').update(patch).eq('id', conv.id).then();
         var msgRes = await sb.from('chat_messages').select('*').eq('conversation_id', conv.id).order('created_at', {ascending: true});
         if(msgRes.data) {
           S.chat = msgRes.data.map(m => ({
@@ -773,6 +786,7 @@ async function sendMsg(text){
   
   if (!S.conversation_id) {
     let { data: newConv } = await sb.from('conversations').insert([{
+      client_id: S.clientId || null,
       client_phone: S.phone,
       client_name: S.name,
       last_message_at: new Date().toISOString(),
