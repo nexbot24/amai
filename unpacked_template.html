@@ -478,23 +478,23 @@ button,input,textarea,select{font-family:inherit;font-size:16px}
       </div>
 
       <div id="s3" class="hide">
-        <h3 class="serif" style="font-size:23px;margin:0 0 6px">Your number, and you're in.</h3>
-        <p style="font-size:14.5px;line-height:1.65;color:#CBB49E;margin:0 0 18px">It confirms the appointment and doubles as your sign-in. No password to invent.</p>
-        <label class="flab" style="margin-bottom:14px">Mobile number<input id="f-tel" class="field" inputmode="tel" placeholder="07700 900123"></label>
+        <h3 class="serif" style="font-size:23px;margin:0 0 6px">Your details, and you're in.</h3>
+        <p style="font-size:14.5px;line-height:1.65;color:#CBB49E;margin:0 0 18px">We use your email to confirm the appointment — and it doubles as your sign-in. No password to invent.</p>
+        <label class="flab" style="margin-bottom:14px">Email address<input id="f-email" type="email" class="field" autocomplete="email" placeholder="hello@example.com"></label>
         <label class="flab" style="margin-bottom:14px">First name<input id="f-name" class="field" placeholder="Your name"></label>
-        <label class="flab" style="margin-bottom:14px">Email address (optional)<input id="f-email" type="email" class="field" placeholder="you@example.com"></label>
-        <label class="flab" style="margin-bottom:14px">Notes for your therapist (optional)<textarea id="f-notes" class="field" rows="2" style="resize:vertical;min-height:60px"></textarea></label>
+        <label class="flab" style="margin-bottom:14px">Phone<input id="f-tel" class="field" type="tel" inputmode="tel" autocomplete="tel" placeholder="07..."></label>
         <div id="known" class="hide" style="display:flex;align-items:center;gap:12px;background:#443B36;padding:14px 16px;margin-bottom:14px">
           <span style="width:8px;height:8px;border-radius:50%;background:#E8D5C4;flex:none"></span>
           <span id="known-copy" style="font-size:14px;line-height:1.6"></span>
         </div>
+        <label class="flab" style="margin-bottom:14px">Anything we should know <span style="text-transform:none;letter-spacing:normal">(optional)</span><textarea id="f-notes" class="field" rows="2" style="resize:vertical;min-height:60px" placeholder="Sensitive skin, first wax, timings..."></textarea></label>
         <label style="display:flex;align-items:flex-start;gap:13px;border:1px solid rgba(232,213,196,.3);padding:18px;margin-bottom:6px">
           <input id="f-acct" type="checkbox" checked="" style="margin-top:2px;accent-color:#E8D5C4;width:18px;height:18px;flex:none">
           <span>
             <span id="acct-head" class="serif" style="font-size:17px;display:block;margin-bottom:6px">Keep this as my AMAI account</span>
             <span style="display:flex;flex-direction:column;gap:5px;font-size:13.5px;line-height:1.6;color:#CBB49E">
               <span>Move or cancel yourself, any time</span>
-              <span>Loyalty card starts today — 5 stamps is 25% off, 10 is free</span>
+              <span>Loyalty card starts today - 5 stamps is 25% off, 10 is free</span>
               <span>Booking again takes two taps</span>
             </span>
           </span>
@@ -967,25 +967,42 @@ function renderSlots(){
     box.appendChild(b);
   });
 }
-function checkKnown(){
-  var tel=dig($("f-tel").value);
-  if(tel.length<10){ $("known").className="hide"; return; }
-  (async function(){
-    if(!sb) return;
-    var r=await sb.from('clients').select('id,name,stamps').eq('phone',tel).maybeSingle();
-    if(r&&r.data){
-      B.returning=true;
-      $("known").className="";
-      $("known-copy").innerHTML='Welcome back, <strong style="font-weight:600">'+r.data.name+'</strong>. Your stamps and history are waiting.';
-      if(!$("f-name").value.trim()) $("f-name").value=r.data.name;
-      $("acct-head").textContent="Add this visit to my account";
-    } else { B.returning=false; $("known").className="hide"; $("acct-head").textContent="Keep this as my AMAI account"; }
-  })();
+async function checkKnown(){
+  var emailEl=$("f-email");
+  if(!emailEl) return;
+  var email=emailEl.value.trim().toLowerCase();
+  if(!email||email.indexOf('@')===-1){
+    $("known").className="hide";
+    if($("f-name")) $("f-name").closest("label").style.display="";
+    if($("f-tel")) $("f-tel").closest("label").style.display="";
+    $("acct-head").textContent="Keep this as my AMAI account";
+    return;
+  }
+  if(!sb) return;
+  var r=await sb.from('clients').select('*').eq('email',email).maybeSingle();
+  B.returning=!!(r&&r.data);
+  if(r&&r.data){
+    $("known").className="";
+    $("known-copy").innerHTML='Welcome back, <strong style="font-weight:600">'+r.data.name+'</strong>. We\'ve found your account \u2014 your stamps and history are waiting.';
+    if($("f-name")){ $("f-name").value=r.data.name; $("f-name").closest("label").style.display="none"; }
+    if($("f-tel")&&r.data.phone){ $("f-tel").value=r.data.phone; $("f-tel").closest("label").style.display="none"; }
+    $("acct-head").textContent="Add this visit to my account";
+  } else {
+    $("known").className="hide";
+    if($("f-name")) $("f-name").closest("label").style.display="";
+    if($("f-tel")) $("f-tel").closest("label").style.display="";
+    $("acct-head").textContent="Keep this as my AMAI account";
+  }
 }
 function ready(){
   if(B.step===1) return !!B.treat;
   if(B.step===2) return !!(B.dayKey&&B.time);
-  if(B.step===3) return dig($("f-tel").value).length>=10 && !!$("f-name").value.trim();
+  if(B.step===3){
+    var em=$("f-email");
+    var nm=$("f-name");
+    if(em&&nm) return em.value.indexOf('@')>-1 && em.value.indexOf('.')>-1 && !!nm.value.trim();
+    return true;
+  }
   return dig($("c-num").value).length>=15 && dig($("c-exp").value).length>=4 && dig($("c-cvc").value).length>=3;
 }
 function sync(){
@@ -1061,17 +1078,18 @@ async function finish(acct){
   $("navrow").className="hide"; $("help").textContent=""; $("done").className="";
   if(sb){
     try{
-      var phone=dig($("f-tel").value), name=$("f-name").value.trim();
+      var phone=$("f-tel")?$("f-tel").value.trim():"";
+      var name=$("f-name").value.trim();
       var email=$("f-email")?$("f-email").value.trim():"";
       var notes=$("f-notes")?$("f-notes").value.trim():"";
-      var r=await sb.from('clients').select('id').eq('phone',phone);
+      var r=await sb.from('clients').select('id,phone').eq('email',email);
       var clientId;
       if(r.data&&r.data.length>0){
         clientId=r.data[0].id;
-        if(email) await sb.from('clients').update({email:email}).eq('id',clientId);
+        if(phone&&r.data[0].phone!==phone) await sb.from('clients').update({phone:phone}).eq('id',clientId);
       }
       else {
-        var ins=await sb.from('clients').insert([{name:name,phone:phone,email:email||null,stamps:0}]).select().single();
+        var ins=await sb.from('clients').insert([{name:name,phone:phone||null,email:email,stamps:0}]).select().single();
         if(ins.data) clientId=ins.data.id;
       }
       if(clientId){
@@ -1091,8 +1109,10 @@ async function finish(acct){
 $("q").oninput=function(){ B.q=this.value; renderPicker(); };
 $("cal-prev").onclick=function(){ hop(-1); };
 $("cal-next").onclick=function(){ hop(1); };
-$("f-tel").oninput=function(){ checkKnown(); sync(); };
+$("f-email").oninput=function(){ sync(); };
+$("f-email").onblur=function(){ checkKnown(); sync(); };
 $("f-name").oninput=sync;
+$("f-tel").oninput=sync;
 $("f-acct").onchange=sync;
 ["c-num","c-exp","c-cvc"].forEach(function(id){ $(id).oninput=sync; });
 $("next").onclick=function(){ if(!ready())return; if(B.step<4){ B.step++; show(); window.scrollTo({top:$("book").offsetTop-40,behavior:"smooth"}); } else confirmPay("card"); };
@@ -1103,7 +1123,9 @@ $("v-go").onclick=function(){ if(dig($("v-code").value).length!==6)return; saveH
 $("v-skip").onclick=function(){ finish(false); };
 $("again").onclick=function(){
   B={step:1,treat:(BOOKABLE.length?BOOKABLE[0].n:""),dayKey:"",time:"",q:"",how:"",returning:false};
-  ["f-tel","f-name","c-num","c-exp","c-cvc","q","v-code"].forEach(function(id){ $(id).value=""; });
+  ["f-email","f-tel","f-name","f-notes","c-num","c-exp","c-cvc","q","v-code"].forEach(function(id){ if($(id)) $(id).value=""; });
+  if($("f-name")) $("f-name").closest("label").style.display="";
+  if($("f-tel")) $("f-tel").closest("label").style.display="";
   $("f-acct").checked=true; checkKnown();
   $("done").className="hide"; $("navrow").className="";
   renderPicker(); renderDays(); renderSlots(); show();
@@ -1145,20 +1167,21 @@ var G=[
    items:[["Facials & skin consultation","60 min","Autumn 2026"],["Body treatments","60–90 min","In preparation"],["Aftercare products","—","In preparation"]]}
 ];
 /* populate Waxing & Intimate from DB */
-if(window.sb){
-  (async function(){
-    var r=await sb.from('services').select('*').eq('available',true).order('sort_order');
-    if(r.data){
-      G[0].items=[]; G[1].items=[];
-      r.data.forEach(function(s){
-        var row=[s.name,s.duration_minutes+' min','\u00a3'+Number(s.price)];
-        if(s.category==='Waxing') G[0].items.push(row);
-        else if(s.category==='Intimate Care') G[1].items.push(row);
-      });
-      seg(); panel();
-    }
-  })();
-}
+(async function(){
+  /* wait for sb to be ready (loaded by the home IIFE) */
+  for(var tries=0;tries<40&&!window.sb;tries++) await new Promise(function(r){setTimeout(r,250);});
+  if(!window.sb) return;
+  var r=await sb.from('services').select('*').eq('available',true).order('sort_order');
+  if(r.data){
+    G[0].items=[]; G[1].items=[];
+    r.data.forEach(function(s){
+      var row=[s.name,s.duration_minutes+' min','\u00a3'+Number(s.price)];
+      if(s.category==='Waxing') G[0].items.push(row);
+      else if(s.category==='Intimate Care') G[1].items.push(row);
+    });
+    seg(); panel();
+  }
+})();
 var cur=0;
 function seg(){
   var box=$("seg"); box.innerHTML="";
