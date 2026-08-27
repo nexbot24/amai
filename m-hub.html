@@ -127,6 +127,7 @@ a{color:#E8D5C4;text-decoration:none}
 .grab{width:40px;height:4px;border-radius:2px;background:rgba(232,213,196,.28);margin:0 auto 16px}
 .toast{position:fixed;left:50%;bottom:calc(82px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:50;background:#E8D5C4;color:#3A322E;padding:13px 20px;font-size:14px;line-height:1.5;max-width:86%;text-align:center;animation:rise .24s ease both}
 </style>
+<script src="push-register.js"></script>
 </head>
 <body>
 <div class="app" id="root">
@@ -511,6 +512,9 @@ V.account=function(){
 
     '<div class="sec"><div class="lbl" style="margin-bottom:12px">Notifications</div>'+
       '<div class="card">'+
+        '<div class="row"><span style="min-width:0"><span style="display:block;margin-bottom:3px">Push notifications</span>'+
+          '<span style="font-size:12.5px;color:#B39C88">Alerts on your phone for bookings</span></span>'+
+          '<button class="btn btn-sm" id="enable-push" style="flex:none;padding:8px 16px;font-size:13px">Enable</button></div>'+
         [["reminder","Appointment reminders","A text the day before"],
          ["aftercare","Aftercare notes","Sent after each visit"],
          ["openings","Last-minute openings","Only for your usual treatment"],
@@ -731,6 +735,32 @@ function wire(scope){
   q("[data-plan]").forEach(function(b){ b.onclick=function(){ draft={}; planSheet(); }; });
   q("[data-plantreat]").forEach(function(b){ b.onclick=function(){ draft.plan.treat=b.dataset.plantreat; planSheet(); }; });
   q("[data-planweeks]").forEach(function(b){ b.onclick=function(){ draft.plan.weeks=+b.dataset.planweeks; planSheet(); }; });
+  /* Push notification enable button */
+  if(q("#enable-push")[0]){
+    var pushBtn=q("#enable-push")[0];
+    if('serviceWorker' in navigator && 'PushManager' in window){
+      navigator.serviceWorker.ready.then(function(reg){
+        reg.pushManager.getSubscription().then(function(sub){
+          if(sub){ pushBtn.textContent="Enabled ✓"; pushBtn.disabled=true; pushBtn.style.opacity=".5"; }
+        });
+      }).catch(function(){});
+    }
+    pushBtn.onclick=async function(){
+      pushBtn.textContent="Enabling…"; pushBtn.disabled=true;
+      var ok=await registerPush('client', S.id||null);
+      pushBtn.textContent=ok?"Enabled ✓":"Not available";
+      pushBtn.style.opacity=".5";
+    };
+  }
+  /* Admin push via hash */
+  if(location.hash==='#admin-push'){
+    (async function(){
+      if(typeof registerPush!=='function') return;
+      var ok=await registerPush('admin');
+      toast(ok?'Admin notifications enabled ✓':'Could not enable notifications');
+      history.replaceState(null,'',location.pathname);
+    })();
+  }
   q("[data-notify]").forEach(function(b){ b.onclick=function(){
     var k=b.dataset.notify; S.notify[k]=!S.notify[k]; b.setAttribute("aria-pressed",String(S.notify[k])); save(); }; });
 

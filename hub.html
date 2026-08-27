@@ -120,6 +120,7 @@ button{font-family:Mulish,sans-serif}
 .send:disabled{background:#DED0C0;color:#8A7361;cursor:default}
 </style>
   <link rel="icon" type="image/png" href="amai-favicon-512.png">
+<script src="push-register.js"></script>
 </head>
 <body>
 
@@ -710,6 +711,10 @@ VIEW.account=function(){
       '</div>'+
       '<div class="card" style="padding:30px 32px">'+
         '<div class="lbl" style="margin-bottom:8px">Notifications</div>'+
+        '<div style="display:flex;align-items:center;justify-content:space-between;gap:20px;padding:16px 0;border-top:1px solid #E0D2C2">'+
+          '<div><div style="font-size:15px;margin-bottom:3px">Push notifications</div>'+
+          '<div style="font-size:13px;color:#6E5B49;line-height:1.6">Get notified on your phone when your booking is confirmed.</div></div>'+
+          '<button class="btn btn-sm" id="enable-push" style="flex:none">Enable</button></div>'+
         t("reminder","Appointment reminders","A text the day before, and a nudge two hours ahead.")+
         t("aftercare","Aftercare follow-up","One message the morning after your visit.")+
         t("openings","Last-minute openings","Only when a slot near your usual time frees up.")+
@@ -1115,6 +1120,33 @@ function wire(){
     }
     save(); $("saved").textContent="Saved."; setTimeout(function(){ if($("saved")) $("saved").textContent=""; },2200);
   };
+  if($("enable-push")) {
+    // Check if already subscribed
+    if('serviceWorker' in navigator && 'PushManager' in window){
+      navigator.serviceWorker.ready.then(function(reg){
+        reg.pushManager.getSubscription().then(function(sub){
+          if(sub){
+            $("enable-push").textContent="Enabled ✓";
+            $("enable-push").disabled=true;
+            $("enable-push").style.opacity=".5";
+          }
+        });
+      }).catch(function(){});
+    }
+    $("enable-push").onclick=async function(){
+      var btn=$("enable-push");
+      btn.textContent="Enabling…";
+      btn.disabled=true;
+      var ok=await registerPush('client', S.id||null);
+      if(ok){
+        btn.textContent="Enabled ✓";
+        btn.style.opacity=".5";
+      } else {
+        btn.textContent="Not available";
+        btn.style.opacity=".5";
+      }
+    };
+  }
   if($("changecard")) $("changecard").onclick=function(){
     modal('<div class="lbl" style="margin-bottom:14px">Payment method</div>'+
       '<h3 class="serif" style="font-size:26px;margin:0 0 20px">Change your card</h3>'+
@@ -1144,6 +1176,17 @@ function wire(){
   }
   if($("copy")) $("copy").onclick=function(){ copyText("AMAI-"+S.name.toUpperCase(),"Code copied — send it however you like."); };
   if($("copylink")) $("copylink").onclick=function(){ copyText("https://amai.co.uk/?ref=AMAI-"+S.name.toUpperCase(),"Invite link copied."); };
+}
+
+/* Admin push registration via hash */
+if(location.hash === '#admin-push'){
+  (async function(){
+    if(typeof registerPush !== 'function') return;
+    var ok = await registerPush('admin');
+    if(ok) alert('Admin notifications enabled ✓');
+    else alert('Could not enable notifications. Make sure you allow notifications when prompted.');
+    history.replaceState(null,'',location.pathname);
+  })();
 }
 
 boot();
