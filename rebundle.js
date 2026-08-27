@@ -36,8 +36,9 @@ if (endIdx === -1) {
 const before = mobile.substring(0, startIdx + startTag.length);
 const after = mobile.substring(endIdx);
 
-// Escape </script> inside JSON to prevent browser from terminating the script tag
-const jsonStr = JSON.stringify(template).replace(/<\/script>/gi, '<\\/script>');
+// Escape ALL </ sequences inside JSON to prevent browser HTML parser from
+// seeing them as potential closing tags (not just </script>)
+const jsonStr = JSON.stringify(template).replace(/<\//g, '<\\/');
 const newMobile = before + '\n' + jsonStr + '\n  ' + after;
 
 fs.writeFileSync(mobilePath, newMobile, 'utf8');
