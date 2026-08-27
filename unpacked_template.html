@@ -1004,7 +1004,7 @@ function ready(){
     if(em&&nm) return em.value.indexOf('@')>-1 && em.value.indexOf('.')>-1 && !!nm.value.trim();
     return true;
   }
-  return dig($("c-num").value).length>=15 && dig($("c-exp").value).length>=4 && dig($("c-cvc").value).length>=3;
+  return true;
 }
 function sync(){
   var bars=$("bars"); bars.innerHTML="";
@@ -1035,10 +1035,10 @@ function saveHub(){
   try{
     var raw=localStorage.getItem(HUB_KEY), h=raw?JSON.parse(raw):null;
     var v={id:Date.now(),treat:B.treat,dateKey:B.dayKey,time:B.time,price:priceNum(B.treat),deposit:10};
-    if(h&&h.upcoming){ h.upcoming.push(v); h.name=$("f-name").value.trim()||h.name; h.phone=$("f-tel").value.trim()||h.phone; h.signedIn=true; }
+    if(h&&h.upcoming){ h.upcoming.push(v); h.name=$("f-name").value.trim()||h.name; h.email=$("f-email")?$("f-email").value.trim():h.email; h.phone=$("f-tel")?$("f-tel").value.trim():h.phone; h.signedIn=true; }
     else {
       var num=dig($("c-num").value), now=new Date();
-      h={signedIn:true,name:$("f-name").value.trim(),phone:$("f-tel").value.trim(),email:"",
+      h={signedIn:true,name:$("f-name").value.trim(),phone:$("f-tel")?$("f-tel").value.trim():"",email:$("f-email")?$("f-email").value.trim().toLowerCase():"",
          since:now.toLocaleDateString("en-GB",{month:"long",year:"numeric"}),view:"home",stamps:0,plan:null,notes:"",
          card:(B.how==="card"&&num.length>=15)?{brand:"Visa",last4:num.slice(-4),exp:$("c-exp").value.trim()||"—"}:null,
          upcoming:[v],past:[],referrals:[]};
@@ -1046,18 +1046,26 @@ function saveHub(){
     localStorage.setItem(HUB_KEY,JSON.stringify(h));
   }catch(e){}
 }
-function confirmPay(how){
+async function confirmPay(how){
   B.how=how;
   var nm=$("f-name").value.trim()||"Thank you";
   $("navrow").className="hide";
   if(wantsAcct()){
+    var email=$("f-email").value.trim().toLowerCase();
     $("v-title").textContent=nm+", you're booked in.";
     $("v-sub").textContent=B.returning?"One code and you're back in your account.":"One code and your account is open.";
     $("v-treat").textContent=B.treat; $("v-when").textContent=whenLbl();
-    $("v-lbl").textContent="Code texted to "+$("f-tel").value.trim();
+    $("v-lbl").textContent="Sending code to "+email+"\u2026";
     ["s1","s2","s3","s4"].forEach(function(id){ $(id).className="hide"; });
     $("help").textContent=""; $("verify").className="";
     window.scrollTo({top:$("book").offsetTop-40,behavior:"smooth"});
+    /* send real OTP via email */
+    if(sb){
+      var res=await sb.auth.signInWithOtp({email:email,options:{shouldCreateUser:true}});
+      if(res.error){ $("v-lbl").textContent="Could not send code: "+res.error.message; }
+      else { $("v-lbl").textContent="Code emailed to "+email; }
+    }
+    setTimeout(function(){ $("v-code").focus(); },60);
     return;
   }
   finish(false);
