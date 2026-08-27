@@ -358,7 +358,7 @@ async function showDone(how,acct){
       }
       if(clientId){
         await sb.from('bookings').insert([{
-          client_id:clientId,client_name:name,client_phone:phone,client_email:email||null,
+          client_id:clientId,
           treatment_name:S.treatment,
           appointment_date:dayKeyToDate(S.dateKey),appointment_time:S.time.replace('.',':'),
           price:priceNum(S.treatment),deposit_amount:10,
@@ -377,7 +377,9 @@ async function showDone(how,acct){
   if($("d-when"))$("d-when").textContent=whenLabel();
   if($("d-paid"))$("d-paid").textContent=how==="apple"?"\u00a310 paid \u00b7 Apple Pay":"\u00a310 deposit to be paid later";
   if($("d-bal"))$("d-bal").textContent=balanceOf(S.treatment)+" in the studio";
-  if($("d-hub"))$("d-hub").className=acct?"btn":"hide";
+  var hasHub = acct;
+  try { var h=JSON.parse(localStorage.getItem('amai_hub')||'{}'); if(h&&h.signedIn) hasHub=true; } catch(e){}
+  if($("d-hub"))$("d-hub").className=hasHub?"btn":"hide";
 
   /* hide everything, show done */
   [1,2,3,4].forEach(function(n){var e=$("step"+n);if(e)e.className="hide";});
