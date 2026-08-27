@@ -482,6 +482,8 @@ button,input,textarea,select{font-family:inherit;font-size:16px}
         <p style="font-size:14.5px;line-height:1.65;color:#CBB49E;margin:0 0 18px">It confirms the appointment and doubles as your sign-in. No password to invent.</p>
         <label class="flab" style="margin-bottom:14px">Mobile number<input id="f-tel" class="field" inputmode="tel" placeholder="07700 900123"></label>
         <label class="flab" style="margin-bottom:14px">First name<input id="f-name" class="field" placeholder="Your name"></label>
+        <label class="flab" style="margin-bottom:14px">Email address (optional)<input id="f-email" type="email" class="field" placeholder="you@example.com"></label>
+        <label class="flab" style="margin-bottom:14px">Notes for your therapist (optional)<textarea id="f-notes" class="field" rows="2" style="resize:vertical;min-height:60px"></textarea></label>
         <div id="known" class="hide" style="display:flex;align-items:center;gap:12px;background:#443B36;padding:14px 16px;margin-bottom:14px">
           <span style="width:8px;height:8px;border-radius:50%;background:#E8D5C4;flex:none"></span>
           <span id="known-copy" style="font-size:14px;line-height:1.6"></span>
@@ -842,7 +844,6 @@ async function loadMobileServices(){
   if(sh.data && sh.data.value) OPENING_HOURS=sh.data.value;
   console.log('CLOSED_DAYS map:', JSON.stringify(CLOSED_DAYS));
 }
-var KNOWN={"07700900123":"Nadia","07700900456":"Priya","07700900789":"Hannah"};
 var CLOSED_DAYS={};
 var OPENING_HOURS={tue:{open:'9.00',close:'18.00'},wed:{open:'9.00',close:'18.00'},thu:{open:'9.00',close:'18.00'},fri:{open:'9.00',close:'18.00'},sat:{open:'9.00',close:'18.00'}};
 var HUB_KEY="amai_hub_v2";
@@ -855,7 +856,7 @@ function key(d){ return d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate(); }
 function dayKeyToDate(k){ var p=k.split('-'); var d=new Date(+p[0],+p[1],+p[2]); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function parseK(k){ var p=k.split("-"); return new Date(+p[0],+p[1],+p[2]); }
 function isOpen(d){ if(d.getDay()===0||d.getDay()===1) return false; var k=key(d); if(CLOSED_DAYS[k]) console.log('BLOCKED closed day:',k); return !CLOSED_DAYS[k]; }
-function free(d){ return true; /* was fake mock logic */ }
+function free(d){ return slotsFor(d).some(function(s){ return s.open; }); }
 function longD(d){ return d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}); }
 function priceOf(n){ for(var i=0;i<BOOKABLE.length;i++) if(BOOKABLE[i].n===n) return BOOKABLE[i].p; return ""; }
 function priceNum(n){ return parseFloat(String(priceOf(n)).replace(/[^0-9.]/g,""))||0; }
@@ -967,14 +968,19 @@ function renderSlots(){
   });
 }
 function checkKnown(){
-  var nm=KNOWN[dig($("f-tel").value)];
-  B.returning=!!nm;
-  if(nm){
-    $("known").className="";
-    $("known-copy").innerHTML='Welcome back, <strong style="font-weight:600">'+nm+'</strong>. Your stamps and history are waiting.';
-    if(!$("f-name").value.trim()) $("f-name").value=nm;
-    $("acct-head").textContent="Add this visit to my account";
-  } else { $("known").className="hide"; $("acct-head").textContent="Keep this as my AMAI account"; }
+  var tel=dig($("f-tel").value);
+  if(tel.length<10){ $("known").className="hide"; return; }
+  (async function(){
+    if(!sb) return;
+    var r=await sb.from('clients').select('id,name,stamps').eq('phone',tel).maybeSingle();
+    if(r&&r.data){
+      B.returning=true;
+      $("known").className="";
+      $("known-copy").innerHTML='Welcome back, <strong style="font-weight:600">'+r.data.name+'</strong>. Your stamps and history are waiting.';
+      if(!$("f-name").value.trim()) $("f-name").value=r.data.name;
+      $("acct-head").textContent="Add this visit to my account";
+    } else { B.returning=false; $("known").className="hide"; $("acct-head").textContent="Keep this as my AMAI account"; }
+  })();
 }
 function ready(){
   if(B.step===1) return !!B.treat;
@@ -1055,20 +1061,27 @@ async function finish(acct){
   $("navrow").className="hide"; $("help").textContent=""; $("done").className="";
   if(sb){
     try{
-      var phone=$("f-tel").value.trim(), name=$("f-name").value.trim();
+      var phone=dig($("f-tel").value), name=$("f-name").value.trim();
+      var email=$("f-email")?$("f-email").value.trim():"";
+      var notes=$("f-notes")?$("f-notes").value.trim():"";
       var r=await sb.from('clients').select('id').eq('phone',phone);
       var clientId;
-      if(r.data&&r.data.length>0){ clientId=r.data[0].id; }
+      if(r.data&&r.data.length>0){
+        clientId=r.data[0].id;
+        if(email) await sb.from('clients').update({email:email}).eq('id',clientId);
+      }
       else {
-        var ins=await sb.from('clients').insert([{name:name,phone:phone}]).select().single();
+        var ins=await sb.from('clients').insert([{name:name,phone:phone,email:email||null,stamps:0}]).select().single();
         if(ins.data) clientId=ins.data.id;
       }
       if(clientId){
         await sb.from('bookings').insert([{
-          client_id:clientId,treatment_name:B.treat,
-          appointment_date:dayKeyToDate(B.dayKey),appointment_time:B.time,
+          client_id:clientId,client_name:name,client_phone:phone,client_email:email||null,
+          treatment_name:B.treat,
+          appointment_date:dayKeyToDate(B.dayKey),appointment_time:B.time.replace('.',':'),
           price:priceNum(B.treat),deposit_amount:10,
-          duration_minutes:getDuration(B.treat),status:'confirmed'
+          duration_minutes:getDurationM(B.treat),status:'confirmed',
+          notes:notes
         }]);
       }
     }catch(e){ console.warn('booking save error',e); }
