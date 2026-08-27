@@ -993,6 +993,7 @@ async function checkKnown(){
     if($("f-tel")) $("f-tel").closest("label").style.display="";
     $("acct-head").textContent="Keep this as my AMAI account";
   }
+  sync();
 }
 function ready(){
   if(B.step===1) return !!B.treat;
@@ -1136,12 +1137,13 @@ $("again").onclick=function(){
   var dock=$("dock"), book=$("book");
   if(!dock||!book) return;
   addEventListener("scroll",function(){
+    /* hide if user is already in booking flow (past step 1) */
+    if(B.step>1){ dock.className="dock"; return; }
     var y=scrollY;
-    var bookTop=book.offsetTop;
-    var bookBot=bookTop+book.offsetHeight;
-    var pastHero = y > innerHeight*0.5;
-    var inOrPastForm = (y + innerHeight) > (bookTop + 100);
-    dock.className = (pastHero && !inOrPastForm) ? "dock up" : "dock";
+    var bookRect=book.getBoundingClientRect();
+    var bookVisible = bookRect.top < innerHeight;
+    var pastHero = y > innerHeight*0.4;
+    dock.className = (pastHero && !bookVisible) ? "dock up" : "dock";
   },{passive:true});
 })();
 
