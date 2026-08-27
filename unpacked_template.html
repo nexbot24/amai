@@ -851,12 +851,50 @@ function priceOf(n){ for(var i=0;i<BOOKABLE.length;i++) if(BOOKABLE[i].n===n) re
 function priceNum(n){ return parseFloat(String(priceOf(n)).replace(/[^0-9.]/g,""))||0; }
 function balOf(n){ var p=priceOf(n), v=priceNum(n); if(!v) return "Balance"; return (String(p).indexOf("from")===0?"from £":"£")+(v-10); }
 function whenLbl(){ if(!B.dayKey) return "Not chosen yet"; var d=parseK(B.dayKey); return B.time? longD(d)+", "+B.time : longD(d); }
+var CAL_CACHE_M={};
+function getDurationM(name){ for(var i=0;i<BOOKABLE.length;i++) if(BOOKABLE[i].n===name) return parseInt(BOOKABLE[i].t)||60; return 60; }
+function dotTimeToMinsM(t){ var p=t.split('.'); return parseInt(p[0])*60+parseInt(p[1]||0); }
+function minsToTimeM(m){ return Math.floor(m/60)+'.'+String(m%60).padStart(2,'0'); }
+function timeToMinsM(t){ if(!t)return 0; var p=t.replace(':','.').split('.'); return parseInt(p[0])*60+parseInt(p[1]||0); }
+async function fetchMonthBookingsM(vm){
+  var k=vm.getFullYear()+'-'+vm.getMonth();
+  if(CAL_CACHE_M[k]) return;
+  if(!sb) return;
+  var y=vm.getFullYear(),m=vm.getMonth();
+  var ds=y+'-'+String(m+1).padStart(2,'0')+'-01';
+  var de=y+'-'+String(m+2>12?1:m+2).padStart(2,'0')+'-01';
+  var r=await sb.from('bookings').select('appointment_date,appointment_time,treatment_name').gte('appointment_date',ds).lt('appointment_date',de);
+  CAL_CACHE_M[k]=r.data||[];
+}
 function slotsFor(d){
   var dayMap=['sun','mon','tue','wed','thu','fri','sat'];
   var dk=dayMap[d.getDay()]; var hrs=OPENING_HOURS[dk]||{open:'9.00',close:'18.00'};
-  var op=hrs.open.split('.'),cl=hrs.close.split('.');
-  var start=parseInt(op[0])*60+parseInt(op[1]||0),end=parseInt(cl[0])*60+parseInt(cl[1]||0),slots=[];
-  for(var m=start;m<end;m+=15){ var h=Math.floor(m/60),mm=m%60; slots.push({l:h+'.'+String(mm).padStart(2,'0'),open:true}); }
+  var start=dotTimeToMinsM(hrs.open), end=dotTimeToMinsM(hrs.close);
+  var dur=getDurationM(B.treat);
+  var step=15;
+  /* If today, skip past slots */
+  var now=new Date();
+  var isToday=d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth()&&d.getDate()===now.getDate();
+  var nowMins=isToday?now.getHours()*60+now.getMinutes():0;
+  /* Get existing bookings for this date */
+  var k=d.getFullYear()+'-'+d.getMonth();
+  var dateStr=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  var bookings=CAL_CACHE_M[k]||[];
+  var dayBookings=bookings.filter(function(b){ return b.appointment_date===dateStr; });
+  var slots=[];
+  for(var m=start;m+dur<=end;m+=step){
+    if(isToday&&m<=nowMins) continue;
+    var m_end=m+dur;
+    var overlap=false;
+    for(var i=0;i<dayBookings.length;i++){
+      var b=dayBookings[i];
+      var b_start=timeToMinsM(b.appointment_time);
+      var b_dur=getDurationM(b.treatment_name);
+      var b_end=b_start+b_dur;
+      if(m<b_end&&m_end>b_start){ overlap=true; break; }
+    }
+    slots.push({l:minsToTimeM(m),open:!overlap});
+  }
   return slots;
 }
 function wantsAcct(){ return $("f-acct").checked; }
@@ -878,11 +916,12 @@ function renderPicker(){
 }
 var calOff=0;
 function viewMonth(){ var t=d0(); return new Date(t.getFullYear(),t.getMonth()+calOff,1); }
-function renderDays(){
+async function renderDays(){
   var v=viewMonth(), t=d0(), box=$("days"); box.innerHTML="";
   $("cal-month").textContent=v.toLocaleDateString("en-GB",{month:"long",year:"numeric"});
   $("cal-prev").disabled = calOff<=0;
   $("cal-next").disabled = calOff>=5;
+  await fetchMonthBookingsM(v);
   var firstDow=(v.getDay()+6)%7, dim=new Date(v.getFullYear(),v.getMonth()+1,0).getDate();
   for(var i=0;i<firstDow;i++) box.appendChild(Object.assign(document.createElement("div"),{className:"blank"}));
   for(var n=1;n<=dim;n++){
@@ -899,9 +938,9 @@ function renderDays(){
     })(n);
   }
 }
-function hop(n){
+async function hop(n){
   calOff=Math.min(5,Math.max(0,calOff+n));
-  renderDays();
+  await renderDays();
 }
 function renderSlots(){
   var box=$("slots"); box.innerHTML="";
