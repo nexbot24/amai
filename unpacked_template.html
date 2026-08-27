@@ -449,43 +449,43 @@ button,input,textarea,select{font-family:inherit;font-size:16px}
 
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px">
         <div id="bars" style="display:flex;gap:8px;flex:1"></div>
-        <span id="steplbl" class="lbl" style="color:#B39C88"></span>
+        <span id="step-label" class="lbl" style="color:#B39C88"></span>
       </div>
 
-      <div id="s1">
+      <div id="step1">
         <h3 class="serif" style="font-size:23px;margin:0 0 6px">What are you booking?</h3>
         <p style="font-size:14.5px;line-height:1.65;color:#CBB49E;margin:0 0 16px">Not sure? Choose a first visit and we'll talk it through.</p>
         <input id="q" class="field" placeholder="Search treatments" style="margin-bottom:12px">
         <div id="picker" class="pick"></div>
       </div>
 
-      <div id="s2" class="hide">
+      <div id="step2" class="hide">
         <h3 class="serif" style="font-size:23px;margin:0 0 6px">Pick a day.</h3>
         <p style="font-size:14.5px;line-height:1.65;color:#CBB49E;margin:0 0 16px">Dotted days have hours free. Closed Sunday and Monday.</p>
         <div class="cal">
           <div class="calbar">
-            <button class="calnav" id="cal-prev" aria-label="Previous month">←</button>
-            <span class="serif" id="cal-month" style="font-size:19px"></span>
-            <button class="calnav" id="cal-next" aria-label="Next month">→</button>
+            <button class="calnav" id="prev" aria-label="Previous month">←</button>
+            <span class="serif" id="month" style="font-size:19px"></span>
+            <button class="calnav" id="next-m" aria-label="Next month">→</button>
           </div>
           <div class="dow"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
-          <div class="grid" id="days"></div>
+          <div class="grid" id="cells"></div>
         </div>
-        <div id="slotlbl" class="lbl" style="color:#B39C88;margin:24px 0 12px"></div>
+        <div id="slots-label" class="lbl" style="color:#B39C88;margin:24px 0 12px"></div>
         <div id="slots" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
       </div>
 
-      <div id="s3" class="hide">
+      <div id="step3" class="hide">
         <h3 class="serif" style="font-size:23px;margin:0 0 6px">Your details, and you're in.</h3>
         <p style="font-size:14.5px;line-height:1.65;color:#CBB49E;margin:0 0 18px">We use your email to confirm the appointment — and it doubles as your sign-in. No password to invent.</p>
-        <label class="flab" style="margin-bottom:14px">Email address<input id="f-email" type="email" class="field" autocomplete="email" placeholder="hello@example.com"></label>
+        <label class="flab" style="margin-bottom:14px">Email address<input id="f-contact" type="email" class="field" autocomplete="email" placeholder="hello@example.com"></label>
         <label class="flab" style="margin-bottom:14px">First name<input id="f-name" class="field" placeholder="Your name"></label>
-        <label class="flab" style="margin-bottom:14px">Phone<input id="f-tel" class="field" type="tel" inputmode="tel" autocomplete="tel" placeholder="07..."></label>
+        <label class="flab" style="margin-bottom:14px">Phone<input id="f-phone" class="field" type="tel" inputmode="tel" autocomplete="tel" placeholder="07..."></label>
         <div id="known" class="hide" style="display:flex;align-items:center;gap:12px;background:#443B36;padding:14px 16px;margin-bottom:14px">
           <span style="width:8px;height:8px;border-radius:50%;background:#E8D5C4;flex:none"></span>
           <span id="known-copy" style="font-size:14px;line-height:1.6"></span>
         </div>
-        <label class="flab" style="margin-bottom:14px">Anything we should know <span style="text-transform:none;letter-spacing:normal">(optional)</span><textarea id="f-notes" class="field" rows="2" style="resize:vertical;min-height:60px" placeholder="Sensitive skin, first wax, timings..."></textarea></label>
+        <label class="flab" style="margin-bottom:14px">Anything we should know <span style="text-transform:none;letter-spacing:normal">(optional)</span><textarea id="f-note" class="field" rows="2" style="resize:vertical;min-height:60px" placeholder="Sensitive skin, first wax, timings..."></textarea></label>
         <label style="display:flex;align-items:flex-start;gap:13px;border:1px solid rgba(232,213,196,.3);padding:18px;margin-bottom:6px">
           <input id="f-acct" type="checkbox" checked="" style="margin-top:2px;accent-color:#E8D5C4;width:18px;height:18px;flex:none">
           <span>
@@ -499,7 +499,7 @@ button,input,textarea,select{font-family:inherit;font-size:16px}
         </label>
       </div>
 
-      <div id="s4" class="hide">
+      <div id="step4" class="hide">
         <h3 class="serif" style="font-size:23px;margin:0 0 6px">Hold it with £10.</h3>
         <p style="font-size:14.5px;line-height:1.65;color:#CBB49E;margin:0 0 18px">Comes off your treatment price. Refunded in full up to 24 hours before.</p>
         <button id="apple" class="btn" style="background:#F7F1EA;font-family:Mulish,sans-serif;font-weight:600;font-size:16px">Pay £10 with Apple&nbsp;Pay</button>
@@ -512,14 +512,14 @@ button,input,textarea,select{font-family:inherit;font-size:16px}
           <label class="flab">Code<input id="c-cvc" class="field" inputmode="numeric" placeholder="123"></label>
         </div>
         <div style="margin-top:20px;background:#443B36;padding:18px;display:flex;flex-direction:column;gap:9px;font-size:14px">
-          <div style="display:flex;justify-content:space-between;gap:16px"><span style="color:#CBB49E" id="r-treat"></span><span id="r-price"></span></div>
-          <div style="display:flex;justify-content:space-between;gap:16px"><span style="color:#CBB49E" id="r-when"></span></div>
+          <div style="display:flex;justify-content:space-between;gap:16px"><span style="color:#CBB49E" id="s4-treat"></span><span id="s4-price"></span></div>
+          <div style="display:flex;justify-content:space-between;gap:16px"><span style="color:#CBB49E" id="s4-when"></span></div>
           <div style="display:flex;justify-content:space-between;gap:16px;padding-top:9px;border-top:1px solid rgba(232,213,196,.18)"><span style="color:#CBB49E">Deposit today</span><span style="font-weight:600">£10</span></div>
-          <div style="display:flex;justify-content:space-between;gap:16px"><span style="color:#CBB49E">In the studio</span><span id="r-bal"></span></div>
+          <div style="display:flex;justify-content:space-between;gap:16px"><span style="color:#CBB49E">In the studio</span><span id="s4-bal"></span></div>
         </div>
       </div>
 
-      <div id="verify" class="hide">
+      <div id="verify-side" class="hide">
         <h3 class="serif" style="font-size:26px;line-height:1.25;margin:0 0 8px" id="v-title"></h3>
         <p style="font-size:14.5px;line-height:1.7;color:#CBB49E;margin:0 0 20px" id="v-sub"></p>
         <div style="border:1px solid rgba(232,213,196,.2);padding:18px;margin-bottom:20px">
@@ -527,13 +527,13 @@ button,input,textarea,select{font-family:inherit;font-size:16px}
           <div class="serif" id="v-treat" style="font-size:18px;margin-bottom:4px"></div>
           <div style="font-size:14px;color:#CBB49E" id="v-when"></div>
         </div>
-        <div class="lbl" id="v-lbl" style="color:#B39C88;margin-bottom:10px"></div>
+        <div class="lbl" id="v-code-label" style="color:#B39C88;margin-bottom:10px"></div>
         <input id="v-code" class="field" inputmode="numeric" maxlength="6" placeholder="——————" style="font-family:Marcellus,serif;font-size:25px;letter-spacing:.45em;text-align:center;padding:16px;margin-bottom:16px">
         <button id="v-go" class="btn" style="background:rgba(232,213,196,.28)">Open my account</button>
         <button id="v-skip" style="background:none;border:none;color:#B39C88;font-size:13.5px;padding:14px 0 0;width:100%">Not now — just show my booking</button>
       </div>
 
-      <div id="done" class="hide" style="text-align:center">
+      <div id="done-side" class="hide" style="text-align:center">
         <div class="arch" style="width:34px;height:46px;border:1.6px solid #E8D5C4;border-bottom:none;margin:8px auto 20px"></div>
         <h3 class="serif" style="font-size:27px;line-height:1.25;margin:0 0 12px" id="d-title"></h3>
         <p style="font-size:14.5px;line-height:1.7;color:#CBB49E;margin:0 0 22px">A confirmation is on its way. If anything changes, tell us — life happens.</p>
@@ -551,7 +551,7 @@ button,input,textarea,select{font-family:inherit;font-size:16px}
         <button id="back" class="btn btn-o hide" style="width:auto;padding:0 24px">Back</button>
         <button id="next" class="btn"></button>
       </div>
-      <div id="help" style="font-size:12.5px;line-height:1.6;color:#B39C88;margin-top:12px"></div>
+      <div id="helper" style="font-size:12.5px;line-height:1.6;color:#B39C88;margin-top:12px"></div>
     </section>
 
     
@@ -752,6 +752,10 @@ button,input,textarea,select{font-family:inherit;font-size:16px}
 
 
 
+<script src="booking.js"></script>
+<script>
+(async function(){ await initBooking(); })();
+</script>
 <script>
 (function(){
   var top=document.querySelector(".top");
@@ -780,370 +784,11 @@ button,input,textarea,select{font-family:inherit;font-size:16px}
   else if(VIEWS.indexOf(h0)>-1) go(h0);
 })();
 
-/* home */
-(function(){var $=function(i){return document.getElementById(i);};
-var STEPS=[
-  ["Before your wax","Simple preparation improves your results and reduces irritation. A gentle exfoliation, clean skin and appropriate hair length are the foundations of a considered appointment."],
-  ["In the room","You'll be met at the door — no waiting area bustle, no one booked on top of you. We talk through what you'd like first, then work at a pace that suits you, and you can ask us to pause at any point."],
-  ["After your wax","Aftercare goes home in your hand. Avoid heat and friction, hydrate consistently, and treat freshly waxed skin as the delicate surface it is."]
-];
-(function(){
-  var box=$("acc");
-  STEPS.forEach(function(s,i){
-    var w=document.createElement("div");
-    w.style.borderTop="1px solid #C9B8A4";
-    w.innerHTML='<button class="acc"><span><span style="font-family:Marcellus,serif;font-size:14px;color:#8A7361;display:block;margin-bottom:5px">0'+(i+1)+'</span>'+
-      '<span style="font-family:Marcellus,serif;font-size:21px">'+s[0]+'</span></span>'+
-      '<span class="pl" style="font-size:20px;color:#8A7361;flex:none">+</span></button>'+
-      '<div class="acc-b"><p style="font-size:14.5px;line-height:1.75;color:#5C5148;margin:0 0 20px">'+s[1]+'</p></div>';
-    var b=w.querySelector(".acc"), body=w.querySelector(".acc-b"), pl=w.querySelector(".pl");
-    b.onclick=function(){
-      var open=body.style.maxHeight&&body.style.maxHeight!=="0px";
-      [].forEach.call(document.querySelectorAll(".acc-b"),function(x){ x.style.maxHeight="0px"; });
-      [].forEach.call(document.querySelectorAll(".pl"),function(x){ x.textContent="+"; });
-      if(!open){ body.style.maxHeight=body.scrollHeight+"px"; pl.textContent="–"; }
-    };
-    box.appendChild(w);
-  });
-  document.querySelector(".acc").click();
-})();
-
-var BOOKABLE=[];
-var SB_URL='https://tphyrmweauzfletdlqvi.supabase.co';
-var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwaHlybXdlYXV6ZmxldGRscXZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0NTIxOTQsImV4cCI6MjEwMzAyODE5NH0.Z_utKsxYquCoL2LfTjjL8QFB1tnLJZW9j3El7Sykk8o';
-var sb=null;
-function loadSupabaseSDK(){
-  return new Promise(function(resolve){
-    if(window.supabase){sb=window.supabase.createClient(SB_URL,SB_KEY);window.sb=sb;resolve();return;}
-    var s=document.createElement('script');
-    s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
-    s.onload=function(){sb=window.supabase.createClient(SB_URL,SB_KEY);window.sb=sb;resolve();};
-    s.onerror=function(){resolve();};
-    document.head.appendChild(s);
-  });
-}
-async function loadMobileServices(){
-  if(!sb) return;
-  var r=await sb.from('services').select('*').eq('available',true).order('sort_order');
-  if(r.data){
-    BOOKABLE=r.data.map(function(s){return {n:s.name,t:s.duration_minutes+' min',p:'\u00a3'+Number(s.price)};});
-    if(BOOKABLE.length) B.treat=BOOKABLE[0].n;
-  }
-  /* load closed days */
-  var cd=await sb.from('closed_days').select('date_key');
-  console.log('closed_days raw:', JSON.stringify(cd));
-  if(cd.data){
-    cd.data.forEach(function(r){ CLOSED_DAYS[r.date_key]=true; });
-  }
-  /* load opening hours */
-  var sh=await sb.from('studio_settings').select('value').eq('key','opening_hours').single();
-  if(sh.data && sh.data.value) OPENING_HOURS=sh.data.value;
-  console.log('CLOSED_DAYS map:', JSON.stringify(CLOSED_DAYS));
-}
-var CLOSED_DAYS={};
-var OPENING_HOURS={tue:{open:'9.00',close:'18.00'},wed:{open:'9.00',close:'18.00'},thu:{open:'9.00',close:'18.00'},fri:{open:'9.00',close:'18.00'},sat:{open:'9.00',close:'18.00'}};
-var HUB_KEY="amai_hub_v2";
-var B={step:1,treat:"",dayKey:"",time:"",q:"",how:"",returning:false};
-
-function dig(v){ return String(v).replace(/\D/g,""); }
-function d0(){ var d=new Date(); d.setHours(0,0,0,0); return d; }
-function addD(n){ var d=d0(); d.setDate(d.getDate()+n); return d; }
-function key(d){ return d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate(); }
-function dayKeyToDate(k){ var p=k.split('-'); var d=new Date(+p[0],+p[1],+p[2]); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
-function parseK(k){ var p=k.split("-"); return new Date(+p[0],+p[1],+p[2]); }
-function isOpen(d){ if(d.getDay()===0||d.getDay()===1) return false; var k=key(d); if(CLOSED_DAYS[k]) console.log('BLOCKED closed day:',k); return !CLOSED_DAYS[k]; }
-function free(d){ return slotsFor(d).some(function(s){ return s.open; }); }
-function longD(d){ return d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}); }
-function priceOf(n){ for(var i=0;i<BOOKABLE.length;i++) if(BOOKABLE[i].n===n) return BOOKABLE[i].p; return ""; }
-function priceNum(n){ return parseFloat(String(priceOf(n)).replace(/[^0-9.]/g,""))||0; }
-function balOf(n){ var p=priceOf(n), v=priceNum(n); if(!v) return "Balance"; return (String(p).indexOf("from")===0?"from £":"£")+(v-10); }
-function whenLbl(){ if(!B.dayKey) return "Not chosen yet"; var d=parseK(B.dayKey); return B.time? longD(d)+", "+B.time : longD(d); }
-var CAL_CACHE_M={};
-function getDurationM(name){ for(var i=0;i<BOOKABLE.length;i++) if(BOOKABLE[i].n===name) return parseInt(BOOKABLE[i].t)||60; return 60; }
-function dotTimeToMinsM(t){ var p=t.split('.'); return parseInt(p[0])*60+parseInt(p[1]||0); }
-function minsToTimeM(m){ return Math.floor(m/60)+'.'+String(m%60).padStart(2,'0'); }
-function timeToMinsM(t){ if(!t)return 0; var p=t.replace(':','.').split('.'); return parseInt(p[0])*60+parseInt(p[1]||0); }
-async function fetchMonthBookingsM(vm){
-  var k=vm.getFullYear()+'-'+vm.getMonth();
-  if(CAL_CACHE_M[k]) return;
-  if(!sb) return;
-  var y=vm.getFullYear(),m=vm.getMonth();
-  var ds=y+'-'+String(m+1).padStart(2,'0')+'-01';
-  var de=y+'-'+String(m+2>12?1:m+2).padStart(2,'0')+'-01';
-  var r=await sb.from('bookings').select('appointment_date,appointment_time,treatment_name').gte('appointment_date',ds).lt('appointment_date',de);
-  CAL_CACHE_M[k]=r.data||[];
-}
-function slotsFor(d){
-  var dayMap=['sun','mon','tue','wed','thu','fri','sat'];
-  var dk=dayMap[d.getDay()]; var hrs=OPENING_HOURS[dk]||{open:'9.00',close:'18.00'};
-  var start=dotTimeToMinsM(hrs.open), end=dotTimeToMinsM(hrs.close);
-  var dur=getDurationM(B.treat);
-  var step=15;
-  /* If today, skip past slots */
-  var now=new Date();
-  var isToday=d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth()&&d.getDate()===now.getDate();
-  var nowMins=isToday?now.getHours()*60+now.getMinutes():0;
-  /* Get existing bookings for this date */
-  var k=d.getFullYear()+'-'+d.getMonth();
-  var dateStr=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-  var bookings=CAL_CACHE_M[k]||[];
-  var dayBookings=bookings.filter(function(b){ return b.appointment_date===dateStr; });
-  var slots=[];
-  for(var m=start;m+dur<=end;m+=step){
-    if(isToday&&m<=nowMins) continue;
-    var m_end=m+dur;
-    var overlap=false;
-    for(var i=0;i<dayBookings.length;i++){
-      var b=dayBookings[i];
-      var b_start=timeToMinsM(b.appointment_time);
-      var b_dur=getDurationM(b.treatment_name);
-      var b_end=b_start+b_dur;
-      if(m<b_end&&m_end>b_start){ overlap=true; break; }
-    }
-    slots.push({l:minsToTimeM(m),open:!overlap});
-  }
-  return slots;
-}
-function wantsAcct(){ return $("f-acct").checked; }
-
-function renderPicker(){
-  var q=B.q.trim().toLowerCase();
-  var list=q?BOOKABLE.filter(function(i){return i.n.toLowerCase().indexOf(q)>-1;}):BOOKABLE;
-  var box=$("picker"); box.innerHTML="";
-  if(!list.length){ box.innerHTML='<p style="font-size:14px;color:#B39C88;padding:14px 2px;margin:0">Nothing by that name. Clear the search, or tell us at the next step.</p>'; return; }
-  list.forEach(function(it){
-    var b=document.createElement("button");
-    b.className="srow"; b.setAttribute("aria-checked",String(B.treat===it.n));
-    b.innerHTML='<span style="flex:1;min-width:0"><span class="serif" style="display:block;font-size:16.5px;line-height:1.3">'+it.n+'</span>'+
-      '<span style="font-size:12.5px;color:#B39C88">'+it.t+'</span></span>'+
-      '<span style="font-size:15px;font-weight:600;flex:none">'+it.p+'</span><span class="tick"></span>';
-    b.onclick=function(){ B.treat=it.n; renderPicker(); sync(); };
-    box.appendChild(b);
-  });
-}
-var calOff=0;
-function viewMonth(){ var t=d0(); return new Date(t.getFullYear(),t.getMonth()+calOff,1); }
-async function renderDays(){
-  var v=viewMonth(), t=d0(), box=$("days"); box.innerHTML="";
-  $("cal-month").textContent=v.toLocaleDateString("en-GB",{month:"long",year:"numeric"});
-  $("cal-prev").disabled = calOff<=0;
-  $("cal-next").disabled = calOff>=5;
-  await fetchMonthBookingsM(v);
-  var firstDow=(v.getDay()+6)%7, dim=new Date(v.getFullYear(),v.getMonth()+1,0).getDate();
-  for(var i=0;i<firstDow;i++) box.appendChild(Object.assign(document.createElement("div"),{className:"blank"}));
-  for(var n=1;n<=dim;n++){
-    (function(n){
-      var d=new Date(v.getFullYear(),v.getMonth(),n), k=key(d);
-      var usable = d>=t && isOpen(d) && free(d);
-      var b=document.createElement("button");
-      b.className="dcell"+(k===key(t)?" today":"");
-      b.setAttribute("aria-pressed",String(B.dayKey===k));
-      b.innerHTML=n+(usable?'<u></u>':'');
-      if(!usable) b.setAttribute("disabled","disabled");
-      else b.onclick=function(){ B.dayKey=k; B.time=""; renderDays(); renderSlots(); sync(); };
-      box.appendChild(b);
-    })(n);
-  }
-}
-async function hop(n){
-  calOff=Math.min(5,Math.max(0,calOff+n));
-  await renderDays();
-}
-function renderSlots(){
-  var box=$("slots"); box.innerHTML="";
-  if(!B.dayKey){ $("slotlbl").textContent="Choose a day to see times"; return; }
-  var d=parseK(B.dayKey);
-  $("slotlbl").textContent="Times on "+longD(d);
-  slotsFor(d).forEach(function(s){
-    var b=document.createElement("button");
-    b.className="chip"; b.style.width="100%"; b.setAttribute("aria-pressed",String(B.time===s.l));
-    b.textContent=s.l;
-    if(!s.open) b.setAttribute("disabled","disabled");
-    else b.onclick=function(){ B.time=s.l; renderSlots(); sync(); };
-    box.appendChild(b);
-  });
-}
-async function checkKnown(){
-  var emailEl=$("f-email");
-  if(!emailEl) return;
-  var email=emailEl.value.trim().toLowerCase();
-  if(!email||email.indexOf('@')===-1){
-    $("known").className="hide";
-    if($("f-name")) $("f-name").closest("label").style.display="";
-    if($("f-tel")) $("f-tel").closest("label").style.display="";
-    $("acct-head").textContent="Keep this as my AMAI account";
-    return;
-  }
-  if(!sb) return;
-  var r=await sb.from('clients').select('*').eq('email',email).maybeSingle();
-  B.returning=!!(r&&r.data);
-  if(r&&r.data){
-    $("known").className="";
-    $("known-copy").innerHTML='Welcome back, <strong style="font-weight:600">'+r.data.name+'</strong>. We\'ve found your account \u2014 your stamps and history are waiting.';
-    if($("f-name")){ $("f-name").value=r.data.name; $("f-name").closest("label").style.display="none"; }
-    if($("f-tel")&&r.data.phone){ $("f-tel").value=r.data.phone; $("f-tel").closest("label").style.display="none"; }
-    $("acct-head").textContent="Add this visit to my account";
-  } else {
-    $("known").className="hide";
-    if($("f-name")) $("f-name").closest("label").style.display="";
-    if($("f-tel")) $("f-tel").closest("label").style.display="";
-    $("acct-head").textContent="Keep this as my AMAI account";
-  }
-  sync();
-}
-function ready(){
-  if(B.step===1) return !!B.treat;
-  if(B.step===2) return !!(B.dayKey&&B.time);
-  if(B.step===3){
-    var em=$("f-email");
-    var nm=$("f-name");
-    if(em&&nm) return em.value.indexOf('@')>-1 && em.value.indexOf('.')>-1 && !!nm.value.trim();
-    return true;
-  }
-  return true;
-}
-function sync(){
-  var bars=$("bars"); bars.innerHTML="";
-  [1,2,3,4].forEach(function(n){
-    var d=document.createElement("div");
-    d.style.cssText="height:3px;flex:"+(n===B.step?"1.6":"1")+";background:"+(n<=B.step?"#E8D5C4":"rgba(232,213,196,.25)");
-    bars.appendChild(d);
-  });
-  $("steplbl").textContent="Step "+B.step+" of 4";
-  var ok=ready(), b=$("next");
-  b.textContent = B.step<3?"Continue" : B.step===3?"Continue to deposit" : "Pay £10 and confirm";
-  b.style.background = ok?"#E8D5C4":"rgba(232,213,196,.28)";
-  $("back").className = B.step>1?"btn btn-o":"btn btn-o hide";
-  $("help").textContent = B.step===1?"First visits include a consultation and extra time, at no extra cost."
-    : B.step===2?"Struck-through times are already taken."
-    : B.step===3?(wantsAcct()?"We'll text a six-digit code after payment — that opens your account.":"Next: a £10 deposit holds the room.")
-    : "Payment is secure. The balance is paid in the studio.";
-}
-function show(){
-  [1,2,3,4].forEach(function(n){ $("s"+n).className = B.step===n?"":"hide"; });
-  if(B.step===4){
-    $("r-treat").textContent=B.treat; $("r-price").textContent=priceOf(B.treat);
-    $("r-when").textContent=whenLbl(); $("r-bal").textContent=balOf(B.treat);
-  }
-  sync();
-}
-function saveHub(){
-  try{
-    var raw=localStorage.getItem(HUB_KEY), h=raw?JSON.parse(raw):null;
-    var v={id:Date.now(),treat:B.treat,dateKey:B.dayKey,time:B.time,price:priceNum(B.treat),deposit:10};
-    if(h&&h.upcoming){ h.upcoming.push(v); h.name=$("f-name").value.trim()||h.name; h.email=$("f-email")?$("f-email").value.trim():h.email; h.phone=$("f-tel")?$("f-tel").value.trim():h.phone; h.signedIn=true; }
-    else {
-      var num=dig($("c-num").value), now=new Date();
-      h={signedIn:true,name:$("f-name").value.trim(),phone:$("f-tel")?$("f-tel").value.trim():"",email:$("f-email")?$("f-email").value.trim().toLowerCase():"",
-         since:now.toLocaleDateString("en-GB",{month:"long",year:"numeric"}),view:"home",stamps:0,plan:null,notes:"",
-         card:(B.how==="card"&&num.length>=15)?{brand:"Visa",last4:num.slice(-4),exp:$("c-exp").value.trim()||"—"}:null,
-         upcoming:[v],past:[],referrals:[]};
-    }
-    localStorage.setItem(HUB_KEY,JSON.stringify(h));
-  }catch(e){}
-}
-async function confirmPay(how){
-  B.how=how;
-  var nm=$("f-name").value.trim()||"Thank you";
-  $("navrow").className="hide";
-  if(wantsAcct()){
-    var email=$("f-email").value.trim().toLowerCase();
-    $("v-title").textContent=nm+", you're booked in.";
-    $("v-sub").textContent=B.returning?"One code and you're back in your account.":"One code and your account is open.";
-    $("v-treat").textContent=B.treat; $("v-when").textContent=whenLbl();
-    $("v-lbl").textContent="Sending code to "+email+"\u2026";
-    ["s1","s2","s3","s4"].forEach(function(id){ $(id).className="hide"; });
-    $("help").textContent=""; $("verify").className="";
-    window.scrollTo({top:$("book").offsetTop-40,behavior:"smooth"});
-    /* send real OTP via email */
-    if(sb){
-      var res=await sb.auth.signInWithOtp({email:email,options:{shouldCreateUser:true}});
-      if(res.error){ $("v-lbl").textContent="Could not send code: "+res.error.message; }
-      else { $("v-lbl").textContent="Code emailed to "+email; }
-    }
-    setTimeout(function(){ $("v-code").focus(); },60);
-    return;
-  }
-  finish(false);
-}
-function getDuration(name){
-  var t=BOOKABLE.find(function(i){return i.n===name;});
-  if(!t) return 60;
-  var m=String(t.t).match(/(\d+)/);
-  return m?parseInt(m[1],10):60;
-}
-async function finish(acct){
-  var nm=$("f-name").value.trim()||"Thank you";
-  $("d-title").textContent = acct? (B.returning? nm+", you're booked and signed in." : nm+", your account is ready.") : nm+", you're booked in.";
-  $("d-treat").textContent=B.treat; $("d-when").textContent=whenLbl();
-  $("d-paid").textContent = B.how==="apple" ? "£10 paid · Apple Pay" : "£10 paid · card ending "+dig($("c-num").value).slice(-4);
-  $("d-bal").textContent=balOf(B.treat)+" in the studio";
-  $("d-hub").className = acct?"btn":"hide";
-  ["s1","s2","s3","s4","verify"].forEach(function(id){ $(id).className="hide"; });
-  $("navrow").className="hide"; $("help").textContent=""; $("done").className="";
-  if(sb){
-    try{
-      var phone=$("f-tel")?$("f-tel").value.trim():"";
-      var name=$("f-name").value.trim();
-      var email=$("f-email")?$("f-email").value.trim():"";
-      var notes=$("f-notes")?$("f-notes").value.trim():"";
-      var r=await sb.from('clients').select('id,phone').eq('email',email);
-      var clientId;
-      if(r.data&&r.data.length>0){
-        clientId=r.data[0].id;
-        if(phone&&r.data[0].phone!==phone) await sb.from('clients').update({phone:phone}).eq('id',clientId);
-      }
-      else {
-        var ins=await sb.from('clients').insert([{name:name,phone:phone||null,email:email,stamps:0}]).select().single();
-        if(ins.data) clientId=ins.data.id;
-      }
-      if(clientId){
-        await sb.from('bookings').insert([{
-          client_id:clientId,client_name:name,client_phone:phone,client_email:email||null,
-          treatment_name:B.treat,
-          appointment_date:dayKeyToDate(B.dayKey),appointment_time:B.time.replace('.',':'),
-          price:priceNum(B.treat),deposit_amount:10,
-          duration_minutes:getDurationM(B.treat),status:'confirmed',
-          notes:notes
-        }]);
-      }
-    }catch(e){ console.warn('booking save error',e); }
-  }
-}
-
-$("q").oninput=function(){ B.q=this.value; renderPicker(); };
-$("cal-prev").onclick=function(){ hop(-1); };
-$("cal-next").onclick=function(){ hop(1); };
-$("f-email").oninput=function(){ sync(); };
-$("f-email").onblur=function(){ checkKnown(); sync(); };
-$("f-name").oninput=sync;
-$("f-tel").oninput=sync;
-$("f-acct").onchange=sync;
-["c-num","c-exp","c-cvc"].forEach(function(id){ $(id).oninput=sync; });
-$("next").onclick=function(){ if(!ready())return; if(B.step<4){ B.step++; show(); window.scrollTo({top:$("book").offsetTop-40,behavior:"smooth"}); } else confirmPay("card"); };
-$("back").onclick=function(){ if(B.step>1){ B.step--; show(); } };
-$("apple").onclick=function(){ confirmPay("apple"); };
-$("v-code").oninput=function(){ this.value=dig(this.value).slice(0,6); $("v-go").style.background=this.value.length===6?"#E8D5C4":"rgba(232,213,196,.28)"; };
-$("v-go").onclick=function(){ if(dig($("v-code").value).length!==6)return; saveHub(); finish(true); };
-$("v-skip").onclick=function(){ finish(false); };
-$("again").onclick=function(){
-  B={step:1,treat:(BOOKABLE.length?BOOKABLE[0].n:""),dayKey:"",time:"",q:"",how:"",returning:false};
-  ["f-email","f-tel","f-name","f-notes","c-num","c-exp","c-cvc","q","v-code"].forEach(function(id){ if($(id)) $(id).value=""; });
-  if($("f-name")) $("f-name").closest("label").style.display="";
-  if($("f-tel")) $("f-tel").closest("label").style.display="";
-  $("f-acct").checked=true; checkKnown();
-  $("done").className="hide"; $("navrow").className="";
-  renderPicker(); renderDays(); renderSlots(); show();
-};
-
-
-(async function(){
-  await loadSupabaseSDK();
-  await loadMobileServices();
-  renderPicker(); renderDays(); renderSlots(); checkKnown(); show();
-})();
-
-})();
+</script>
+<script src="booking.js"></script>
+<script>
+/* Mobile: init booking engine */
+(async function(){ await initBooking(); })();
 
 /* treatments */
 (function(){var $=function(i){return document.getElementById(i);};
