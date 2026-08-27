@@ -219,7 +219,7 @@ function whenLabel(ts){
   return (day==="Today"?"Today":day)+", "+clockOf(ts);
 }
 
-var KEY="amai_studio_v4";
+var KEY="amai_studio_v5";
 function load(){ try{ return JSON.parse(localStorage.getItem(KEY))||null; }catch(e){ return null; } }
 function save(){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
 
@@ -787,12 +787,12 @@ function apptSheet(a){
 }
 function newSheet(dayKey,time){
   var first=bookable()[0]||{d:60};
-  draft={id:null,day:dayKey,time:time||"",cid:S.clients[0].id,svc:0,dur:first.d};
+  draft={id:null,day:dayKey,time:time||"",cid:S.clients.length?S.clients[0].id:null,svc:0,dur:first.d};
   sheet('<div class="lbl" style="margin-bottom:10px">New booking</div>'+
     '<div class="serif" style="font-size:28px;margin-bottom:20px">'+longDate(parseKey(dayKey))+'</div>'+
     '<div class="lbl" style="margin-bottom:10px">Client</div>'+
     '<select class="field" id="n-client" style="margin-bottom:18px">'+
-      S.clients.map(function(c){ return '<option value="'+c.id+'">'+c.name+' · '+c.phone+'</option>'; }).join("")+
+      S.clients.map(function(c){ return '<option value="'+c.id+'">'+c.name+' · '+(c.phone||c.email||'')+'</option>'; }).join("")+
       '<option value="new">+ New client</option></select>'+
     '<div id="newfields" class="hide" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px">'+
       '<input class="field" id="n-name" placeholder="Name"><input class="field" id="n-phone" placeholder="Phone">'+
@@ -800,6 +800,8 @@ function newSheet(dayKey,time){
     '<div class="lbl" style="margin-bottom:10px">Treatment</div>'+
     '<select class="field" id="n-svc" style="margin-bottom:18px">'+
       bookable().map(function(s,i){ return '<option value="'+i+'">'+s.n+' · '+s.d+' min · '+money(s.p)+'</option>'; }).join("")+'</select>'+
+    '<div class="lbl" style="margin-bottom:10px">Date</div>'+
+    '<input class="field" type="date" id="n-date" value="'+inputDate(parseKey(dayKey))+'" style="margin-bottom:18px">'+
     '<div class="lbl" style="margin-bottom:10px">Time</div>'+
     '<div style="display:flex;flex-wrap:wrap;gap:8px" id="chips">'+timeChips(dayKey,draft.time)+'</div>'+
     '<div style="display:flex;gap:10px;margin-top:24px">'+
@@ -808,10 +810,18 @@ function newSheet(dayKey,time){
   bindSheet();
   $("sclose").onclick=closeSheet;
   $("n-client").onchange=function(){ $("newfields").className=this.value==="new"?"":"hide"; };
+  $("n-date").onchange=function(){
+    var d=fromInput(this.value);
+    if(!open(d)){ this.style.borderColor="#c44"; return; }
+    this.style.borderColor="";
+    draft.day=iso(d); draft.time="";
+    $("chips").innerHTML=timeChips(draft.day,draft.time,draft.dur);
+    bindSheet();
+  };
   $("n-svc").onchange=function(){
     var sv=bookable()[+this.value]; draft.dur=sv.d;
-    if(draft.time&&!fitsAt(dayKey,draft.time,draft.dur,null)) draft.time="";
-    $("chips").innerHTML=timeChips(dayKey,draft.time,draft.dur);
+    if(draft.time&&!fitsAt(draft.day,draft.time,draft.dur,null)) draft.time="";
+    $("chips").innerHTML=timeChips(draft.day,draft.time,draft.dur);
     bindSheet();
   };
   $("ssave").onclick=async function(){
@@ -832,9 +842,9 @@ function newSheet(dayKey,time){
       }
     } else cid=sel;
     var sv=bookable()[+$("n-svc").value];
-    var bRes = await sb.from('bookings').insert({client_id:cid, treatment_name:sv.n, appointment_date: dayKeyToDate(dayKey), appointment_time: draft.time, price: sv.p, deposit_amount:10, duration_minutes: sv.d, status:'confirmed'}).select().single();
+    var bRes = await sb.from('bookings').insert({client_id:cid, treatment_name:sv.n, appointment_date: dayKeyToDate(draft.day), appointment_time: draft.time, price: sv.p, deposit_amount:10, duration_minutes: sv.d, status:'confirmed'}).select().single();
     var dbId = bRes.data ? bRes.data.id : null;
-    S.appts.push({id:Date.now()+1,c:cid,s:sv.n,t:draft.time,dur:sv.d,p:sv.p,dep:10,day:dayKey,st:"due", dbId:dbId});
+    S.appts.push({id:dbId||Date.now()+1,c:cid,s:sv.n,t:draft.time,dur:sv.d,p:sv.p,dep:10,day:draft.day,st:"due", dbId:dbId});
     save(); closeSheet(); render();
   };
 }
@@ -934,6 +944,7 @@ function clientSheet(c){
     }).join(""):'<div style="font-size:14px;color:#6E5B49">Nothing booked.</div>')+
     '<div style="display:flex;gap:10px;margin-top:22px;flex-wrap:wrap">'+
       '<button class="btn btn-sm" data-bookfor="'+c.id+'">Book them in</button>'+
+      '<button class="btn btn-o btn-sm" data-msgclient="'+c.id+'">Message</button>'+
       '<button class="btn btn-o btn-sm" data-call="'+c.phone+'">Call</button>'+
       '<button class="btn btn-o btn-sm" data-stamp="'+c.id+'">Add a stamp</button>'+
       '<button class="btn btn-o btn-sm" id="sclose" style="margin-left:auto">Close</button></div>');
@@ -1231,6 +1242,16 @@ function wire(scope){
   q("[data-editday]").forEach(function(b){ b.onclick=function(){ hoursSheet(b.dataset.editday); }; });
   q("[data-stamp]").forEach(function(b){ b.onclick=async function(){ var c=client(b.dataset.stamp); c.stamps=Math.min(10,c.stamps+1); if(c.id) await sb.from('clients').update({stamps: c.stamps}).eq('id', c.id); save(); clientSheet(c); }; });
   q("[data-bookfor]").forEach(function(b){ b.onclick=function(){ closeSheet(); newSheet(S.dayKey,""); setTimeout(function(){ $("n-client").value=b.dataset.bookfor; },0); }; });
+  q("[data-msgclient]").forEach(function(b){ b.onclick=async function(){
+    var c=client(b.dataset.msgclient); if(!c) return;
+    /* find existing conversation or create one */
+    var conv=S.conversations.filter(function(x){ return String(x.client_id)===String(c.id); })[0];
+    if(!conv){
+      var res=await sb.from('conversations').insert({client_id:c.id, client_name:c.name, client_phone:c.phone||c.email||'', last_message_at:new Date().toISOString(), last_message_preview:'', last_sender:'studio', admin_unread:0, client_unread:0}).select().single();
+      if(res.data){ conv=res.data; S.conversations.push(conv); save(); }
+    }
+    if(conv){ closeSheet(); openThread=conv.id; S.view="inbox"; save(); render(); loadThread(conv.id); }
+  }; });
   q("[data-dismiss]").forEach(function(b){ b.onclick=function(){ S.requests=S.requests.filter(function(r){ return String(r.id)!==b.dataset.dismiss; }); save(); render(); }; });
   q("[data-offer]").forEach(function(b){ b.onclick=function(){
     var r=S.requests.filter(function(x){ return String(x.id)===b.dataset.offer; })[0];
