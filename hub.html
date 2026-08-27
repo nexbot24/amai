@@ -233,20 +233,14 @@ function parseKey(k){ var p=k.split("-"); return new Date(+p[0],+p[1],+p[2]); }
 function money(n){ return "£"+n; }
 
 var DEFAULTS={
-  signedIn:false, name:"Josh", phone:"07700 900123", email:"josh@example.com", since:"January 2026",
-  view:"home", stamps:4, plan:null, notes:"Sensitive skin on legs — patch test done Feb 2026.",
-  prefs:{room:"Warm, low light",music:"Quiet",chat:"Happy to chat"},
+  signedIn:false, name:"", phone:"", email:"", since:"",
+  view:"home", stamps:0, plan:null, notes:"",
+  prefs:{room:"",music:"",chat:""},
   notify:{reminder:true,aftercare:true,openings:false,news:false},
-  card:{brand:"Visa",last4:"4242",exp:"04 / 29"},
-  referrals:[{who:"Priya · booked 4 Mar",state:"Stamp earned"},{who:"Hannah · invited 18 Mar",state:"Not booked yet"}],
-  upcoming:[{id:1,treat:"Hollywood wax",dateKey:iso(openDay(9)),time:"14.30",price:42,deposit:10}],
-  past:[
-    {id:101,treat:"Hollywood wax",dateKey:iso(pastDay(-26)),time:"15.00",price:42},
-    {id:102,treat:"Brow shape & tidy",dateKey:iso(pastDay(-26)),time:"16.00",price:16},
-    {id:103,treat:"Hollywood wax",dateKey:iso(pastDay(-61)),time:"11.00",price:42},
-    {id:104,treat:"Bikini wax",dateKey:iso(pastDay(-96)),time:"10.30",price:28},
-    {id:105,treat:"First visit — consultation & treatment",dateKey:iso(pastDay(-131)),time:"12.00",price:30}
-  ]
+  card:null,
+  referrals:[],
+  upcoming:[],
+  past:[]
 };
 var S=(function(){
   var saved=load()||{}, s={};
@@ -282,7 +276,7 @@ $("a-verify").onclick=async function(){
   if(res.error){ $("a-hint").textContent=res.error.message; return; }
   S.signedIn=true; save(); boot();
 };
-$("signout").onclick=async function(){ await sb.auth.signOut(); S.signedIn=false; save(); location.reload(); };
+$("signout").onclick=async function(){ await sb.auth.signOut(); Object.assign(S, DEFAULTS); localStorage.clear(); location.reload(); };
 
 /* ---------- shell ---------- */
 var VIEWS=[
@@ -951,6 +945,7 @@ function bindBookingModal(cta){
     if(draft.mode==="amend"){
       // We will actually update Supabase later, for now just ui
       S.upcoming.forEach(function(b){ if(b.id===draft.id){ b.dateKey=draft.dateKey; b.time=draft.time; } });
+      if(sb) await sb.from('bookings').update({appointment_date: dayKeyToDate(draft.dateKey), appointment_time: draft.time}).eq('id', draft.id);
       save(); closeModal(); render();
       toast("Moved to "+longDate(parseKey(draft.dateKey))+", "+draft.time+".");
     } else {
@@ -1094,9 +1089,16 @@ function wire(){
   [].forEach.call(document.querySelectorAll("[data-toggle]"),function(b){
     b.onclick=function(){ var k=b.dataset.toggle; S.notify[k]=!S.notify[k]; b.setAttribute("aria-checked",String(S.notify[k])); save(); };
   });
-  if($("savedetails")) $("savedetails").onclick=function(){
+  if($("savedetails")) $("savedetails").onclick=async function(){
     S.name=$("f-name").value.trim()||S.name; S.phone=($("f-phone")?$("f-phone").value.trim():S.phone);
     S.email=$("f-email").value.trim(); S.notes=$("f-notes").value.trim();
+    if(S.clientId) {
+      await sb.from('clients').update({
+        name: S.name,
+        phone: S.phone,
+        notes: S.notes
+      }).eq('id', S.clientId);
+    }
     save(); $("saved").textContent="Saved."; setTimeout(function(){ if($("saved")) $("saved").textContent=""; },2200);
   };
   if($("changecard")) $("changecard").onclick=function(){

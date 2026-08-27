@@ -279,6 +279,7 @@ section[id]{scroll-margin-top:84px}
           <div class="two" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:16px">
             <label class="flab">Email address<input id="f-contact" class="field" type="email" autocomplete="email" placeholder="hello@example.com"></label>
             <label class="flab">First name<input id="f-name" class="field" placeholder="Your name"></label>
+            <label class="flab">Phone<input class="field" id="f-phone" type="tel" placeholder="07..." autocomplete="tel"></label>
           </div>
           <div id="known" class="hide" style="display:flex;align-items:center;gap:14px;background:#443B36;padding:15px 18px;margin-bottom:16px">
             <span style="width:9px;height:9px;border-radius:50%;background:#E8D5C4;flex:none"></span>
@@ -317,10 +318,12 @@ section[id]{scroll-margin-top:84px}
             <label class="flab">Expiry<input id="c-exp" class="field" placeholder="MM / YY"></label>
             <label class="flab">Security code<input id="c-cvc" class="field" placeholder="123"></label>
           </div>
-          <div style="margin-top:24px;background:#443B36;padding:20px 22px;display:flex;flex-direction:column;gap:10px;font-size:14px">
+          <div id="promo-row" style="display:flex;gap:10px;margin-top:24px;margin-bottom:18px"><input class="field" id="f-promo" placeholder="Promo code" style="flex:1;text-transform:uppercase;letter-spacing:.08em"><button class="btn btn-o btn-sm" id="apply-promo">Apply</button></div><div id="promo-result" style="font-size:14px;margin-bottom:12px"></div>
+          <div style="background:#443B36;padding:20px 22px;display:flex;flex-direction:column;gap:10px;font-size:14px">
             <div style="display:flex;justify-content:space-between;gap:20px"><span style="color:#CBB49E" id="s4-treat"></span><span id="s4-price"></span></div>
+            <div style="display:flex;justify-content:space-between;gap:20px" id="s4-promo-row" class="hide"><span style="color:#CBB49E" id="s4-promo-code"></span><span style="color:#4ADE80" id="s4-promo-discount"></span></div>
             <div style="display:flex;justify-content:space-between;gap:20px"><span style="color:#CBB49E" id="s4-when"></span><span style="color:#CBB49E" id="s4-name"></span></div>
-            <div style="display:flex;justify-content:space-between;gap:20px;padding-top:10px;border-top:1px solid rgba(232,213,196,.18)"><span style="color:#CBB49E">Deposit today</span><span style="font-weight:600">£10</span></div>
+            <div style="display:flex;justify-content:space-between;gap:20px;padding-top:10px;border-top:1px solid rgba(232,213,196,.18)"><span style="color:#CBB49E">Deposit today</span><span style="font-weight:600">£10.00</span></div>
             <div style="display:flex;justify-content:space-between;gap:20px"><span style="color:#CBB49E">Balance in the studio</span><span id="s4-bal"></span></div>
           </div>
         </div>
@@ -476,9 +479,8 @@ var REASONS = [
 ];
 var BOOKABLE = [];
 
-var KNOWN = { "07700900123":"Nadia", "07700900456":"Priya", "07700900789":"Hannah" };
 var HUB_KEY = "amai_hub_v2";
-var S = { group:0, step:1, treatment:"", monthOffset:0, dateKey:"", time:"", query:"", paid:"", how:"", sent:false, returning:false };
+var S = { group:0, step:1, treatment:"", monthOffset:0, dateKey:"", time:"", query:"", paid:"", how:"", sent:false, returning:false, promo:null };
 var $ = function(id){ return document.getElementById(id); };
 var el = function(tag, attrs, html){ var n=document.createElement(tag); for(var k in attrs){ if(k==="style")n.setAttribute("style",attrs[k]); else if(k.indexOf("on")===0)n[k]=attrs[k]; else n.setAttribute(k,attrs[k]); } if(html!=null)n.innerHTML=html; return n; };
 function dayKeyToDate(k){ var p=k.split('-'); var d=new Date(+p[0],+p[1],+p[2]); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
@@ -638,18 +640,30 @@ function whenLabel(){ var d=chosenDate(); if(!d) return "Not chosen yet"; return
 function digits(v){ return String(v).replace(/\D/g,""); }
 function priceNum(n){ return parseFloat(String(priceOf(n)).replace(/[^0-9.]/g,""))||0; }
 function wantsAccount(){ return $("f-acct") && $("f-acct").checked; }
-function checkKnown(){
+async function checkKnown(){
   var contactInput = $("f-contact");
   if(!contactInput) return;
-  var name=KNOWN[contactInput.value.trim().toLowerCase()];
+  var email = contactInput.value.trim().toLowerCase();
+  if(!email || email.indexOf('@')===-1) {
+    if($("known")) $("known").className="hide";
+    if($("f-name")) $("f-name").closest("label").style.display="";
+    if($("f-phone")) $("f-phone").closest("label").style.display="";
+    if($("acct-head")) $("acct-head").textContent="Keep this as my AMAI account";
+    return;
+  }
+  var { data } = await sb.from('clients').select('*').eq('email', email).maybeSingle();
+  var name = data ? data.name : null;
   S.returning=!!name;
   if(name){
     if($("known")) $("known").className="";
     if($("known-copy")) $("known-copy").innerHTML='Welcome back, <strong style="font-weight:600">'+name+'</strong>. We\'ve found your account — your stamps and history are waiting.';
-    if($("f-name") && !$("f-name").value.trim()) $("f-name").value=name;
+    if($("f-name")) { $("f-name").value=name; $("f-name").closest("label").style.display="none"; }
+    if($("f-phone") && data.phone) { $("f-phone").value=data.phone; $("f-phone").closest("label").style.display="none"; }
     if($("acct-head")) $("acct-head").textContent="Add this visit to my account";
   } else {
     if($("known")) $("known").className="hide";
+    if($("f-name")) $("f-name").closest("label").style.display="";
+    if($("f-phone")) $("f-phone").closest("label").style.display="";
     if($("acct-head")) $("acct-head").textContent="Keep this as my AMAI account";
   }
 }
@@ -721,7 +735,18 @@ function showStep(){
   if(S.step===4){
     $("s4-treat").textContent=S.treatment; $("s4-price").textContent=priceOf(S.treatment);
     $("s4-when").textContent=whenLabel(); $("s4-name").textContent=$("f-name").value.trim();
-    $("s4-bal").textContent=balanceOf(S.treatment);
+    var p = priceNum(S.treatment);
+    var bal = p - 10;
+    if(S.promo) {
+      $("s4-promo-row").className = "display:flex;justify-content:space-between;gap:20px";
+      $("s4-promo-code").textContent = "Promo: " + S.promo.code;
+      $("s4-promo-discount").textContent = "−£" + S.promo.discount.toFixed(2);
+      bal = p - S.promo.discount - 10;
+    } else {
+      if($("s4-promo-row")) $("s4-promo-row").className = "hide";
+    }
+    var prefix = String(priceOf(S.treatment)).indexOf("from")===0?"from £":"£";
+    $("s4-bal").textContent= prefix + Math.max(0, bal).toFixed(2);
   }
   renderTracker(); syncNext();
 }
@@ -760,13 +785,17 @@ async function showDone(how,acct){
   
 
   // Create client if not exists
-  let { data: clients } = await sb.from('clients').select('id').eq('email', email);
+  let { data: clients } = await sb.from('clients').select('id, phone').eq('email', email);
   let clientId;
+  var phoneVal = $("f-phone") ? $("f-phone").value.trim() : null;
   if (!clients || clients.length === 0) {
-    const { data: newClient } = await sb.from('clients').insert([{ name: name, email: email }]).select().single();
+    const { data: newClient } = await sb.from('clients').insert([{ name: name, email: email, phone: phoneVal }]).select().single();
     if(newClient) clientId = newClient.id;
   } else {
     clientId = clients[0].id;
+    if(phoneVal && clients[0].phone !== phoneVal) {
+      await sb.from('clients').update({ phone: phoneVal }).eq('id', clientId);
+    }
   }
 
   // Create booking
@@ -779,7 +808,10 @@ async function showDone(how,acct){
       price: parseFloat(String(priceOf(S.treatment)).replace(/[^0-9.]/g,"")),
       deposit_amount: 10,
       duration_minutes: getDuration(S.treatment),
-      status: 'confirmed'
+      status: 'confirmed',
+      notes: $("f-note") ? $("f-note").value.trim() : '',
+      promo_code: S.promo ? S.promo.code : null,
+      discount_amount: S.promo ? S.promo.discount : 0
     }]);
   }
 
@@ -799,7 +831,42 @@ $("next").onclick=function(){ if(!ready())return; if(S.step<4){ S.step++; showSt
 $("back").onclick=function(){ if(S.step>1){ S.step--; showStep(); } };
 $("apple").onclick=function(){ confirm("apple"); };
 $("f-acct").onchange=function(){ renderTracker(); syncNext(); };
-$("f-contact").oninput=function(){ checkKnown(); renderTracker(); syncNext(); };
+$("f-contact").oninput=function(){ renderTracker(); syncNext(); };
+$("f-contact").onblur=function(){ checkKnown(); renderTracker(); syncNext(); };
+if($("apply-promo")) {
+  $("apply-promo").onclick = async function() {
+    var code = $("f-promo").value.trim().toUpperCase();
+    if(!code) return;
+    var { data } = await sb.from('promos').select('*').eq('code', code).eq('active', true).maybeSingle();
+    var res = $("promo-result");
+    if(!data) {
+      res.innerHTML = '<span style="color:#ef4444">Invalid or expired promo code.</span>';
+      S.promo = null;
+      showStep();
+      return;
+    }
+    if(data.cap > 0 && data.uses >= data.cap) {
+      res.innerHTML = '<span style="color:#ef4444">This promo code has reached its usage limit.</span>';
+      S.promo = null;
+      showStep();
+      return;
+    }
+    if(data.until && new Date(data.until) < today()) {
+      res.innerHTML = '<span style="color:#ef4444">This promo code has expired.</span>';
+      S.promo = null;
+      showStep();
+      return;
+    }
+    var p = priceNum(S.treatment);
+    var discount = 0;
+    if(data.kind === '%') discount = p * (data.value / 100);
+    else if(data.kind === '£') discount = data.value;
+    
+    S.promo = { code: code, discount: discount };
+    res.innerHTML = '<span style="color:#4ade80">' + code + ' applied — ' + (data.kind==='%'? data.value+'% off' : '£'+data.value+' off') + ' (−£' + discount.toFixed(2) + ')</span>';
+    showStep();
+  };
+}
 $("v-code").oninput=function(){
   this.value=digits(this.value).slice(0,6);
   var ok=this.value.length===6, b=$("v-go");
@@ -817,8 +884,9 @@ $("v-go").onclick=async function(){
 };
 $("v-skip").onclick=function(){ showDone(S.how,false); };
 $("again").onclick=function(){
-  S={group:S.group,step:1,treatment:(BOOKABLE.length?BOOKABLE[0].name:""),monthOffset:0,dateKey:"",time:"",query:"",paid:"",how:"",sent:false,returning:false};
-  ["f-name","f-contact","f-note","c-num","c-exp","c-cvc","q","v-code"].forEach(function(id){ $(id).value=""; });
+  S={group:S.group,step:1,treatment:(BOOKABLE.length?BOOKABLE[0].name:""),monthOffset:0,dateKey:"",time:"",query:"",paid:"",how:"",sent:false,returning:false,promo:null};
+  ["f-name","f-phone","f-promo","f-contact","f-note","c-num","c-exp","c-cvc","q","v-code"].forEach(function(id){ if($(id)) $(id).value=""; });
+  if($("promo-result")) $("promo-result").innerHTML="";
   $("f-acct").checked=true; checkKnown();
   $("done-side").className="hide"; $("verify-side").className="hide"; $("form-side").className="";
   renderPicker(); renderCalendar(); renderSlots(); showStep();
@@ -898,6 +966,16 @@ $("again").onclick=function(){
       }
     }
   } catch(e) {}
+  
+  window.addEventListener('storage', function(e) {
+    if (e.key === "amai_hub_v2") {
+      var h = e.newValue ? JSON.parse(e.newValue) : null;
+      if (!h || !h.signedIn) {
+        var signoutLink = document.getElementById("sign-out-link");
+        if(signoutLink) signoutLink.click();
+      }
+    }
+  });
 })();
 </script>
 </body>

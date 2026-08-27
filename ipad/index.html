@@ -227,44 +227,11 @@ function seed(){
   var t=nextOpen(0), t2=nextOpen(1), t3=nextOpen(2);
   return {
     view:"today", dayKey:iso(t), locked:false,
-    clients:[
-      {id:1,name:"Nadia Rahman",phone:"07700 900123",since:"Jan 2026",stamps:4,plan:"Hollywood, every 5 weeks",notes:"Sensitive on legs — patch tested Feb.",visits:5,spend:158},
-      {id:2,name:"Priya Shah",phone:"07700 900456",since:"Mar 2026",stamps:2,plan:null,notes:"First Brazilian was Mar — prefers 10.00.",visits:2,spend:64},
-      {id:3,name:"Hannah Doyle",phone:"07700 900789",since:"Feb 2026",stamps:9,plan:"Bikini, every 5 weeks",notes:"Runs 5 mins late, always.",visits:9,spend:286},
-      {id:4,name:"Leila Osman",phone:"07700 900321",since:"Apr 2026",stamps:1,plan:null,notes:"New — consultation only so far.",visits:1,spend:30},
-      {id:5,name:"Chloe Baptiste",phone:"07700 900654",since:"Jan 2026",stamps:6,plan:null,notes:"Waxes brows every visit, add 20 min.",visits:6,spend:214}
-    ],
-    appts:[
-      {id:11,c:1,s:"Hollywood wax",t:"10.00",dur:45,p:42,dep:10,day:iso(t),st:"done"},
-      {id:12,c:5,s:"Full leg wax",t:"11.00",dur:45,p:38,dep:10,day:iso(t),st:"done"},
-      {id:13,c:2,s:"Brazilian wax",t:"13.00",dur:40,p:36,dep:10,day:iso(t),st:"due"},
-      {id:14,c:3,s:"Bikini wax",t:"15.00",dur:30,p:28,dep:10,day:iso(t),st:"due"},
-      {id:15,c:4,s:"Brow shape & tidy",t:"16.00",dur:20,p:16,dep:10,day:iso(t),st:"due"},
-      {id:16,c:3,s:"Hollywood wax",t:"10.00",dur:45,p:42,dep:10,day:iso(t2),st:"due"},
-      {id:17,c:1,s:"Brow shape & tidy",t:"14.00",dur:20,p:16,dep:10,day:iso(t2),st:"due"},
-      {id:18,c:5,s:"Underarm wax",t:"9.00",dur:15,p:14,dep:10,day:iso(t3),st:"due"},
-      {id:19,c:2,s:"Half leg wax",t:"12.00",dur:30,p:26,dep:10,day:iso(t3),st:"due"},
-      {id:20,c:1,s:"Brow shape & tidy",t:"10.00",dur:20,p:16,dep:10,day:iso(back(1)),st:"done"},
-      {id:21,c:3,s:"Bikini wax",t:"12.00",dur:30,p:28,dep:10,day:iso(back(1)),st:"done"},
-      {id:22,c:5,s:"Hollywood wax",t:"15.00",dur:45,p:42,dep:10,day:iso(back(1)),st:"done"},
-      {id:23,c:2,s:"Underarm wax",t:"11.00",dur:15,p:14,dep:10,day:iso(back(2)),st:"done"},
-      {id:24,c:4,s:"Facial waxing",t:"14.00",dur:15,p:12,dep:10,day:iso(back(2)),st:"done"},
-      {id:25,c:3,s:"Full leg wax",t:"9.00",dur:45,p:38,dep:10,day:iso(back(3)),st:"done"},
-      {id:26,c:1,s:"Hollywood wax",t:"13.00",dur:45,p:42,dep:10,day:iso(back(3)),st:"done"},
-      {id:27,c:5,s:"Brow shape & tidy",t:"16.00",dur:20,p:16,dep:10,day:iso(back(4)),st:"done"},
-      {id:28,c:2,s:"Brazilian wax",t:"10.00",dur:40,p:36,dep:10,day:iso(back(4)),st:"done"},
-      {id:29,c:4,s:"Bikini wax",t:"15.00",dur:30,p:28,dep:10,day:iso(back(5)),st:"done"}
-    ],
-    requests:[
-      {id:31,name:"Sara Whitfield",phone:"07700 900222",s:"First visit — consultation & treatment",want:"Any afternoon this week",note:"Never waxed before, a bit nervous."},
-      {id:32,name:"Priya Shah",phone:"07700 900456",s:"Brazilian wax",want:"Saturday morning",note:""}
-    ],
+    clients:[],
+    appts:[],
+    requests:[],
     closed:{},
-    promos:[
-      {id:51,code:"FIRST10",kind:"£",val:10,note:"First visit only",uses:14,cap:0,until:"",on:true},
-      {id:52,code:"AUGUST25",kind:"%",val:25,note:"Quiet weeks in August",uses:3,cap:40,until:"",on:true},
-      {id:53,code:"REFER10",kind:"£",val:10,note:"Client referrals",uses:6,cap:0,until:"",on:false}
-    ],
+    promos:[],
     services:DEFAULT_SERVICES.map(function(s,i){ return {id:i+1,n:s.n,d:s.d,p:s.p,on:true}; })
   };
 }
@@ -313,7 +280,7 @@ async function loadAll(){
     if(br.data){
       S.appts=br.data.map(function(r){
         var cid=r.client_id||0;
-        return {id:r.id,c:cid,s:r.treatment_name||'',t:r.appointment_time||'10.00',dur:r.duration||45,p:Number(r.price)||0,dep:Number(r.deposit_amount||10),day:dateToDayKey(r.appointment_date),st:r.status==='completed'?'done':r.status==='cancelled'?'cancelled':'due',dbId:r.id};
+        return {id:r.id,c:cid,s:r.treatment_name||'',t:r.appointment_time||'10.00',dur:r.duration||45,p:Number(r.price)||0,dep:Number(r.deposit_amount||10),day:dateToDayKey(r.appointment_date),st:r.status==='completed'?'done':r.status==='cancelled'?'cancelled':'due',dbId:r.id, promo:r.promo_code||'', disc:Number(r.discount_amount)||0};
       }).filter(function(a){ return a.st!=='cancelled'; });
     }
     /* requests */
@@ -331,6 +298,9 @@ async function loadAll(){
         S.closed[r.date_key]={why:r.reason||''};
       });
     }
+    /* promos */
+    var pr = await sb.from('promos').select('*');
+    if(pr.data) S.promos = pr.data.map(function(r){ return {id:r.id,code:r.code,kind:r.kind,val:Number(r.value),note:r.note||'',uses:r.uses||0,cap:r.cap||0,until:r.until||'',on:r.active!==false}; });
     /* opening hours */
     var sh=await sb.from('studio_settings').select('value').eq('key','opening_hours').single();
     if(sh.data && sh.data.value) S.hours=sh.data.value;
@@ -384,7 +354,21 @@ function upcomingClosures(){
 /* ---------- helpers ---------- */
 function client(id){ return S.clients.filter(function(c){ return c.id===id; })[0]; }
 function dayAppts(k){ return S.appts.filter(function(a){ return a.day===k; }).sort(function(a,b){ return parseFloat(a.t)-parseFloat(b.t); }); }
-function takings(k){ return dayAppts(k).reduce(function(s,a){ return s+a.p; },0); }
+function promoOf(code){ if(!code) return null; return S.promos.filter(function(p){ return p.code===code; })[0]||null; }
+function bill(a){
+  var gross=a.p, disc=0, label="";
+  var p=a.promo?promoOf(a.promo):null;
+  if(p){
+    disc = p.kind==="%" ? Math.round(gross*p.val/100) : Math.min(gross,p.val);
+    label = p.code+" · "+(p.kind==="%" ? p.val+"% off" : money(p.val)+" off");
+  }
+  var due=Math.max(0,gross-disc), dep=a.dep||0;
+  var balance=Math.max(0,due-dep), credit=Math.max(0,dep-due);
+  return {gross:gross,disc:disc,label:label,due:due,dep:dep,
+          balance:balance,credit:credit,paid:dep+(a.st==="done"?balance:0),settled:a.st==="done"};
+}
+function takings(k){ return dayAppts(k).reduce(function(s,a){ return s+bill(a).due; },0); }
+function outstanding(k){ return dayAppts(k).reduce(function(s,a){ return s+(a.st==="done"?0:bill(a).balance); },0); }
 function bookable(){ return S.services.filter(function(s){ return s.on!==false; }); }
 function slotIndex(t){ return TIMES.indexOf(t); }
 function spanOf(dur){ return Math.max(1,Math.ceil((dur||60)/60)); }
@@ -449,7 +433,9 @@ V.today=function(){
           '<span style="font-size:13px;opacity:.75">'+a.s+' · '+a.dur+' min</span></span>'+
         '<span style="display:flex;align-items:center;gap:10px;flex:none">'+
           (c.stamps>=9?'<span class="pill warn">Reward due</span>':'')+
-          (a.st==="done"?'<span class="pill">Paid</span>':'<span style="font-size:15px;font-weight:600">'+money(a.p-a.dep)+'</span>')+
+          (a.promo?'<span class="pill">'+a.promo+'</span>':'')+
+          (a.st==="done"?'<span class="pill">Paid</span>':(function(){ var b=bill(a);
+            return '<span style="font-size:15px;font-weight:600">'+(b.credit?money(b.credit)+" back":money(b.balance)+" due")+'</span>'; })())+
         '</span></button></div>';
   }).join("");
   var info=closedInfo(S.dayKey);
@@ -465,6 +451,7 @@ V.today=function(){
       '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'+
         '<span class="pill">'+list.length+' booked</span>'+
         '<span class="pill">'+money(takings(S.dayKey))+' expected</span>'+
+        (outstanding(S.dayKey)?'<span class="pill warn">'+money(outstanding(S.dayKey))+' to collect</span>':'')+
         '<button class="btn btn-o btn-sm" id="closeday">'+(info?"Reopen":"Close day")+'</button></div>'+
     '</div>'+
     (info?'<div class="card" style="margin-bottom:14px;background:#3A322E;border-color:#3A322E;color:#E8D5C4">'+
@@ -763,13 +750,34 @@ function apptSheet(a){
     '<div style="display:flex;gap:8px"><span class="pill'+(c.stamps>=9?' warn':'')+'">'+c.stamps+'/10 stamps</span>'+
     (c.plan?'<span class="pill on">On a plan</span>':'')+'</div></div>'+
     (c.notes?'<div class="card" style="margin-bottom:18px"><div class="lbl" style="margin-bottom:8px">Notes</div><div style="font-size:14.5px;line-height:1.7">'+c.notes+'</div></div>':'')+
-    '<div class="kv"><span style="color:#6E5B49">Deposit paid</span><span>'+money(a.dep)+'</span></div>'+
-    '<div class="kv"><span style="color:#6E5B49">Due in studio</span><span>'+money(a.p-a.dep)+'</span></div>'+
-    '<div class="kv" style="border-bottom:1px solid #E0D2C2"><span style="color:#6E5B49">Phone</span><span>'+c.phone+'</span></div>'+
+    (function(){ var b=bill(a);
+      return '<div class="card" style="margin-bottom:18px;padding:0;overflow:hidden">'+
+        '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:18px 20px 14px">'+
+          '<span class="lbl">Payment</span>'+
+          '<span class="pill'+(b.settled?" on":b.balance?" warn":"")+'">'+
+            (b.settled?"Settled":b.credit?money(b.credit)+" to refund":b.balance?money(b.balance)+" outstanding":"Nothing left to pay")+'</span></div>'+
+        '<div style="padding:0 20px">'+
+          '<div class="kv" style="padding-top:0"><span style="color:#6E5B49">Treatment price</span><span>'+money(b.gross)+'</span></div>'+
+          (b.disc
+            ? '<div class="kv"><span style="color:#6E5B49">Promo code <span style="color:#241F1C;font-weight:600">'+a.promo+'</span> at booking</span><span>\u2212'+money(b.disc)+'</span></div>'
+            : '<div class="kv"><span style="color:#6E5B49">Promo code</span><span style="color:#8A7361">None used</span></div>')+
+          '<div class="kv"><span style="color:#6E5B49">Total to pay</span><span style="font-weight:600">'+money(b.due)+'</span></div>'+
+          '<div class="kv"><span style="color:#6E5B49">Deposit paid online</span><span>'+money(b.dep)+'</span></div>'+
+          '<div class="kv"'+(b.credit?'':' style="border-bottom:1px solid #E0D2C2"')+'><span style="color:#6E5B49">'+(b.settled?"Balance taken in studio":"Balance due in studio")+'</span>'+
+            '<span class="serif" style="font-size:20px">'+money(b.balance)+'</span></div>'+
+          (b.credit?'<div class="kv" style="border-bottom:1px solid #E0D2C2"><span style="color:#6E5B49">Deposit exceeds the total \u2014 refund</span>'+
+            '<span class="serif" style="font-size:20px">'+money(b.credit)+'</span></div>':'')+
+        '</div>'+
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;padding:16px 20px 18px">'+
+          (b.settled
+            ? '<button class="btn btn-o btn-sm" data-undone="'+a.id+'">Undo payment</button>'
+            : '<button class="btn btn-sm" data-arrive="'+a.id+'">'+(b.balance?"Mark "+money(b.balance)+" paid":"Mark as settled")+'</button>')+
+        '</div></div>'+
+      '<div class="kv" style="border-bottom:1px solid #E0D2C2"><span style="color:#6E5B49">Phone</span><span>'+c.phone+'</span></div>';
+    })()+
     '<div class="lbl" style="margin:22px 0 10px">Move to another time on '+shortDate(parseKey(a.day))+'</div>'+
     '<div style="display:flex;flex-wrap:wrap;gap:8px" id="chips">'+timeChips(a.day,a.t,a.dur)+'</div>'+
     '<div style="display:flex;gap:10px;margin-top:24px;flex-wrap:wrap">'+
-      (a.st==="done"?'<button class="btn btn-o btn-sm" data-undone="'+a.id+'">Mark unpaid</button>':'<button class="btn btn-sm" data-arrive="'+a.id+'">Mark arrived &amp; paid</button>')+
       '<button class="btn btn-o btn-sm" data-call="'+c.phone+'">Call</button>'+
       '<button class="btn btn-o btn-sm" data-cancelappt="'+a.id+'">Cancel visit</button>'+
       '<button class="btn btn-o btn-sm" id="sclose" style="margin-left:auto">Close</button></div>');
@@ -805,16 +813,25 @@ function newSheet(dayKey,time){
     $("chips").innerHTML=timeChips(dayKey,draft.time,draft.dur);
     bindSheet();
   };
-  $("ssave").onclick=function(){
+  $("ssave").onclick=async function(){
     if(!draft.time) return;
     var sel=$("n-client").value, cid;
     if(sel==="new"){
       var nm=$("n-name").value.trim()||"New client";
-      cid=Date.now();
-      S.clients.push({id:cid,name:nm,phone:$("n-phone").value.trim(),since:new Date().toLocaleDateString("en-GB",{month:"short",year:"numeric"}),stamps:0,plan:null,notes:"",visits:0,spend:0});
+      var ph=$("n-phone").value.trim();
+      var cRes = await sb.from('clients').insert({name:nm, phone:ph}).select().single();
+      if (cRes.data) {
+        cid = cRes.data.id;
+        S.clients.push({id:cid,name:nm,phone:ph,since:new Date().toLocaleDateString("en-GB",{month:"short",year:"numeric"}),stamps:0,plan:null,notes:"",visits:0,spend:0});
+      } else {
+        cid=Date.now();
+        S.clients.push({id:cid,name:nm,phone:ph,since:new Date().toLocaleDateString("en-GB",{month:"short",year:"numeric"}),stamps:0,plan:null,notes:"",visits:0,spend:0});
+      }
     } else cid=+sel;
     var sv=bookable()[+$("n-svc").value];
-    S.appts.push({id:Date.now()+1,c:cid,s:sv.n,t:draft.time,dur:sv.d,p:sv.p,dep:10,day:dayKey,st:"due"});
+    var bRes = await sb.from('bookings').insert({client_id:cid, treatment_name:sv.n, appointment_date: dayKeyToDate(dayKey), appointment_time: draft.time, price: sv.p, deposit_amount:10, duration_minutes: sv.d, status:'confirmed'}).select().single();
+    var dbId = bRes.data ? bRes.data.id : null;
+    S.appts.push({id:Date.now()+1,c:cid,s:sv.n,t:draft.time,dur:sv.d,p:sv.p,dep:10,day:dayKey,st:"due", dbId:dbId});
     save(); closeSheet(); render();
   };
 }
@@ -918,7 +935,11 @@ function clientSheet(c){
       '<button class="btn btn-o btn-sm" data-stamp="'+c.id+'">Add a stamp</button>'+
       '<button class="btn btn-o btn-sm" id="sclose" style="margin-left:auto">Close</button></div>');
   $("sclose").onclick=closeSheet;
-  $("savenotes").onclick=function(){ c.notes=$("cnotes").value.trim(); save(); $("notesaved").textContent="Saved."; render(); };
+  $("savenotes").onclick=async function(){
+    c.notes=$("cnotes").value.trim();
+    if(c.id) await sb.from('clients').update({notes: c.notes}).eq('id', c.id);
+    save(); $("notesaved").textContent="Saved."; render();
+  };
   bindSheet();
 }
 function bindSheet(){
@@ -1130,16 +1151,18 @@ function promoSheet(id){
     b.onclick=function(){ promoDraft.kind=b.dataset.kind;
       [].forEach.call($("p-kind").children,function(x){ x.setAttribute("aria-pressed",String(x===b)); }); vlbl(); };
   });
-  $("p-save").onclick=function(){
+  $("p-save").onclick=async function(){
     var code=$("p-code").value.trim().toUpperCase().replace(/\s+/g,"");
     if(!code) { $("p-code").focus(); return; }
     var val=parseFloat($("p-val").value)||0, cap=parseInt($("p-cap").value,10)||0;
     var u=$("p-until").value? iso(fromInput($("p-until").value)) : "";
-    if(isNew){
-      var nid=S.promos.reduce(function(m,x){ return Math.max(m,x.id); },50)+1;
-      S.promos.push({id:nid,code:code,kind:promoDraft.kind,val:val,note:$("p-note").value.trim(),uses:0,cap:cap,until:u,on:true});
-    } else {
-      S.promos.forEach(function(x){ if(x.id===p.id){ x.code=code; x.kind=promoDraft.kind; x.val=val; x.cap=cap; x.until=u; x.note=$("p-note").value.trim(); } });
+    var res = await sb.from('promos').upsert({code:code, kind:promoDraft.kind, value:val, note:$("p-note").value.trim(), uses: (isNew?0:p.uses), cap:cap, until:u, active:true}).select().single();
+    if (res.data) {
+      if(isNew){
+        S.promos.push({id:res.data.id,code:code,kind:promoDraft.kind,val:val,note:$("p-note").value.trim(),uses:0,cap:cap,until:u,on:true});
+      } else {
+        S.promos.forEach(function(x){ if(x.id===p.id){ x.id=res.data.id; x.code=code; x.kind=promoDraft.kind; x.val=val; x.cap=cap; x.until=u; x.note=$("p-note").value.trim(); } });
+      }
     }
     save(); closeSheet(); render();
   };
@@ -1159,15 +1182,21 @@ function wire(scope){
     if(b.dataset.day==="today"){ S.dayKey=iso(nextOpen(0)); }
     else { var d=shift(parseKey(S.dayKey),+b.dataset.day); while(!open(d)) d=shift(d,+b.dataset.day); S.dayKey=iso(d); }
     save(); render(); }; });
-  q("[data-arrive]").forEach(function(b){ b.onclick=function(){
+  q("[data-arrive]").forEach(function(b){ b.onclick=async function(){
     var a=S.appts.filter(function(x){ return x.id===+b.dataset.arrive; })[0];
-    a.st="done"; var c=client(a.c); c.stamps=Math.min(10,c.stamps+1); c.visits++; c.spend+=a.p;
+    a.st="done"; var c=client(a.c), bd=bill(a); c.stamps=Math.min(10,c.stamps+1); c.visits++; c.spend+=bd.due;
+    if(a.dbId||a.id) await sb.from('bookings').update({status:'completed'}).eq('id', a.dbId||a.id);
+    if(c.id) await sb.from('clients').update({stamps: c.stamps, visits: c.visits, spend: c.spend}).eq('id', c.id);
     save(); closeSheet(); render(); }; });
-  q("[data-undone]").forEach(function(b){ b.onclick=function(){
+  q("[data-undone]").forEach(function(b){ b.onclick=async function(){
     var a=S.appts.filter(function(x){ return x.id===+b.dataset.undone; })[0];
-    a.st="due"; var c=client(a.c); c.stamps=Math.max(0,c.stamps-1); c.visits=Math.max(0,c.visits-1); c.spend=Math.max(0,c.spend-a.p);
+    a.st="due"; var c=client(a.c), bd=bill(a); c.stamps=Math.max(0,c.stamps-1); c.visits=Math.max(0,c.visits-1); c.spend=Math.max(0,c.spend-bd.due);
+    if(a.dbId||a.id) await sb.from('bookings').update({status:'confirmed'}).eq('id', a.dbId||a.id);
+    if(c.id) await sb.from('clients').update({stamps: c.stamps, visits: c.visits, spend: c.spend}).eq('id', c.id);
     save(); closeSheet(); render(); }; });
-  q("[data-cancelappt]").forEach(function(b){ b.onclick=function(){
+  q("[data-cancelappt]").forEach(function(b){ b.onclick=async function(){
+    var a = S.appts.filter(function(x){ return x.id===+b.dataset.cancelappt; })[0];
+    if(a && (a.dbId||a.id)) await sb.from('bookings').update({status:'cancelled'}).eq('id', a.dbId||a.id);
     S.appts=S.appts.filter(function(x){ return x.id!==+b.dataset.cancelappt; }); save(); closeSheet(); render(); }; });
   q("[data-svcedit]").forEach(function(b){ b.onclick=function(){ svcSheet(b.dataset.svcedit); }; });
   q("[data-svctoggle]").forEach(function(b){ b.onclick=async function(){
@@ -1194,7 +1223,7 @@ function wire(scope){
     $("r-yes").onclick=async function(){ S.services=S.services.filter(function(x){ return String(x.id)!==id; }); await sb.from('services').delete().eq('id',id); save(); closeSheet(); render(); };
   }; });
   q("[data-editday]").forEach(function(b){ b.onclick=function(){ hoursSheet(b.dataset.editday); }; });
-  q("[data-stamp]").forEach(function(b){ b.onclick=function(){ var c=client(+b.dataset.stamp); c.stamps=Math.min(10,c.stamps+1); save(); clientSheet(c); }; });
+  q("[data-stamp]").forEach(function(b){ b.onclick=async function(){ var c=client(+b.dataset.stamp); c.stamps=Math.min(10,c.stamps+1); if(c.id) await sb.from('clients').update({stamps: c.stamps}).eq('id', c.id); save(); clientSheet(c); }; });
   q("[data-bookfor]").forEach(function(b){ b.onclick=function(){ closeSheet(); newSheet(S.dayKey,""); setTimeout(function(){ $("n-client").value=b.dataset.bookfor; },0); }; });
   q("[data-dismiss]").forEach(function(b){ b.onclick=function(){ S.requests=S.requests.filter(function(r){ return r.id!==+b.dataset.dismiss; }); save(); render(); }; });
   q("[data-offer]").forEach(function(b){ b.onclick=function(){
@@ -1238,10 +1267,14 @@ function wire(scope){
   q("[data-reopen]").forEach(function(b){ b.onclick=function(){ var rk=b.dataset.reopen; delete S.closed[rk]; sb.from('closed_days').delete().eq('date_key',rk).then(function(){}); save(); render(); }; });
   q("[data-moff]").forEach(function(b){ b.onclick=function(){ S.moff=Math.min(6,Math.max(0,(S.moff||0)+ +b.dataset.moff)); save(); render(); }; });
   q("[data-promoedit]").forEach(function(b){ b.onclick=function(){ promoSheet(+b.dataset.promoedit); }; });
-  q("[data-promotoggle]").forEach(function(b){ b.onclick=function(){
-    S.promos.forEach(function(p){ if(p.id===+b.dataset.promotoggle) p.on = p.on===false; }); save(); render(); }; });
-  q("[data-promodel]").forEach(function(b){ b.onclick=function(){
-    S.promos=S.promos.filter(function(p){ return p.id!==+b.dataset.promodel; }); save(); closeSheet(); render(); }; });
+  q("[data-promotoggle]").forEach(function(b){ b.onclick=async function(){
+    var p=S.promos.filter(function(x){ return x.id===+b.dataset.promotoggle; })[0];
+    if(p) { p.on = p.on===false; await sb.from('promos').update({active: p.on}).eq('id', p.id); }
+    save(); render(); }; });
+  q("[data-promodel]").forEach(function(b){ b.onclick=async function(){
+    var id = +b.dataset.promodel;
+    await sb.from('promos').delete().eq('id', id);
+    S.promos=S.promos.filter(function(p){ return p.id!==id; }); save(); closeSheet(); render(); }; });
   if(scope.getElementById&&scope.getElementById("addpromo")) scope.getElementById("addpromo").onclick=function(){ promoSheet(null); };
   if(scope.getElementById&&scope.getElementById("closerange")) scope.getElementById("closerange").onclick=rangeSheet;
   q("[data-tab]").forEach(function(b){ b.onclick=function(){ S.view=b.dataset.tab; save(); render(); }; });

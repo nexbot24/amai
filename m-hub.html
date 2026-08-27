@@ -232,19 +232,14 @@ function getDuration(name){
 }
 
 var DEFAULTS={
-  signedIn:true, name:"Josh", phone:"07700 900123", email:"josh@example.com", since:"January 2026",
-  stamps:4, plan:null, notes:"Sensitive skin on legs — patch test done Feb 2026.",
-  prefs:{room:"Warm, low light",music:"Quiet"},
+  signedIn:false, name:"", phone:"", email:"", since:"",
+  stamps:0, plan:null, notes:"",
+  prefs:{room:"",music:""},
   notify:{reminder:true,aftercare:true,openings:false,news:false},
-  card:{brand:"Visa",last4:"4242",exp:"04 / 29"},
-  referrals:[{who:"Priya",when:"Booked 4 Mar",state:"Stamp earned"},{who:"Hannah",when:"Invited 18 Mar",state:"Not booked yet"}],
-  upcoming:[{id:1,treat:"Hollywood wax",dateKey:key(openDay(9)),time:"14.30",price:42,deposit:10}],
-  past:[
-    {id:101,treat:"Hollywood wax",dateKey:key(relDay(-26)),time:"15.00",price:42},
-    {id:102,treat:"Brow shape & tidy",dateKey:key(relDay(-26)),time:"16.00",price:16},
-    {id:103,treat:"Hollywood wax",dateKey:key(relDay(-61)),time:"11.00",price:42},
-    {id:104,treat:"Full leg wax",dateKey:key(relDay(-96)),time:"10.00",price:38}
-  ]
+  card:null,
+  referrals:[],
+  upcoming:[],
+  past:[]
 };
 function load(){
   var s={},j;
@@ -620,14 +615,14 @@ function startBook(treat){
   bookSheet();
 }
 function startMove(id){
-  var v=S.upcoming.filter(function(x){ return x.id===id; })[0]; if(!v) return;
+  var v=S.upcoming.filter(function(x){ return String(x.id)===String(id); })[0]; if(!v) return;
   var d=parseK(v.dateKey), t=d0();
   draft={mode:"move",id:id,treat:v.treat,dateKey:v.dateKey,time:v.time,keep:v.time,q:"",
          off:Math.max(0,(d.getFullYear()-t.getFullYear())*12+(d.getMonth()-t.getMonth()))};
   bookSheet();
 }
 function cancelSheet(id){
-  var v=S.upcoming.filter(function(x){ return x.id===id; })[0]; if(!v) return;
+  var v=S.upcoming.filter(function(x){ return String(x.id)===String(id); })[0]; if(!v) return;
   var refund=daysTo(v.dateKey)>=1;
   sheet('<div class="lbl" style="margin-bottom:12px">Cancel a visit</div>'+
     '<h2 class="serif" style="font-size:25px;line-height:1.2;margin:0 0 8px">'+v.treat+'</h2>'+
@@ -711,19 +706,19 @@ function wire(scope){
   q("[data-rebook]").forEach(function(b){ b.onclick=function(){
     var last=S.past.slice().sort(function(x,y){ return parseK(y.dateKey)-parseK(x.dateKey); })[0];
     startBook(S.plan?S.plan.treat:(last?last.treat:"")); }; });
-  q("[data-move]").forEach(function(b){ b.onclick=function(){ closeSheet(); startMove(+b.dataset.move); }; });
-  q("[data-cancel]").forEach(function(b){ b.onclick=function(){ cancelSheet(+b.dataset.cancel); }; });
+  q("[data-move]").forEach(function(b){ b.onclick=function(){ closeSheet(); startMove(b.dataset.move); }; });
+  q("[data-cancel]").forEach(function(b){ b.onclick=function(){ cancelSheet(b.dataset.cancel); }; });
   q("[data-dropit]").forEach(function(b){ b.onclick=async function(){
     var bid=b.dataset.dropit;
-    S.upcoming=S.upcoming.filter(function(x){ return String(x.id)!==bid&&x.id!==+bid; });
+    S.upcoming=S.upcoming.filter(function(x){ return String(x.id)!==bid&&x.id!==bid; });
     if(sb) await sb.from('bookings').update({status:'cancelled'}).eq('id',bid);
     save(); closeSheet(); render(); toast("Cancelled. Your deposit is on its way back."); }; });
   q("[data-prep]").forEach(function(b){ b.onclick=function(){
-    var v=S.upcoming.filter(function(x){ return x.id===+b.dataset.prep; })[0]; if(v) prepSheet(v.treat); }; });
+    var v=S.upcoming.filter(function(x){ return String(x.id)===String(b.dataset.prep); })[0]; if(v) prepSheet(v.treat); }; });
   q("[data-after]").forEach(function(b){ b.onclick=function(){
-    var v=S.past.filter(function(x){ return x.id===+b.dataset.after; })[0]; if(v) afterSheet(v.treat); }; });
+    var v=S.past.filter(function(x){ return String(x.id)===String(b.dataset.after); })[0]; if(v) afterSheet(v.treat); }; });
   q("[data-again]").forEach(function(b){ b.onclick=function(){
-    var v=S.past.filter(function(x){ return x.id===+b.dataset.again; })[0]; if(v) startBook(v.treat); }; });
+    var v=S.past.filter(function(x){ return String(x.id)===String(b.dataset.again); })[0]; if(v) startBook(v.treat); }; });
   q("[data-again2]").forEach(function(b){ b.onclick=function(){ startBook(b.dataset.again2); }; });
   q("[data-after2]").forEach(function(b){ b.onclick=function(){ afterSheet(b.dataset.after2); }; });
   q("[data-stamp]").forEach(function(b){ b.onclick=function(){ stampSheet(+b.dataset.stamp); }; });
@@ -742,15 +737,16 @@ function wire(scope){
   var sq=one("s-q"); if(sq) sq.oninput=function(){
     draft.q=this.value; if($("s-pick")) $("s-pick").innerHTML=pickHTML(); wire($("host")); };
   var ok=one("s-ok"); if(ok) ok.onclick=async function(){
-    if(!(draft.treat&&draft.dateKey&&draft.time)) return;
+    if(!draft.dateKey||!draft.time) return;
+    var btn = $("s-ok");
+    btn.disabled = true;
+    btn.textContent = "Confirming...";
+    
     if(draft.mode==="move"){
-      var was=S.upcoming.filter(function(x){ return x.id===draft.id; })[0];
-      var same=was&&was.dateKey===draft.dateKey&&was.time===draft.time;
-      S.upcoming.forEach(function(x){ if(x.id===draft.id){ x.dateKey=draft.dateKey; x.time=draft.time; } });
-      if(sb&&!same) await sb.from('bookings').update({appointment_date:dayKeyToDate(draft.dateKey),appointment_time:draft.time}).eq('id',draft.id);
+      S.upcoming.forEach(function(b){ if(String(b.id)===String(draft.id)){ b.dateKey=draft.dateKey; b.time=draft.time; } });
+      if(sb) await sb.from('bookings').update({appointment_date: dayKeyToDate(draft.dateKey), appointment_time: draft.time}).eq('id', draft.id);
       save(); closeSheet(); render();
-      toast(same?"Nothing changed — you're still on "+shortD(parseK(draft.dateKey))+" at "+draft.time+"."
-                :"Moved to "+longD(parseK(draft.dateKey))+", "+draft.time+".");
+      toast("Moved to "+longD(parseK(draft.dateKey))+", "+draft.time+".");
     } else {
       var s=svc(draft.treat);
       var price=s?s.p:0;
@@ -786,14 +782,25 @@ function wire(scope){
     if(num.length<15){ toast("That card number looks short."); return; }
     S.card={brand:"Visa",last4:num.slice(-4),exp:$("k-exp").value.trim()||"—"};
     save(); closeSheet(); render(); toast("Card saved."); };
-  var as=one("a-save"); if(as) as.onclick=function(){
-    S.name=$("a-name").value.trim(); S.phone=$("a-phone").value.trim(); S.email=$("a-email").value.trim();
-    save(); render(); toast("Details saved."); };
-  var an=one("a-savenotes"); if(an) an.onclick=function(){
-    S.notes=$("a-notes").value.trim();
-    S.prefs={room:$("a-room").value.trim(),music:$("a-music").value.trim()};
-    save(); toast("Saved. Your practitioner sees this before you arrive."); };
-  var so=one("signout"); if(so) so.onclick=async function(){ await sb.auth.signOut(); S.signedIn=false; save(); location.href="mobile.html"; };
+  var as=one("a-save"); if(as) as.onclick=async function(){
+    S.name=one("a-name").value.trim()||S.name;
+    S.phone=one("a-phone").value.trim();
+    S.email=one("a-email").value.trim();
+    if(S.clientId) {
+      await sb.from('clients').update({ name: S.name, phone: S.phone }).eq('id', S.clientId);
+    }
+    save(); toast("Details saved.");
+  };
+  var an=one("a-savenotes"); if(an) an.onclick=async function(){
+    S.notes=one("a-notes").value.trim();
+    S.prefs.room=one("a-room").value.trim();
+    S.prefs.music=one("a-music").value.trim();
+    if(S.clientId) {
+      await sb.from('clients').update({ notes: S.notes }).eq('id', S.clientId);
+    }
+    save(); toast("Preferences saved.");
+  };
+  var so=one("signout"); if(so) so.onclick=async function(){ await sb.auth.signOut(); Object.assign(S, DEFAULTS); localStorage.clear(); location.href="mobile.html"; };
 
   var apwa = one("a-pwa"); if(apwa) apwa.onclick = async function() {
     if (deferredPrompt) {
