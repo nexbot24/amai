@@ -316,6 +316,22 @@ async function confirm(how){
   if($("helper"))$("helper").textContent="";
 
   if(wantsAccount()){
+    /* Already signed in? Skip OTP entirely */
+    var alreadySignedIn = false;
+    try {
+      var h = JSON.parse(localStorage.getItem('amai_hub')||'{}');
+      if(h && h.signedIn) alreadySignedIn = true;
+    } catch(e){}
+    if(!alreadySignedIn && sb){
+      var sess = await sb.auth.getSession();
+      if(sess.data && sess.data.session) alreadySignedIn = true;
+    }
+    if(alreadySignedIn){
+      saveToHub();
+      showDone(how, true);
+      return;
+    }
+
     var email=$("f-contact")?$("f-contact").value.trim().toLowerCase():"";
     $("v-title").textContent=name+", you\u2019re booked in.";
     $("v-sub").textContent=S.returning?"One code and you\u2019re back in your account.":"One code and your account is open.";
