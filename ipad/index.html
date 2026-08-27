@@ -140,6 +140,7 @@ button{font-family:Mulish,sans-serif;cursor:pointer;color:#241F1C}
 @media (max-width:860px),(max-height:1220px){ .ipad{width:100vw;height:100vh} }
 @media (display-mode:standalone){ .ipad{width:100vw;height:100vh} #install{display:none!important} }
 </style>
+<script src="/push-register.js"></script>
 </head>
 <body>
 
@@ -1384,6 +1385,23 @@ tick(); setInterval(tick,20000);
     $("install").className="hide";
     try{ localStorage.setItem("amai_studio_install","off"); }catch(e){}
   };
+})();
+</script>
+<script>
+/* Auto-register admin push notifications */
+(async function(){
+  if(!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+  try {
+    var reg = await navigator.serviceWorker.register('/sw.js');
+    await navigator.serviceWorker.ready;
+    var sub = await reg.pushManager.getSubscription();
+    if(!sub){
+      /* Not yet subscribed — register */
+      if(typeof registerPush === 'function' && window.sb){
+        await registerPush('admin');
+      }
+    }
+  } catch(e){ console.log('Push setup:', e); }
 })();
 </script>
 </body>
