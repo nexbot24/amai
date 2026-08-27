@@ -611,7 +611,12 @@ V.settings=function(){
         '<div class="card"><div class="lbl" style="margin-bottom:14px">Loyalty</div>'+
           '<div class="kv"><span style="color:#6E5B49">5 stamps</span><span>25% off a visit</span></div>'+
           '<div class="kv" style="border-bottom:1px solid #E0D2C2"><span style="color:#6E5B49">10 stamps</span><span>Visit free</span></div></div>'+
-      '</div></div>';
+      '</div></div>'+
+    '<div class="card" style="margin-top:10px"><div class="lbl" style="margin-bottom:14px">Notifications</div>'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 0">'+
+        '<div><div class="serif" style="font-size:17px;margin-bottom:4px">Push notifications</div>'+
+          '<div style="font-size:13px;color:#6E5B49;line-height:1.6">Get alerted when a booking or enquiry comes in.</div></div>'+
+        '<button class="btn btn-sm" id="push-btn" style="flex:none">Enable</button></div></div>';
 };
 
 V.closures=function(){
@@ -1388,20 +1393,31 @@ tick(); setInterval(tick,20000);
 })();
 </script>
 <script>
-/* Auto-register admin push notifications */
+/* Admin push notification button handler */
 (async function(){
   if(!('serviceWorker' in navigator) || !('PushManager' in window)) return;
-  try {
-    var reg = await navigator.serviceWorker.register('/sw.js');
-    await navigator.serviceWorker.ready;
-    var sub = await reg.pushManager.getSubscription();
-    if(!sub){
-      /* Not yet subscribed — register */
-      if(typeof registerPush === 'function' && window.sb){
-        await registerPush('admin');
-      }
-    }
-  } catch(e){ console.log('Push setup:', e); }
+  try { await navigator.serviceWorker.register('/sw.js'); } catch(e){}
+  
+  /* Check existing subscription on each render */
+  var origRender = window.render;
+  if(typeof origRender === 'function'){
+    window.render = function(){
+      origRender.apply(this, arguments);
+      var btn = document.getElementById('push-btn');
+      if(!btn) return;
+      navigator.serviceWorker.ready.then(function(reg){
+        reg.pushManager.getSubscription().then(function(sub){
+          if(sub){ btn.textContent='Enabled ✓'; btn.disabled=true; btn.style.opacity='.5'; }
+        });
+      }).catch(function(){});
+      btn.onclick = async function(){
+        btn.textContent='Enabling…'; btn.disabled=true;
+        var ok = await registerPush('admin');
+        btn.textContent = ok ? 'Enabled ✓' : 'Not available';
+        btn.style.opacity = '.5';
+      };
+    };
+  }
 })();
 </script>
 </body>
