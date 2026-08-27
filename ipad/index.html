@@ -284,7 +284,7 @@ async function loadAll(){
     if(br.data){
       S.appts=br.data.map(function(r){
         var cid=r.client_id||0;
-        return {id:r.id,c:cid,s:r.treatment_name||'',t:r.appointment_time||'10.00',dur:r.duration_minutes||r.duration||45,p:Number(r.price)||0,dep:Number(r.deposit_amount||10),day:dateToDayKey(r.appointment_date),st:r.status==='completed'?'done':r.status==='cancelled'?'cancelled':'due',dbId:r.id, promo:r.promo_code||'', disc:Number(r.discount_amount)||0};
+        return {id:r.id,c:cid,s:r.treatment_name||'',t:r.appointment_time||'10.00',dur:r.duration_minutes||r.duration||45,p:Number(r.price)||0,dep:Number(r.deposit_amount||10),day:dateToDayKey(r.appointment_date),st:r.status==='completed'?'done':r.status==='cancelled'?'cancelled':'due',dbId:r.id, promo:r.promo_code||'', disc:Number(r.discount_amount)||0, notes:r.notes||''};
       }).filter(function(a){ return a.st!=='cancelled'; });
     }
     /* requests */
@@ -759,7 +759,8 @@ function apptSheet(a){
     '<div style="font-size:15px;color:#5C5148">'+a.s+' · '+a.dur+' min · '+money(a.p)+'</div></div>'+
     '<div style="display:flex;gap:8px"><span class="pill'+(c.stamps>=9?' warn':'')+'">'+c.stamps+'/10 stamps</span>'+
     (c.plan?'<span class="pill on">On a plan</span>':'')+'</div></div>'+
-    (c.notes?'<div class="card" style="margin-bottom:18px"><div class="lbl" style="margin-bottom:8px">Notes</div><div style="font-size:14.5px;line-height:1.7">'+c.notes+'</div></div>':'')+
+    (c.notes?'<div class="card" style="margin-bottom:18px"><div class="lbl" style="margin-bottom:8px">Client notes</div><div style="font-size:14.5px;line-height:1.7">'+c.notes+'</div></div>':'')+
+    (a.notes?'<div class="card" style="margin-bottom:18px"><div class="lbl" style="margin-bottom:8px">Booking note from client</div><div style="font-size:14.5px;line-height:1.7">'+a.notes+'</div></div>':'')+
     (function(){ var b=bill(a);
       return '<div class="card" style="margin-bottom:18px;padding:0;overflow:hidden">'+
         '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:18px 20px 14px">'+
