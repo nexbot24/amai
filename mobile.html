@@ -71,7 +71,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
     const manifest = JSON.parse(manifestEl.textContent);
-    let template = JSON.parse(atob(templateEl.textContent.replace(/\s/g, '')));
+    var b64raw = templateEl.textContent.replace(/\s/g, '');
+    var binStr = atob(b64raw);
+    var bytes = new Uint8Array(binStr.length);
+    for (var i = 0; i < binStr.length; i++) bytes[i] = binStr.charCodeAt(i);
+    let template = JSON.parse(new TextDecoder().decode(bytes));
 
     // Nested page bundles (iframe targets). Each ships ONCE, in the ROOT
     // document's manifest; frame srcs carry an about:blank#<uuid> marker
