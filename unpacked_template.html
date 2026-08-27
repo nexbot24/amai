@@ -352,9 +352,7 @@ button,input,textarea,select{font-family:inherit;font-size:16px}
 .dcell.today:not([aria-pressed="true"]){box-shadow:inset 0 0 0 1px rgba(232,213,196,.4)}
 .dcell:not([disabled]):active{background:#443B36}
 .blank{aspect-ratio:1/1;min-height:44px}
-.dock{position:fixed;left:0;right:0;bottom:calc(62px + env(safe-area-inset-bottom));z-index:25;transform:translateY(140%);transition:transform .3s ease}
-.dock.up{transform:none}
-.dockin{max-width:480px;margin:0 auto;padding:12px 20px 14px;background:rgba(36,31,28,.95);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid rgba(232,213,196,.14)}
+
 
 .segwrap{position:sticky;top:calc(56px + env(safe-area-inset-top));z-index:15;background:#3A322E;padding:14px 20px 16px;border-bottom:1px solid rgba(232,213,196,.14)}
 .seg{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
@@ -374,7 +372,7 @@ button,input,textarea,select{font-family:inherit;font-size:16px}
 @media (min-width:768px){
   .app{max-width:100%;margin:0}
   .tabin{max-width:100%}
-  .dockin{max-width:100%}
+
   .hero .copy{max-width:680px}
   .pad{padding:0 40px}
   .sec{padding:44px 40px}
@@ -545,7 +543,7 @@ button,input,textarea,select{font-family:inherit;font-size:16px}
           <div style="font-size:14px;color:#CBB49E" id="d-when"></div>
           <div style="display:flex;justify-content:space-between;gap:16px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(232,213,196,.18);font-size:13.5px"><span style="color:#B39C88" id="d-paid"></span><span id="d-bal"></span></div>
         </div>
-        <a id="d-hub" class="btn" href="hub.html">Open my dashboard</a>
+        <a id="d-hub" class="btn" href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">Back to home</a>
         <button id="again" style="background:none;border:none;color:#B39C88;font-size:14px;padding:16px 0 0;width:100%;font-family:Marcellus,serif">Book another visit</button>
       </div>
 
@@ -557,8 +555,6 @@ button,input,textarea,select{font-family:inherit;font-size:16px}
     </section>
 
     
-
-    <div class="dock" id="dock"><div class="dockin"><a class="btn" href="#book">Book a visit</a></div></div>
 
 </div>
     <div class="view" id="v-about">
@@ -818,10 +814,10 @@ var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI
 var sb=null;
 function loadSupabaseSDK(){
   return new Promise(function(resolve){
-    if(window.supabase){sb=window.supabase.createClient(SB_URL,SB_KEY);resolve();return;}
+    if(window.supabase){sb=window.supabase.createClient(SB_URL,SB_KEY);window.sb=sb;resolve();return;}
     var s=document.createElement('script');
     s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
-    s.onload=function(){sb=window.supabase.createClient(SB_URL,SB_KEY);resolve();};
+    s.onload=function(){sb=window.supabase.createClient(SB_URL,SB_KEY);window.sb=sb;resolve();};
     s.onerror=function(){resolve();};
     document.head.appendChild(s);
   });
@@ -1140,20 +1136,6 @@ $("again").onclick=function(){
   renderPicker(); renderDays(); renderSlots(); show();
 };
 
-/* docked CTA once the hero has passed, hidden over the form */
-(function(){
-  var dock=$("dock"), book=$("book");
-  if(!dock||!book) return;
-  addEventListener("scroll",function(){
-    /* hide if user is already in booking flow (past step 1) */
-    if(B.step>1){ dock.className="dock"; return; }
-    var y=scrollY;
-    var bookRect=book.getBoundingClientRect();
-    var bookVisible = bookRect.top < innerHeight;
-    var pastHero = y > innerHeight*0.4;
-    dock.className = (pastHero && !bookVisible) ? "dock up" : "dock";
-  },{passive:true});
-})();
 
 (async function(){
   await loadSupabaseSDK();
