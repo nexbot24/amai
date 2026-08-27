@@ -25,3 +25,15 @@
   from = "/m-contact.html"
   to = "/mobile.html"
   status = 301
+
+[[headers]]
+  for = "/ipad/*"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"

@@ -3,6 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Amai Studio</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1331,14 +1334,19 @@ function subline(){
   return "";
 }
 function render(){
-  tabs();
-  $("ttl").textContent=TITLES[S.view]||"Diary";
-  $("sub").textContent=subline();
-  $("back").className = PARENT[S.view]? "navbtn" : "navbtn hide";
-  $("quick").className = (S.view==="settings"||PARENT[S.view])? "btn btn-l btn-sm hide" : "btn btn-l btn-sm";
-  $("view").innerHTML=(V[S.view]||V.today)();
-  $("aside").innerHTML=aside();
-  wire(document);
+  try {
+    tabs();
+    $("ttl").textContent=TITLES[S.view]||"Diary";
+    $("sub").textContent=subline();
+    $("back").className = PARENT[S.view]? "navbtn" : "navbtn hide";
+    $("quick").className = (S.view==="settings"||PARENT[S.view])? "btn btn-l btn-sm hide" : "btn btn-l btn-sm";
+    $("view").innerHTML=(V[S.view]||V.today)();
+    $("aside").innerHTML=aside();
+    wire(document);
+  } catch(e) {
+    console.error('Render error:', e);
+    $("view").innerHTML='<div style="padding:40px 20px;text-align:center"><div class="lbl" style="margin-bottom:12px;color:#c44">Something went wrong</div><div style="font-size:13px;color:#6E5B49;margin-bottom:16px">'+e.message+'</div><button class="btn btn-sm" onclick="location.reload(true)">Reload</button></div>';
+  }
 }
 $("back").onclick=function(){ S.view=PARENT[S.view]||"settings"; save(); render(); };
 function tick(){
