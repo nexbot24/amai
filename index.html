@@ -20,10 +20,6 @@
   var touch = navigator.maxTouchPoints > 1;
   var mob = w <= 860 || (touch && w <= 1366);
   window.__amaiMobile = mob;
-  document.addEventListener('DOMContentLoaded', function(){
-    var kill = document.querySelector(mob ? '.desktop-shell' : '.mobile-shell');
-    if(kill) kill.remove();
-  });
 })();
 </script>
 
@@ -965,6 +961,8 @@ button,input,textarea,select{font-family:inherit;font-size:16px}
 <!-- ═══════ DESKTOP SCRIPTS ═══════ -->
 <script>
 if(!window.__amaiMobile){
+/* Remove mobile shell so no duplicate IDs */
+var _ms=document.querySelector('.mobile-shell');if(_ms)_ms.remove();
 
 /* Desktop-specific: treatment tabs, reasons */
 function renderTabs(){
@@ -1077,6 +1075,8 @@ var REASONS = [
 <!-- ═══════ MOBILE SCRIPTS ═══════ -->
 <script>
 if(window.__amaiMobile){
+/* Remove desktop shell so no duplicate IDs */
+var _ds=document.querySelector('.desktop-shell');if(_ds)_ds.remove();
 (async function(){ await initBooking(); })();
 
 
