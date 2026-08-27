@@ -1110,7 +1110,7 @@ async function initSupabase() {
         S.upcoming=[]; S.past=[];
         bk.data.forEach(function(b){
           var v={id:b.id,treat:b.treatment_name,dateKey:dateToDayKey(b.appointment_date),time:b.appointment_time,price:Number(b.price),deposit:Number(b.deposit_amount||10)};
-          var d=parseK(b.appointment_date);
+          var d=parseK(dateToDayKey(b.appointment_date));
           if(b.status==='completed'||d<today) S.past.push(v);
           else S.upcoming.push(v);
         });

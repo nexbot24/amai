@@ -280,7 +280,7 @@ async function loadAll(){
     if(br.data){
       S.appts=br.data.map(function(r){
         var cid=r.client_id||0;
-        return {id:r.id,c:cid,s:r.treatment_name||'',t:r.appointment_time||'10.00',dur:r.duration||45,p:Number(r.price)||0,dep:Number(r.deposit_amount||10),day:dateToDayKey(r.appointment_date),st:r.status==='completed'?'done':r.status==='cancelled'?'cancelled':'due',dbId:r.id, promo:r.promo_code||'', disc:Number(r.discount_amount)||0};
+        return {id:r.id,c:cid,s:r.treatment_name||'',t:r.appointment_time||'10.00',dur:r.duration_minutes||r.duration||45,p:Number(r.price)||0,dep:Number(r.deposit_amount||10),day:dateToDayKey(r.appointment_date),st:r.status==='completed'?'done':r.status==='cancelled'?'cancelled':'due',dbId:r.id, promo:r.promo_code||'', disc:Number(r.discount_amount)||0};
       }).filter(function(a){ return a.st!=='cancelled'; });
     }
     /* requests */
@@ -352,7 +352,7 @@ function upcomingClosures(){
 }
 
 /* ---------- helpers ---------- */
-function client(id){ return S.clients.filter(function(c){ return c.id===id; })[0]; }
+function client(id){ return S.clients.filter(function(c){ return String(c.id)===String(id); })[0]; }
 function dayAppts(k){ return S.appts.filter(function(a){ return a.day===k; }).sort(function(a,b){ return parseFloat(a.t)-parseFloat(b.t); }); }
 function promoOf(code){ if(!code) return null; return S.promos.filter(function(p){ return p.code===code; })[0]||null; }
 function bill(a){
@@ -795,7 +795,8 @@ function newSheet(dayKey,time){
       S.clients.map(function(c){ return '<option value="'+c.id+'">'+c.name+' · '+c.phone+'</option>'; }).join("")+
       '<option value="new">+ New client</option></select>'+
     '<div id="newfields" class="hide" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px">'+
-      '<input class="field" id="n-name" placeholder="Name"><input class="field" id="n-phone" placeholder="Phone"></div>'+
+      '<input class="field" id="n-name" placeholder="Name"><input class="field" id="n-phone" placeholder="Phone">'+
+      '<input class="field" id="n-email" placeholder="Email" style="grid-column:span 2"></div>'+
     '<div class="lbl" style="margin-bottom:10px">Treatment</div>'+
     '<select class="field" id="n-svc" style="margin-bottom:18px">'+
       bookable().map(function(s,i){ return '<option value="'+i+'">'+s.n+' · '+s.d+' min · '+money(s.p)+'</option>'; }).join("")+'</select>'+
@@ -819,7 +820,9 @@ function newSheet(dayKey,time){
     if(sel==="new"){
       var nm=$("n-name").value.trim()||"New client";
       var ph=$("n-phone").value.trim();
-      var cRes = await sb.from('clients').insert({name:nm, phone:ph}).select().single();
+      var em=$("n-email")?$("n-email").value.trim().toLowerCase():"";
+      var ins={name:nm, phone:ph}; if(em) ins.email=em;
+      var cRes = await sb.from('clients').insert(ins).select().single();
       if (cRes.data) {
         cid = cRes.data.id;
         S.clients.push({id:cid,name:nm,phone:ph,since:new Date().toLocaleDateString("en-GB",{month:"short",year:"numeric"}),stamps:0,plan:null,notes:"",visits:0,spend:0});
@@ -827,7 +830,7 @@ function newSheet(dayKey,time){
         cid=Date.now();
         S.clients.push({id:cid,name:nm,phone:ph,since:new Date().toLocaleDateString("en-GB",{month:"short",year:"numeric"}),stamps:0,plan:null,notes:"",visits:0,spend:0});
       }
-    } else cid=+sel;
+    } else cid=sel;
     var sv=bookable()[+$("n-svc").value];
     var bRes = await sb.from('bookings').insert({client_id:cid, treatment_name:sv.n, appointment_date: dayKeyToDate(dayKey), appointment_time: draft.time, price: sv.p, deposit_amount:10, duration_minutes: sv.d, status:'confirmed'}).select().single();
     var dbId = bRes.data ? bRes.data.id : null;
@@ -948,7 +951,7 @@ function bindSheet(){
       if(b.disabled) return;
       draft.time=b.dataset.time;
       [].forEach.call(document.querySelectorAll("[data-time]"),function(x){ x.setAttribute("aria-pressed",String(x.dataset.time===draft.time)); });
-      if(draft.id){ S.appts.forEach(function(a){ if(a.id===draft.id) a.t=draft.time; }); save(); render(); }
+      if(draft.id){ S.appts.forEach(function(a){ if(String(a.id)===String(draft.id)){ a.t=draft.time; if(a.dbId||a.id) sb.from('bookings').update({appointment_time:draft.time}).eq('id',a.dbId||a.id); } }); save(); render(); }
     };
   });
   wire(document);
@@ -1155,8 +1158,10 @@ function promoSheet(id){
     var code=$("p-code").value.trim().toUpperCase().replace(/\s+/g,"");
     if(!code) { $("p-code").focus(); return; }
     var val=parseFloat($("p-val").value)||0, cap=parseInt($("p-cap").value,10)||0;
-    var u=$("p-until").value? iso(fromInput($("p-until").value)) : "";
-    var res = await sb.from('promos').upsert({code:code, kind:promoDraft.kind, value:val, note:$("p-note").value.trim(), uses: (isNew?0:p.uses), cap:cap, until:u, active:true}).select().single();
+    var u=$("p-until").value? iso(fromInput($("p-until").value)) : null;
+    var payload={code:code, kind:promoDraft.kind, value:val, note:$("p-note").value.trim(), uses: (isNew?0:p.uses), cap:cap, until:u, active:true};
+    if(!isNew) payload.id=p.id;
+    var res = await sb.from('promos').upsert(payload).select().single();
     if (res.data) {
       if(isNew){
         S.promos.push({id:res.data.id,code:code,kind:promoDraft.kind,val:val,note:$("p-note").value.trim(),uses:0,cap:cap,until:u,on:true});
@@ -1173,8 +1178,8 @@ var promoDraft={kind:"%",until:""};
 /* ---------- wiring ---------- */
 function wire(scope){
   var q=function(s){ return [].slice.call(scope.querySelectorAll(s)); };
-  q("[data-appt]").forEach(function(b){ b.onclick=function(){ var a=S.appts.filter(function(x){ return x.id===+b.dataset.appt; })[0]; if(a) apptSheet(a); }; });
-  q("[data-client]").forEach(function(b){ b.onclick=function(){ clientSheet(client(+b.dataset.client)); }; });
+  q("[data-appt]").forEach(function(b){ b.onclick=function(){ var a=S.appts.filter(function(x){ return String(x.id)===b.dataset.appt; })[0]; if(a) apptSheet(a); }; });
+  q("[data-client]").forEach(function(b){ b.onclick=function(){ clientSheet(client(b.dataset.client)); }; });
   q("[data-fill]").forEach(function(b){ b.onclick=function(){ newSheet(S.dayKey,b.dataset.fill); }; });
   q("[data-new]").forEach(function(b){ b.onclick=function(){ var p=b.dataset.new.split("|"); newSheet(p[0],p[1]); }; });
   q("[data-jump]").forEach(function(b){ b.onclick=function(){ S.dayKey=b.dataset.jump; S.view="today"; save(); render(); }; });
@@ -1183,21 +1188,22 @@ function wire(scope){
     else { var d=shift(parseKey(S.dayKey),+b.dataset.day); while(!open(d)) d=shift(d,+b.dataset.day); S.dayKey=iso(d); }
     save(); render(); }; });
   q("[data-arrive]").forEach(function(b){ b.onclick=async function(){
-    var a=S.appts.filter(function(x){ return x.id===+b.dataset.arrive; })[0];
+    var a=S.appts.filter(function(x){ return String(x.id)===b.dataset.arrive; })[0];
     a.st="done"; var c=client(a.c), bd=bill(a); c.stamps=Math.min(10,c.stamps+1); c.visits++; c.spend+=bd.due;
     if(a.dbId||a.id) await sb.from('bookings').update({status:'completed'}).eq('id', a.dbId||a.id);
     if(c.id) await sb.from('clients').update({stamps: c.stamps, visits: c.visits, spend: c.spend}).eq('id', c.id);
     save(); closeSheet(); render(); }; });
   q("[data-undone]").forEach(function(b){ b.onclick=async function(){
-    var a=S.appts.filter(function(x){ return x.id===+b.dataset.undone; })[0];
+    var a=S.appts.filter(function(x){ return String(x.id)===String(b.dataset.undone); })[0];
     a.st="due"; var c=client(a.c), bd=bill(a); c.stamps=Math.max(0,c.stamps-1); c.visits=Math.max(0,c.visits-1); c.spend=Math.max(0,c.spend-bd.due);
     if(a.dbId||a.id) await sb.from('bookings').update({status:'confirmed'}).eq('id', a.dbId||a.id);
     if(c.id) await sb.from('clients').update({stamps: c.stamps, visits: c.visits, spend: c.spend}).eq('id', c.id);
     save(); closeSheet(); render(); }; });
   q("[data-cancelappt]").forEach(function(b){ b.onclick=async function(){
-    var a = S.appts.filter(function(x){ return x.id===+b.dataset.cancelappt; })[0];
-    if(a && (a.dbId||a.id)) await sb.from('bookings').update({status:'cancelled'}).eq('id', a.dbId||a.id);
-    S.appts=S.appts.filter(function(x){ return x.id!==+b.dataset.cancelappt; }); save(); closeSheet(); render(); }; });
+    var a = S.appts.filter(function(x){ return String(x.id)===String(b.dataset.cancelappt); })[0];
+    if(!a) return;
+    if(a.dbId||a.id) await sb.from('bookings').update({status:'cancelled'}).eq('id', a.dbId||a.id);
+    S.appts=S.appts.filter(function(x){ return String(x.id)!==String(b.dataset.cancelappt); }); save(); closeSheet(); render(); }; });
   q("[data-svcedit]").forEach(function(b){ b.onclick=function(){ svcSheet(b.dataset.svcedit); }; });
   q("[data-svctoggle]").forEach(function(b){ b.onclick=async function(){
     var tid=b.dataset.svctoggle;
@@ -1223,11 +1229,11 @@ function wire(scope){
     $("r-yes").onclick=async function(){ S.services=S.services.filter(function(x){ return String(x.id)!==id; }); await sb.from('services').delete().eq('id',id); save(); closeSheet(); render(); };
   }; });
   q("[data-editday]").forEach(function(b){ b.onclick=function(){ hoursSheet(b.dataset.editday); }; });
-  q("[data-stamp]").forEach(function(b){ b.onclick=async function(){ var c=client(+b.dataset.stamp); c.stamps=Math.min(10,c.stamps+1); if(c.id) await sb.from('clients').update({stamps: c.stamps}).eq('id', c.id); save(); clientSheet(c); }; });
+  q("[data-stamp]").forEach(function(b){ b.onclick=async function(){ var c=client(b.dataset.stamp); c.stamps=Math.min(10,c.stamps+1); if(c.id) await sb.from('clients').update({stamps: c.stamps}).eq('id', c.id); save(); clientSheet(c); }; });
   q("[data-bookfor]").forEach(function(b){ b.onclick=function(){ closeSheet(); newSheet(S.dayKey,""); setTimeout(function(){ $("n-client").value=b.dataset.bookfor; },0); }; });
-  q("[data-dismiss]").forEach(function(b){ b.onclick=function(){ S.requests=S.requests.filter(function(r){ return r.id!==+b.dataset.dismiss; }); save(); render(); }; });
+  q("[data-dismiss]").forEach(function(b){ b.onclick=function(){ S.requests=S.requests.filter(function(r){ return String(r.id)!==b.dataset.dismiss; }); save(); render(); }; });
   q("[data-offer]").forEach(function(b){ b.onclick=function(){
-    var r=S.requests.filter(function(x){ return x.id===+b.dataset.offer; })[0];
+    var r=S.requests.filter(function(x){ return String(x.id)===b.dataset.offer; })[0];
     S.requests=S.requests.filter(function(x){ return x.id!==r.id; });
     var exists=S.clients.filter(function(c){ return c.phone===r.phone; })[0];
     if(!exists){ S.clients.push({id:Date.now(),name:r.name,phone:r.phone,since:new Date().toLocaleDateString("en-GB",{month:"short",year:"numeric"}),stamps:0,plan:null,notes:r.note,visits:0,spend:0}); }
@@ -1266,13 +1272,13 @@ function wire(scope){
   q("[data-shut]").forEach(function(b){ b.onclick=function(){ closureSheet(b.dataset.shut); }; });
   q("[data-reopen]").forEach(function(b){ b.onclick=function(){ var rk=b.dataset.reopen; delete S.closed[rk]; sb.from('closed_days').delete().eq('date_key',rk).then(function(){}); save(); render(); }; });
   q("[data-moff]").forEach(function(b){ b.onclick=function(){ S.moff=Math.min(6,Math.max(0,(S.moff||0)+ +b.dataset.moff)); save(); render(); }; });
-  q("[data-promoedit]").forEach(function(b){ b.onclick=function(){ promoSheet(+b.dataset.promoedit); }; });
+  q("[data-promoedit]").forEach(function(b){ b.onclick=function(){ promoSheet(isNaN(b.dataset.promoedit)?b.dataset.promoedit:+b.dataset.promoedit); }; });
   q("[data-promotoggle]").forEach(function(b){ b.onclick=async function(){
-    var p=S.promos.filter(function(x){ return x.id===+b.dataset.promotoggle; })[0];
+    var p=S.promos.filter(function(x){ return String(x.id)===b.dataset.promotoggle; })[0];
     if(p) { p.on = p.on===false; await sb.from('promos').update({active: p.on}).eq('id', p.id); }
     save(); render(); }; });
   q("[data-promodel]").forEach(function(b){ b.onclick=async function(){
-    var id = +b.dataset.promodel;
+    var id = isNaN(b.dataset.promodel) ? b.dataset.promodel : +b.dataset.promodel;
     await sb.from('promos').delete().eq('id', id);
     S.promos=S.promos.filter(function(p){ return p.id!==id; }); save(); closeSheet(); render(); }; });
   if(scope.getElementById&&scope.getElementById("addpromo")) scope.getElementById("addpromo").onclick=function(){ promoSheet(null); };
