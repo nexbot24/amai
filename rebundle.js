@@ -36,10 +36,20 @@ if (endIdx === -1) {
 const before = mobile.substring(0, startIdx + startTag.length);
 const after = mobile.substring(endIdx);
 
-// Escape ALL </ sequences inside JSON to prevent browser HTML parser from
-// seeing them as potential closing tags (not just </script>)
-const jsonStr = JSON.stringify(template).replace(/<\//g, '<\\/');
-const newMobile = before + '\n' + jsonStr + '\n  ' + after;
+// Encode template as base64 to completely avoid HTML parser issues.
+// The bundler script will decode this before JSON.parse.
+const jsonStr = JSON.stringify(template);
+const b64 = Buffer.from(jsonStr).toString('base64');
+
+// Split base64 into chunks of 76 chars per line to avoid
+// ultra-long lines that some mobile browsers may truncate
+const lines = [];
+for (let i = 0; i < b64.length; i += 76) {
+  lines.push(b64.substring(i, i + 76));
+}
+const b64Content = lines.join('\n');
+
+const newMobile = before + '\n' + b64Content + '\n  ' + after;
 
 fs.writeFileSync(mobilePath, newMobile, 'utf8');
 console.log('Rebundled mobile.html (' + Math.round(newMobile.length / 1024) + 'KB)');
