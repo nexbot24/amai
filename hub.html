@@ -511,7 +511,7 @@ async function boot(){
               var now=new Date();
               var apptMins=timeToMins(b.appointment_time);
               var nowMins=now.getHours()*60+now.getMinutes();
-              if(apptMins+getDuration(b.treatment_name) <= nowMins) isPast=true;
+              if(apptMins <= nowMins) isPast=true;
             }
             if(isPast) S.past.push(v);
             else S.upcoming.push(v);
