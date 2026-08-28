@@ -16,6 +16,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Mulish:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/helpers.js"></script>
+  <script src="js/calendar.js"></script>
   <script src="push-register.js"></script>
   
   <style>
@@ -372,7 +375,6 @@ to {opacity:1}
   <script>
 
 
-var $=function(id){return document.getElementById(id);};
 var TREATMENTS=[];
 async function loadServices(){
   var {data}=await sb.from('services').select('*').eq('available',true).order('sort_order');
@@ -390,26 +392,14 @@ var GUIDES=[
   {t:"Between visits",b:"Exfoliate twice a week from day three to keep ingrowns away. Don't shave in between — it resets the cycle we're working with."}
 ];
 
-var sb = supabase.createClient(
-  'https://tphyrmweauzfletdlqvi.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwaHlybXdlYXV6ZmxldGRscXZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0NTIxOTQsImV4cCI6MjEwMzAyODE5NH0.Z_utKsxYquCoL2LfTjjL8QFB1tnLJZW9j3El7Sykk8o'
-);
-window.sb = sb;
+
 
 var KEY="amai_hub_v2";
 function load(){ try{ return JSON.parse(localStorage.getItem(KEY))||null; }catch(e){ return null; } }
 function save(){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
 
-function iso(d){ return d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate(); }
-function dayKeyToDate(k){ var p=k.split('-'); var d=new Date(+p[0],+p[1],+p[2]); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
-function dateToDayKey(ds){ var d=new Date(String(ds).split('T')[0]+'T00:00:00'); return d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate(); }
-function addDays(n){ var d=new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()+n); return d; }
 function openDay(n){ var d=addDays(n); while(d.getDay()===0||d.getDay()===1){ d.setDate(d.getDate()+1); } return d; }
 function pastDay(n){ var d=addDays(n); while(d.getDay()===0||d.getDay()===1){ d.setDate(d.getDate()-1); } return d; }
-function longDate(d){ return d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}); }
-function shortDate(d){ return d.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}); }
-function parseKey(k){ var p=k.split("-"); return new Date(+p[0],+p[1],+p[2]); }
-function money(n){ return "£"+n; }
 
 var DEFAULTS={
   signedIn:false, name:"", phone:"", email:"", since:"",
@@ -462,73 +452,7 @@ if($("signout")) $("signout").onclick=async function(){ await sb.auth.signOut();
 /* ---------- shell ---------- */
 
 
-var CAL_CACHE = {};
-function timeToMins(t) {
-  if(!t) return 0;
-  var p = String(t).split(/[:.]/);
-  return parseInt(p[0], 10) * 60 + parseInt(p[1]||0, 10);
-}
-function minsToTime(m) {
-  var h = Math.floor(m / 60);
-  var mm = m % 60;
-  return h + "." + (mm < 10 ? "0" + mm : mm);
-}
-function getDuration(name) {
-  var t = TREATMENTS.find(function(i){ return i.name === name; });
-  if(!t) return 60;
-  var match = String(t.time).match(/(\d+)/);
-  return match ? parseInt(match[1], 10) : 60;
-}
-async function fetchMonthBookings(v) {
-  var y = v.getFullYear(), m = v.getMonth();
-  var key = y + "-" + m;
-  if (CAL_CACHE[key]) return CAL_CACHE[key];
-  
-  var startStr = y + "-" + String(m+1).padStart(2,'0') + "-01";
-  var dim = new Date(y, m+1, 0).getDate();
-  var endStr = y + "-" + String(m+1).padStart(2,'0') + "-" + String(dim).padStart(2,'0');
 
-  var { data } = await sb.from('bookings')
-    .select('appointment_date, appointment_time, treatment_name')
-    .gte('appointment_date', startStr)
-    .lte('appointment_date', endStr)
-    .neq('status', 'cancelled');
-  
-  CAL_CACHE[key] = data || [];
-  return CAL_CACHE[key];
-}
-
-function calcSlots(d) {
-  var y = d.getFullYear(), m = d.getMonth(), day = d.getDate();
-  var key = y + "-" + m;
-  var dateStr = y + "-" + String(m+1).padStart(2,'0') + "-" + String(day).padStart(2,'0');
-  
-  var bookings = CAL_CACHE[key] || [];
-  var dayBookings = bookings.filter(function(b){ return b.appointment_date === dateStr; });
-  
-  var dur = getDuration(draft.treat);
-  var start = 9 * 60; // 9:00
-  var end = 18 * 60; // 18:00
-  var step = 15;
-  
-  var slots = [];
-  for (var t = start; t + dur <= end; t += step) {
-    var t_end = t + dur;
-    var overlap = false;
-    for (var i=0; i<dayBookings.length; i++) {
-      var b = dayBookings[i];
-      var b_start = timeToMins(b.appointment_time);
-      var b_dur = getDuration(b.treatment_name);
-      var b_end = b_start + b_dur;
-      if (t < b_end && t_end > b_start) {
-        overlap = true;
-        break;
-      }
-    }
-    if (!overlap) slots.push({ label: minsToTime(t), open: true });
-  }
-  return slots;
-}
 
 if (!window.__amaiMobile) {
   var VIEWS=[ 
@@ -552,12 +476,10 @@ async function boot(){
   /* check Supabase session first */
   var sess=null;
   try{ var sr=await sb.auth.getSession(); sess=sr.data.session; }catch(e){ console.warn('getSession error',e); }
-  console.log('boot: supabase session=', !!sess, 'S.signedIn=', S.signedIn, 'S.email=', S.email);
   if(sess){
     S.signedIn=true; S.email=sess.user.email; save();
   }
   if(!S.signedIn){
-    console.log('boot: NOT signed in, showing auth');
     if($("auth")) $("auth").className="";
     if($("hub")) $("hub").className="shell hide";
     if($("m-step-email")) $("m-step-email").style.display="";
@@ -1084,74 +1006,7 @@ function modal(html){
   $("ov").onclick=function(e){ if(e.target===this) closeModal(); };
 }
 var calOffset=0;
-var CAL_CACHE = {};
 
-function timeToMins(t) {
-  if(!t) return 0;
-  var p = String(t).split(/[:.]/);
-  return parseInt(p[0], 10) * 60 + parseInt(p[1]||0, 10);
-}
-function minsToTime(m) {
-  var h = Math.floor(m / 60);
-  var mm = m % 60;
-  return h + "." + (mm < 10 ? "0" + mm : mm);
-}
-function getDuration(name) {
-  var t = TREATMENTS.find(function(i){ return i.name === name; });
-  if(!t) return 60;
-  var match = String(t.time).match(/(\d+)/);
-  return match ? parseInt(match[1], 10) : 60;
-}
-async function fetchMonthBookings(v) {
-  var y = v.getFullYear(), m = v.getMonth();
-  var key = y + "-" + m;
-  if (CAL_CACHE[key]) return CAL_CACHE[key];
-  
-  var startStr = y + "-" + String(m+1).padStart(2,'0') + "-01";
-  var dim = new Date(y, m+1, 0).getDate();
-  var endStr = y + "-" + String(m+1).padStart(2,'0') + "-" + String(dim).padStart(2,'0');
-
-  var { data } = await sb.from('bookings')
-    .select('appointment_date, appointment_time, treatment_name')
-    .gte('appointment_date', startStr)
-    .lte('appointment_date', endStr)
-    .neq('status', 'cancelled');
-  
-  CAL_CACHE[key] = data || [];
-  return CAL_CACHE[key];
-}
-
-function calcSlots(d) {
-  var y = d.getFullYear(), m = d.getMonth(), day = d.getDate();
-  var key = y + "-" + m;
-  var dateStr = y + "-" + String(m+1).padStart(2,'0') + "-" + String(day).padStart(2,'0');
-  
-  var bookings = CAL_CACHE[key] || [];
-  var dayBookings = bookings.filter(function(b){ return b.appointment_date === dateStr; });
-  
-  var dur = getDuration(draft.treat);
-  var start = 9 * 60; // 9:00
-  var end = 18 * 60; // 18:00
-  var step = 15;
-  
-  var slots = [];
-  for (var t = start; t + dur <= end; t += step) {
-    var t_end = t + dur;
-    var overlap = false;
-    for (var i=0; i<dayBookings.length; i++) {
-      var b = dayBookings[i];
-      var b_start = timeToMins(b.appointment_time);
-      var b_dur = getDuration(b.treatment_name);
-      var b_end = b_start + b_dur;
-      if (t < b_end && t_end > b_start) {
-        overlap = true;
-        break;
-      }
-    }
-    if (!overlap) slots.push({ label: minsToTime(t), open: true });
-  }
-  return slots;
-}
 
 async function calendarHTML(sel){
   var t=addDays(0), v=new Date(t.getFullYear(),t.getMonth()+calOffset,1);
@@ -1162,7 +1017,7 @@ async function calendarHTML(sel){
   for(var i=0;i<firstDow;i++) cells+='<div></div>';
   for(var d=1;d<=dim;d++){
     var day=new Date(v.getFullYear(),v.getMonth(),d), k=iso(day);
-    var slots = calcSlots(day);
+    var slots = calcSlots(day, draft.treat);
     var ok=day>=t&&day.getDay()!==0&&day.getDay()!==1&&slots.length>0;
     cells+='<button class="day" data-day="'+k+'" aria-pressed="'+(sel===k)+'"'+(ok?"":" disabled")+'>'+d+'</button>';
   }
@@ -1177,7 +1032,7 @@ async function calendarHTML(sel){
 function slotsHTML(dayKey,sel){
   if(!dayKey) return '<p style="font-size:13.5px;color:#6E5B49;margin:0">Choose a day to see times.</p>';
   var d=parseKey(dayKey);
-  var slots = calcSlots(d);
+  var slots = calcSlots(d, draft.treat);
   if (slots.length === 0) return '<p style="font-size:13.5px;color:#6E5B49;margin:0">No times available.</p>';
   
   return slots.map(function(sl){
@@ -1465,7 +1320,7 @@ V.home=function(){
       '<div style="padding:22px 22px 20px">'+
         '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:14px">'+
           '<span class="lbl" style="color:#E8D5C4">'+countdown(v.dateKey)+'</span>'+
-          '<span class="lbl">'+shortD(parseK(v.dateKey))+'</span></div>'+
+          '<span class="lbl">'+shortDate(parseKey(v.dateKey))+'</span></div>'+
         '<div class="serif" style="font-size:27px;line-height:1.18;margin-bottom:7px">'+v.treat+'</div>'+
         '<div style="font-size:15px;color:#CBB49E">'+when(v.dateKey,v.time)+'</div>'+
       '</div>'+
@@ -1494,7 +1349,7 @@ V.home=function(){
     (reward?'<button class="btn btn-sm" data-tab="rewards" style="margin-top:16px;position:relative">'+(reward==="free"?"Use my free visit":"Use my 25% off")+'</button>':'')+
   '</div></div>';
 
-  var usual=(S.plan&&S.plan.treat)||(S.past.length? S.past.slice().sort(function(a,b){ return parseK(b.dateKey)-parseK(a.dateKey); })[0].treat : "");
+  var usual=(S.plan&&S.plan.treat)||(S.past.length? S.past.slice().sort(function(a,b){ return parseKey(b.dateKey)-parseKey(a.dateKey); })[0].treat : "");
   var quick='<div class="sec">'+
     (usual?'<button class="btn" data-rebook="1" style="margin-bottom:8px">Book '+usual+' again</button>'
           :'<button class="btn" data-book="1" style="margin-bottom:8px">Book a visit</button>')+
@@ -1518,10 +1373,10 @@ V.home=function(){
       '<button class="btn btn-o btn-sm" data-plan="1" style="width:auto">See how it works</button></div></div>';
 
   var recent = S.past.length? '<div class="sec last"><div class="lbl" style="margin-bottom:12px">Last visit</div>'+
-    (function(){ var p=S.past.slice().sort(function(a,b){ return parseK(b.dateKey)-parseK(a.dateKey); })[0];
+    (function(){ var p=S.past.slice().sort(function(a,b){ return parseKey(b.dateKey)-parseKey(a.dateKey); })[0];
       return '<div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:14px">'+
         '<span style="min-width:0"><span class="serif" style="display:block;font-size:18px;line-height:1.3;margin-bottom:4px">'+p.treat+'</span>'+
-        '<span style="font-size:12.5px;color:#B39C88">'+longD(parseK(p.dateKey))+'</span></span>'+
+        '<span style="font-size:12.5px;color:#B39C88">'+longDate(parseKey(p.dateKey))+'</span></span>'+
         '<button class="btn btn-o btn-sm" data-after="'+p.id+'" style="width:auto;flex:none;min-height:40px;font-size:14px">Aftercare</button></div>';
     })()+'</div>' : '<div style="height:20px"></div>';
 
@@ -1534,8 +1389,8 @@ V.home=function(){
 };
 
 V.visits=function(){
-  var up=S.upcoming.slice().sort(function(a,b){ return parseK(a.dateKey)-parseK(b.dateKey); });
-  var past=S.past.slice().sort(function(a,b){ return parseK(b.dateKey)-parseK(a.dateKey); });
+  var up=S.upcoming.slice().sort(function(a,b){ return parseKey(a.dateKey)-parseKey(b.dateKey); });
+  var past=S.past.slice().sort(function(a,b){ return parseKey(b.dateKey)-parseKey(a.dateKey); });
   var tab=S.vtab||"up";
 
   var body = tab==="up"?
@@ -1557,7 +1412,7 @@ V.visits=function(){
     (past.length? past.map(function(v){
       return '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 0;border-bottom:1px solid rgba(232,213,196,.13)">'+
         '<span style="min-width:0"><span class="serif" style="display:block;font-size:17px;line-height:1.3;margin-bottom:3px">'+v.treat+'</span>'+
-        '<span style="font-size:12.5px;color:#B39C88">'+shortD(parseK(v.dateKey))+' · '+v.time+' · '+money(v.price)+'</span></span>'+
+        '<span style="font-size:12.5px;color:#B39C88">'+shortDate(parseKey(v.dateKey))+' · '+v.time+' · '+money(v.price)+'</span></span>'+
         '<span style="display:flex;gap:6px;flex:none">'+
           '<button class="btn btn-o btn-sm" data-again="'+v.id+'" style="min-height:40px;font-size:14px;padding:0 13px">Again</button>'+
           '<button class="btn btn-o btn-sm" data-after="'+v.id+'" style="min-height:40px;font-size:14px;padding:0 13px">Care</button></span></div>';
@@ -1687,13 +1542,13 @@ function sheet(html){
   wire($("host"));
 }
 async function calHTML(){
-  var v=new Date(d0().getFullYear(),d0().getMonth()+draft.off,1), t=d0();
+  var v=new Date(today().getFullYear(),today().getMonth()+draft.off,1), t=today();
   await fetchMonthBookings(v);
   var firstDow=(v.getDay()+6)%7, dim=new Date(v.getFullYear(),v.getMonth()+1,0).getDate(), cells="";
   for(var i=0;i<firstDow;i++) cells+='<div class="blank"></div>';
   for(var n=1;n<=dim;n++){
-    var d=new Date(v.getFullYear(),v.getMonth(),n), k=key(d);
-    var slots = calcSlots(d);
+    var d=new Date(v.getFullYear(),v.getMonth(),n), k=iso(d);
+    var slots = calcSlots(d, draft.treat);
     var ok = d>=t && d.getDay()!==0 && d.getDay()!==1 && slots.length>0;
     cells+='<button class="dcell" data-day="'+k+'" aria-pressed="'+(draft.dateKey===k)+'"'+(ok?"":" disabled")+'>'+n+(ok?'<u></u>':'')+'</button>';
   }
@@ -1706,8 +1561,8 @@ async function calHTML(){
 }
 function slotHTML(){
   if(!draft.dateKey) return '<p style="font-size:13px;color:#8A7361;margin:0">Select a day above.</p>';
-  var d=parseK(draft.dateKey);
-  var slots = calcSlots(d);
+  var d=parseKey(draft.dateKey);
+  var slots = calcSlots(d, draft.treat);
   if(!slots || slots.length===0) return '<p style="font-size:13px;color:#8A7361;margin:0">Fully booked.</p>';
   return '<div class="sgrid">'+slots.map(function(s){
     return '<button class="stok" aria-pressed="'+(draft.time===s.label)+'" data-time="'+s.label+'">'+s.label+'</button>';
@@ -1723,7 +1578,7 @@ async function bookSheet(){
     (moving?"":'<input id="s-q" class="field" placeholder="Search treatments" style="margin-bottom:12px">'+
       '<div id="s-pick">'+pickHTML()+'</div><div class="lbl" style="margin:20px 0 10px">Day</div>')+
     '<div id="s-cal">'+(await calHTML())+'</div>'+
-    '<div class="lbl" id="s-slotlbl" style="margin:20px 0 10px">'+(draft.dateKey?"Times on "+longD(parseK(draft.dateKey)):"Times")+'</div>'+
+    '<div class="lbl" id="s-slotlbl" style="margin:20px 0 10px">'+(draft.dateKey?"Times on "+longDate(parseKey(draft.dateKey)):"Times")+'</div>'+
     '<div id="s-slots">'+slotHTML()+'</div>'+
     '<div id="s-sum" style="margin-top:18px"></div>'+
     '<div style="display:flex;gap:8px;margin-top:20px">'+
@@ -1734,14 +1589,14 @@ async function bookSheet(){
 async function refreshBook(){
   if($("s-cal")) $("s-cal").innerHTML=await calHTML();
   if($("s-slots")) $("s-slots").innerHTML=slotHTML();
-  if($("s-slotlbl")) $("s-slotlbl").textContent=draft.dateKey?"Times on "+longD(parseK(draft.dateKey)):"Times";
+  if($("s-slotlbl")) $("s-slotlbl").textContent=draft.dateKey?"Times on "+longDate(parseKey(draft.dateKey)):"Times";
   if($("s-pick")) $("s-pick").innerHTML=pickHTML();
   var ready=!!(draft.treat&&draft.dateKey&&draft.time);
   if($("s-sum")) $("s-sum").innerHTML = ready?
     (function(){ var s=svc(draft.treat), p=s?s.p:0;
       return '<div class="card" style="padding:16px 18px;font-size:13.5px;line-height:1.9">'+
         '<div style="display:flex;justify-content:space-between;gap:14px"><span style="color:#B39C88">Treatment</span><span>'+draft.treat+'</span></div>'+
-        '<div style="display:flex;justify-content:space-between;gap:14px"><span style="color:#B39C88">When</span><span>'+shortD(parseK(draft.dateKey))+' · '+draft.time+'</span></div>'+
+        '<div style="display:flex;justify-content:space-between;gap:14px"><span style="color:#B39C88">When</span><span>'+shortDate(parseKey(draft.dateKey))+' · '+draft.time+'</span></div>'+
         (draft.mode==="move"?'':'<div style="display:flex;justify-content:space-between;gap:14px"><span style="color:#B39C88">Deposit today</span><span>£10</span></div>'+
         '<div style="display:flex;justify-content:space-between;gap:14px"><span style="color:#B39C88">In the studio</span><span>'+money(p-10)+'</span></div>')+
       '</div>'; })() : "";
@@ -1754,14 +1609,14 @@ function startBook(treat){
 }
 function startMove(id){
   var v=S.upcoming.filter(function(x){ return String(x.id)===String(id); })[0]; if(!v) return;
-  var d=parseK(v.dateKey), t=d0();
+  var d=parseKey(v.dateKey), t=today();
   draft={mode:"move",id:id,treat:v.treat,dateKey:v.dateKey,time:v.time,keep:v.time,q:"",
          off:Math.max(0,(d.getFullYear()-t.getFullYear())*12+(d.getMonth()-t.getMonth()))};
   bookSheet();
 }
 function cancelSheet(id){
   var v=S.upcoming.filter(function(x){ return String(x.id)===String(id); })[0]; if(!v) return;
-  var refund=daysTo(v.dateKey)>=1;
+  var refund=daysAway(v.dateKey)>=1;
   sheet('<div class="lbl" style="margin-bottom:12px">Cancel a visit</div>'+
     '<h2 class="serif" style="font-size:25px;line-height:1.2;margin:0 0 8px">'+v.treat+'</h2>'+
     '<p style="font-size:14px;line-height:1.7;color:#CBB49E;margin:0 0 18px">'+when(v.dateKey,v.time)+'</p>'+
@@ -1842,7 +1697,7 @@ function wire(scope){
   q("[data-vtab]").forEach(function(b){ b.onclick=function(){ S.vtab=b.dataset.vtab; save(); render(); }; });
   q("[data-book]").forEach(function(b){ b.onclick=function(){ startBook(S.plan?S.plan.treat:""); }; });
   q("[data-rebook]").forEach(function(b){ b.onclick=function(){
-    var last=S.past.slice().sort(function(x,y){ return parseK(y.dateKey)-parseK(x.dateKey); })[0];
+    var last=S.past.slice().sort(function(x,y){ return parseKey(y.dateKey)-parseKey(x.dateKey); })[0];
     startBook(S.plan?S.plan.treat:(last?last.treat:"")); }; });
   q("[data-move]").forEach(function(b){ b.onclick=function(){ closeSheet(); startMove(b.dataset.move); }; });
   q("[data-cancel]").forEach(function(b){ b.onclick=function(){ cancelSheet(b.dataset.cancel); }; });
@@ -1910,7 +1765,7 @@ function wire(scope){
       S.upcoming.forEach(function(b){ if(String(b.id)===String(draft.id)){ b.dateKey=draft.dateKey; b.time=draft.time; } });
       if(sb) await sb.from('bookings').update({appointment_date: dayKeyToDate(draft.dateKey), appointment_time: draft.time}).eq('id', draft.id);
       save(); closeSheet(); render();
-      toast("Moved to "+longD(parseK(draft.dateKey))+", "+draft.time+".");
+      toast("Moved to "+longDate(parseKey(draft.dateKey))+", "+draft.time+".");
     } else {
       var s=svc(draft.treat);
       var price=s?s.p:0;
@@ -1927,7 +1782,7 @@ function wire(scope){
         S.upcoming.push({id:Date.now(),treat:draft.treat,dateKey:draft.dateKey,time:draft.time,price:price,deposit:10});
       }
       save(); closeSheet(); go("home");
-      toast("Booked — "+longD(parseK(draft.dateKey))+", "+draft.time+".");
+      toast("Booked — "+longDate(parseKey(draft.dateKey))+", "+draft.time+".");
     }
   };
   var pok=one("plan-ok"); if(pok) pok.onclick=function(){
@@ -1994,7 +1849,7 @@ var chatBuilt=false, typing=false, convId=null, chatUnreadCount=0, chatSub=null;
 function clock(ts){ return new Date(ts).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}); }
 function dayStamp(ts){
   var d=new Date(ts); d.setHours(0,0,0,0);
-  var diff=Math.round((d0()-d)/86400000);
+  var diff=Math.round((today()-d)/86400000);
   if(diff===0) return "Today";
   if(diff===1) return "Yesterday";
   if(diff<7) return new Date(ts).toLocaleDateString("en-GB",{weekday:"long"});
@@ -2281,7 +2136,7 @@ async function initSupabase() {
         S.upcoming=[]; S.past=[];
         bk.data.forEach(function(b){
           var v={id:b.id,treat:b.treatment_name,dateKey:dateToDayKey(b.appointment_date),time:b.appointment_time,price:Number(b.price),deposit:Number(b.deposit_amount||10)};
-          var d=parseK(dateToDayKey(b.appointment_date));
+          var d=parseKey(dateToDayKey(b.appointment_date));
           if(b.status==='completed'||d<today) S.past.push(v);
           else S.upcoming.push(v);
         });

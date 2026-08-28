@@ -1,19 +1,5 @@
 /* booking.js — shared booking engine for AMAI (desktop + mobile) */
-
-/* ─── Supabase ─── */
-var SB_URL='https://tphyrmweauzfletdlqvi.supabase.co';
-var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwaHlybXdlYXV6ZmxldGRscXZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0NTIxOTQsImV4cCI6MjEwMzAyODE5NH0.Z_utKsxYquCoL2LfTjjL8QFB1tnLJZW9j3El7Sykk8o';
-var sb=null;
-function loadSupabaseSDK(){
-  return new Promise(function(resolve){
-    if(window.supabase){sb=window.supabase.createClient(SB_URL,SB_KEY);window.sb=sb;resolve();return;}
-    var s=document.createElement('script');
-    s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
-    s.onload=function(){sb=window.supabase.createClient(SB_URL,SB_KEY);window.sb=sb;resolve();};
-    s.onerror=function(){resolve();};
-    document.head.appendChild(s);
-  });
-}
+/* Depends on: js/supabase.js, js/helpers.js, js/calendar.js */
 
 /* ─── Data ─── */
 var GROUPS=[
@@ -36,27 +22,18 @@ var GROUPS=[
 var BOOKABLE=[];
 var HUB_KEY="amai_hub_v2";
 var S={group:0,step:1,treatment:"",monthOffset:0,dateKey:"",time:"",query:"",paid:"",how:"",sent:false,returning:false,promo:null};
-var CAL_CACHE={};
-var CLOSED_DAYS={};
-var OPENING_HOURS={tue:{open:'9.00',close:'18.00'},wed:{open:'9.00',close:'18.00'},thu:{open:'9.00',close:'18.00'},fri:{open:'9.00',close:'18.00'},sat:{open:'9.00',close:'18.00'}};
+
 
 /* ─── DOM helpers ─── */
-var $=function(id){return document.getElementById(id);};
 var el=function(tag,attrs,html){var n=document.createElement(tag);for(var k in attrs){if(k==="style")n.setAttribute("style",attrs[k]);else if(k.indexOf("on")===0)n[k]=attrs[k];else n.setAttribute(k,attrs[k]);}if(html!=null)n.innerHTML=html;return n;};
 
 /* ─── Utilities ─── */
-function dayKeyToDate(k){var p=k.split('-');var d=new Date(+p[0],+p[1],+p[2]);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function priceOf(n){for(var i=0;i<BOOKABLE.length;i++)if(BOOKABLE[i].name===n)return BOOKABLE[i].price;return"";}
 function balanceOf(n){var p=priceOf(n),v=parseFloat(String(p).replace(/[^0-9.]/g,""));if(!v)return"Balance";
   return(String(p).indexOf("from")===0||String(p).indexOf("\u2013")>-1?"from \u00a3":"\u00a3")+(v-10);}
 function today(){var d=new Date();d.setHours(0,0,0,0);return d;}
 function viewMonth(){var t=today();return new Date(t.getFullYear(),t.getMonth()+S.monthOffset,1);}
-function timeToMins(t){if(!t)return 0;var p=String(t).split(/[:.]/) ;return parseInt(p[0],10)*60+parseInt(p[1]||0,10);}
-function minsToTime(m){var h=Math.floor(m/60),mm=m%60;return h+"."+(mm<10?"0"+mm:mm);}
-function getDuration(name){var t=BOOKABLE.find(function(i){return i.name===name;});if(!t)return 60;var match=String(t.time).match(/(\d+)/);return match?parseInt(match[1],10):60;}
-function dotTimeToMins(t){var p=t.split('.');return parseInt(p[0])*60+parseInt(p[1]||0);}
 function chosenDate(){if(!S.dateKey)return null;var p=S.dateKey.split("-");return new Date(+p[0],+p[1],+p[2]);}
-function longDate(d){return d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});}
 function whenLabel(){var d=chosenDate();if(!d)return"Not chosen yet";return S.time?longDate(d)+", "+S.time:longDate(d);}
 function digits(v){return String(v).replace(/\D/g,"");}
 function priceNum(n){return parseFloat(String(priceOf(n)).replace(/[^0-9.]/g,""))||0;}
@@ -77,51 +54,7 @@ async function loadServicesIntoGroups(){
   }
 }
 
-async function fetchMonthBookings(v){
-  var y=v.getFullYear(),m=v.getMonth(),key=y+"-"+m;
-  if(CAL_CACHE[key])return CAL_CACHE[key];
-  if(!sb)return[];
-  var startStr=y+"-"+String(m+1).padStart(2,'0')+"-01";
-  var dim=new Date(y,m+1,0).getDate();
-  var endStr=y+"-"+String(m+1).padStart(2,'0')+"-"+String(dim).padStart(2,'0');
-  var r=await sb.from('bookings').select('appointment_date, appointment_time, treatment_name').gte('appointment_date',startStr).lte('appointment_date',endStr).neq('status','cancelled');
-  CAL_CACHE[key]=r.data||[];
-  return CAL_CACHE[key];
-}
 
-function calcSlots(d){
-  var y=d.getFullYear(),m=d.getMonth(),day=d.getDate();
-  var key=y+"-"+m;
-  var dateStr=y+"-"+String(m+1).padStart(2,'0')+"-"+String(day).padStart(2,'0');
-  var bookings=CAL_CACHE[key]||[];
-  var dayBookings=bookings.filter(function(b){return b.appointment_date===dateStr;});
-  var dur=getDuration(S.treatment);
-  var dayMap=['sun','mon','tue','wed','thu','fri','sat'];
-  var dk=dayMap[d.getDay()];
-  var hrs=OPENING_HOURS[dk]||{open:'9.00',close:'18.00'};
-  var start=dotTimeToMins(hrs.open),end=dotTimeToMins(hrs.close),step=15;
-  var now=new Date();
-  var isToday=d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth()&&d.getDate()===now.getDate();
-  var nowMins=isToday?now.getHours()*60+now.getMinutes():0;
-  var slots=[];
-  for(var t=start;t+dur<=end;t+=step){
-    if(isToday&&t<=nowMins)continue;
-    var t_end=t+dur,overlap=false;
-    for(var i=0;i<dayBookings.length;i++){
-      var b=dayBookings[i];
-      var b_start=timeToMins(b.appointment_time);
-      var b_dur=getDuration(b.treatment_name);
-      var b_end=b_start+b_dur;
-      if(t<b_end&&t_end>b_start){overlap=true;break;}
-    }
-    if(!overlap)slots.push({label:minsToTime(t),open:true});
-  }
-  return slots;
-}
-
-function dayOpen(d){var w=d.getDay();if(w===0||w===1)return false;var k=d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate();return!CLOSED_DAYS[k];}
-function dayFree(d){return calcSlots(d).length>0;}
-function slotList(d){return calcSlots(d);}
 
 /* ─── Rendering: Picker ─── */
 function renderPicker(){
@@ -156,7 +89,7 @@ async function renderCalendar(){
     (function(day){
       var d=new Date(v.getFullYear(),v.getMonth(),day);
       var key=d.getFullYear()+"-"+d.getMonth()+"-"+day;
-      var usable=d>=t&&dayOpen(d)&&dayFree(d);
+      var usable=d>=t&&dayOpen(d)&&dayFree(d, S.treatment);
       var b=el("button",{class:"day",style:"height:44px;font-family:Mulish,sans-serif;font-size:14.5px;background:transparent;color:#E8D5C4;border:1px solid rgba(232,213,196,.22);cursor:pointer","aria-pressed":String(S.dateKey===key)},String(day));
       if(!usable){b.setAttribute("disabled","disabled");b.style.color="rgba(232,213,196,.22)";b.style.borderColor="transparent";b.style.cursor="default";}
       else b.onclick=function(){S.dateKey=key;S.time="";renderCalendar();renderSlots();if(typeof renderTracker==='function')renderTracker();syncNext();};
@@ -171,7 +104,7 @@ function renderSlots(){
   var d=chosenDate(),box=$("slots");if(!box)return;box.innerHTML="";
   if($("slots-label"))$("slots-label").textContent=d?"Times on "+longDate(d):"Choose a day to see times";
   if(!d)return;
-  slotList(d).forEach(function(sl){
+  calcSlots(d, S.treatment).forEach(function(sl){
     var b=el("button",{class:"chip","aria-pressed":String(S.time===sl.label)},sl.label);
     if(!sl.open)b.setAttribute("disabled","disabled");
     else b.onclick=function(){S.time=sl.label;renderSlots();if(typeof renderTracker==='function')renderTracker();syncNext();};
@@ -481,7 +414,7 @@ function renderDOW(){
 
 /* ─── Init ─── */
 async function initBooking(){
-  await loadSupabaseSDK();
+  await ensureSupabase();
   await loadServicesIntoGroups();
   /* load closed days */
   if(sb){
