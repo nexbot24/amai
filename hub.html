@@ -1,128 +1,221 @@
 <!DOCTYPE html>
 <html lang="en-GB">
 <head>
-<script>
-  if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-    window.location.replace('m-hub.html');
-  }
-</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=5">
+  <title>AMAI — My account</title>
+  <meta name="theme-color" content="#241F1C">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="AMAI">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="favicon/amai-favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="favicon/amai-favicon-180.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Mulish:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="push-register.js"></script>
+  
+  <style>
+    /* Desktop CSS */
+.desktop-shell *, .desktop-shell *::before, .desktop-shell *::after {box-sizing:border-box}
+.desktop-shell {margin:0;font-family:Mulish,sans-serif;color:#241F1C;background:#EFE9E1}
+.desktop-shell a {color:inherit;text-decoration:none}
+.desktop-shell button {font-family:Mulish,sans-serif}
+.desktop-shell .serif {font-family:Marcellus,serif;font-weight:400}
+.desktop-shell .lbl {font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:#6E5B49}
+.desktop-shell .lbl-d {font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:#B39C88}
+.desktop-shell .card {background:#F7F1EA;border:1px solid #E0D2C2;padding:26px 28px}
+.desktop-shell .btn {display:inline-flex;align-items:center;justify-content:center;border:none;cursor:pointer;font-family:Marcellus,serif;font-size:15px;padding:13px 26px;border-radius:22px 22px 0 0;background:#3A322E;color:#F7F1EA}
+.desktop-shell .btn:hover {background:#241F1C}
+.desktop-shell .btn-l {background:#E8D5C4;color:#3A322E}
+.desktop-shell .btn-l:hover {background:#DEC9B4}
+.desktop-shell .btn-o {background:transparent;color:#241F1C;border:1px solid #C9B8A4}
+.desktop-shell .btn-o:hover {border-color:#3A322E}
+.desktop-shell .btn-sm {font-size:14px;padding:10px 20px;border-radius:18px 18px 0 0}
+.desktop-shell .field {width:100%;background:#F7F1EA;border:1px solid #DED0C0;color:#241F1C;padding:13px 15px;font-family:Mulish,sans-serif;font-size:15px;outline:none;border-radius:0}
+.desktop-shell .field:focus {border-color:#8A7361}
+.desktop-shell .flab {display:flex;flex-direction:column;gap:8px;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:#6E5B49}
+.desktop-shell .hide {display:none!important}
+.desktop-shell .pill {display:inline-flex;align-items:center;gap:7px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:5px 12px;border:1px solid #C9B8A4;color:#6E5B49}
+.desktop-shell .pill.on {background:#3A322E;border-color:#3A322E;color:#E8D5C4}
+.desktop-shell .arch {border-radius:999px 999px 0 0}
+.desktop-shell .shell {display:grid;grid-template-columns:250px 1fr;min-height:100vh}
+.desktop-shell .side {background:#3A322E;color:#E8D5C4;display:flex;flex-direction:column;justify-content:space-between;padding:26px 0;position:sticky;top:0;height:100vh}
+.desktop-shell .nav a, .desktop-shell .nav button {display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:none;border:none;cursor:pointer;color:#CBB49E;font-size:14.5px;padding:12px 26px}
+.desktop-shell .nav button.on {background:#443B36;color:#F7F1EA;box-shadow:inset 3px 0 0 #E8D5C4}
+.desktop-shell .nav button:hover {color:#F7F1EA}
+.desktop-shell .main {padding:34px 44px 64px;max-width:1180px}
+.desktop-shell .head {display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:30px}
+.desktop-shell .grid2 {display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.desktop-shell .grid3 {display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.desktop-shell .row {display:grid;grid-template-columns:120px 1fr auto auto;gap:22px;align-items:center;padding:18px 0;border-top:1px solid #E0D2C2}
+.desktop-shell .row:last-of-type {border-bottom:1px solid #E0D2C2}
+.desktop-shell .loyalty {background:#3A322E;color:#E8D5C4;padding:34px 38px 30px;position:relative;overflow:hidden}
+.desktop-shell .loyalty::after {content:"";position:absolute;right:-70px;bottom:-90px;width:220px;height:220px;border:1px solid rgba(232,213,196,.16);border-radius:50%}
+.desktop-shell .punch {display:grid;grid-template-columns:repeat(10,1fr);gap:10px;position:relative;z-index:1}
+.desktop-shell .stamp {aspect-ratio:1;border-radius:50%;border:1px dashed rgba(232,213,196,.38);display:flex;align-items:center;justify-content:center;font-family:Marcellus,serif;font-size:14px;color:#B39C88;position:relative}
+.desktop-shell .stamp.done {background:#E8D5C4;border:1px solid #E8D5C4;color:#3A322E}
+.desktop-shell .stamp.done::before {content:"";position:absolute;inset:7px;border:1px solid rgba(58,50,46,.35);border-radius:50%}
+.desktop-shell .stamp.reward {border:1px solid #B39C88;color:#E8D5C4;font-size:11px;letter-spacing:.06em}
+.desktop-shell .stamp.reward.done {background:#E8D5C4;color:#3A322E;border-color:#E8D5C4}
+.desktop-shell .stamp.ready {animation:none;border:1px solid #E8D5C4;background:rgba(232,213,196,.14);color:#F7F1EA}
+.desktop-shell .perf {border-top:1px dashed rgba(232,213,196,.3);margin:26px 0 0}
+.desktop-shell .switch {width:44px;height:24px;border-radius:12px;background:#DED0C0;border:none;cursor:pointer;position:relative;flex:none}
+.desktop-shell .switch::after {content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#F7F1EA;transition:left .15s}
+.desktop-shell .switch[aria-checked="true"] {background:#3A322E}
+.desktop-shell .switch[aria-checked="true"]::after {left:23px}
+.desktop-shell .modal {position:fixed;inset:0;background:rgba(36,31,28,.6);display:flex;align-items:center;justify-content:center;padding:40px;z-index:50}
+.desktop-shell .sheet {background:#F7F1EA;max-width:560px;width:100%;padding:36px 38px;max-height:86vh;overflow-y:auto}
+.desktop-shell .day {height:40px;font-size:14px;background:transparent;color:#241F1C;border:1px solid #E0D2C2;cursor:pointer}
+.desktop-shell .day[disabled] {color:#C9B8A4;border-color:transparent;cursor:default}
+.desktop-shell .day[aria-pressed="true"] {background:#3A322E;color:#F7F1EA;border-color:#3A322E}
+.desktop-shell .chip {min-height:40px;padding:0 16px;font-size:14px;background:transparent;border:1px solid #DED0C0;cursor:pointer;color:#241F1C}
+.desktop-shell .chip[aria-pressed="true"] {background:#3A322E;color:#F7F1EA;border-color:#3A322E}
+.desktop-shell .chip[disabled] {color:#C9B8A4;border-color:#EFE5D8;text-decoration:line-through;cursor:default}
+@media (max-width:1000px) {
+.desktop-shell .shell {grid-template-columns:1fr}
+.desktop-shell .side {position:static;height:auto;flex-direction:row;align-items:center;overflow-x:auto}
+.desktop-shell .side .foot {display:none}
+.desktop-shell .nav {display:flex}
+.desktop-shell .nav button {white-space:nowrap;padding:12px 16px}
+.desktop-shell .main {padding:24px 20px 48px}
+.desktop-shell .grid2, .desktop-shell .grid3 {grid-template-columns:1fr}
+.desktop-shell .chatbox {height:calc(100vh - 190px)}
+.desktop-shell .bub {max-width:82%}
+.desktop-shell .thread, .desktop-shell .chathead, .desktop-shell .sugg, .desktop-shell .composer {padding-left:18px;padding-right:18px}
 
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Your AMAI — client hub</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Mulish:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Mulish:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>
-*,*::before,*::after{box-sizing:border-box}
-body{margin:0;font-family:Mulish,sans-serif;color:#241F1C;background:#EFE9E1}
-a{color:inherit;text-decoration:none}
-button{font-family:Mulish,sans-serif}
-.serif{font-family:Marcellus,serif;font-weight:400}
-.lbl{font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:#6E5B49}
-.lbl-d{font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:#B39C88}
-.card{background:#F7F1EA;border:1px solid #E0D2C2;padding:26px 28px}
-.btn{display:inline-flex;align-items:center;justify-content:center;border:none;cursor:pointer;font-family:Marcellus,serif;font-size:15px;padding:13px 26px;border-radius:22px 22px 0 0;background:#3A322E;color:#F7F1EA}
-.btn:hover{background:#241F1C}
-.btn-l{background:#E8D5C4;color:#3A322E}
-.btn-l:hover{background:#DEC9B4}
-.btn-o{background:transparent;color:#241F1C;border:1px solid #C9B8A4}
-.btn-o:hover{border-color:#3A322E}
-.btn-sm{font-size:14px;padding:10px 20px;border-radius:18px 18px 0 0}
-.field{width:100%;background:#F7F1EA;border:1px solid #DED0C0;color:#241F1C;padding:13px 15px;font-family:Mulish,sans-serif;font-size:15px;outline:none;border-radius:0}
-.field:focus{border-color:#8A7361}
-.flab{display:flex;flex-direction:column;gap:8px;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:#6E5B49}
-.hide{display:none!important}
-.pill{display:inline-flex;align-items:center;gap:7px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:5px 12px;border:1px solid #C9B8A4;color:#6E5B49}
-.pill.on{background:#3A322E;border-color:#3A322E;color:#E8D5C4}
-.arch{border-radius:999px 999px 0 0}
-
-/* shell */
-.shell{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
-.side{background:#3A322E;color:#E8D5C4;display:flex;flex-direction:column;justify-content:space-between;padding:26px 0;position:sticky;top:0;height:100vh}
-.nav a,.nav button{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:none;border:none;cursor:pointer;color:#CBB49E;font-size:14.5px;padding:12px 26px}
-.nav button.on{background:#443B36;color:#F7F1EA;box-shadow:inset 3px 0 0 #E8D5C4}
-.nav button:hover{color:#F7F1EA}
-.main{padding:34px 44px 64px;max-width:1180px}
-.head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:30px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-.row{display:grid;grid-template-columns:120px 1fr auto auto;gap:22px;align-items:center;padding:18px 0;border-top:1px solid #E0D2C2}
-.row:last-of-type{border-bottom:1px solid #E0D2C2}
-.loyalty{background:#3A322E;color:#E8D5C4;padding:34px 38px 30px;position:relative;overflow:hidden}
-.loyalty::after{content:"";position:absolute;right:-70px;bottom:-90px;width:220px;height:220px;border:1px solid rgba(232,213,196,.16);border-radius:50%}
-.punch{display:grid;grid-template-columns:repeat(10,1fr);gap:10px;position:relative;z-index:1}
-.stamp{aspect-ratio:1;border-radius:50%;border:1px dashed rgba(232,213,196,.38);display:flex;align-items:center;justify-content:center;font-family:Marcellus,serif;font-size:14px;color:#B39C88;position:relative}
-.stamp.done{background:#E8D5C4;border:1px solid #E8D5C4;color:#3A322E}
-.stamp.done::before{content:"";position:absolute;inset:7px;border:1px solid rgba(58,50,46,.35);border-radius:50%}
-.stamp.reward{border:1px solid #B39C88;color:#E8D5C4;font-size:11px;letter-spacing:.06em}
-.stamp.reward.done{background:#E8D5C4;color:#3A322E;border-color:#E8D5C4}
-.stamp.ready{animation:none;border:1px solid #E8D5C4;background:rgba(232,213,196,.14);color:#F7F1EA}
-.perf{border-top:1px dashed rgba(232,213,196,.3);margin:26px 0 0}
-.switch{width:44px;height:24px;border-radius:12px;background:#DED0C0;border:none;cursor:pointer;position:relative;flex:none}
-.switch::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#F7F1EA;transition:left .15s}
-.switch[aria-checked="true"]{background:#3A322E}
-.switch[aria-checked="true"]::after{left:23px}
-.modal{position:fixed;inset:0;background:rgba(36,31,28,.6);display:flex;align-items:center;justify-content:center;padding:40px;z-index:50}
-.sheet{background:#F7F1EA;max-width:560px;width:100%;padding:36px 38px;max-height:86vh;overflow-y:auto}
-.day{height:40px;font-size:14px;background:transparent;color:#241F1C;border:1px solid #E0D2C2;cursor:pointer}
-.day[disabled]{color:#C9B8A4;border-color:transparent;cursor:default}
-.day[aria-pressed="true"]{background:#3A322E;color:#F7F1EA;border-color:#3A322E}
-.chip{min-height:40px;padding:0 16px;font-size:14px;background:transparent;border:1px solid #DED0C0;cursor:pointer;color:#241F1C}
-.chip[aria-pressed="true"]{background:#3A322E;color:#F7F1EA;border-color:#3A322E}
-.chip[disabled]{color:#C9B8A4;border-color:#EFE5D8;text-decoration:line-through;cursor:default}
-@media (max-width:1000px){
-  .shell{grid-template-columns:1fr}
-  .side{position:static;height:auto;flex-direction:row;align-items:center;overflow-x:auto}
-  .side .foot{display:none}
-  .nav{display:flex}
-  .nav button{white-space:nowrap;padding:12px 16px}
-  .main{padding:24px 20px 48px}
-  .grid2,.grid3{grid-template-columns:1fr}
-  .chatbox{height:calc(100vh - 190px)}
-  .bub{max-width:82%}
-  .thread,.chathead,.sugg,.composer{padding-left:18px;padding-right:18px}
 }
-.nav .tally{margin-left:auto;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:#E8D5C4;color:#3A322E;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
 
-/* chat */
-.chatbox{display:flex;flex-direction:column;height:calc(100vh - 230px);min-height:360px;background:#F7F1EA;border:1px solid #E0D2C2}
-.chathead{display:flex;align-items:center;gap:14px;padding:20px 28px;border-bottom:1px solid #E0D2C2;background:#EFE5D8}
-.chathead .ring{width:44px;height:44px;border-radius:50%;border:1px solid #C9B8A4;display:flex;align-items:center;justify-content:center;flex:none}
-.chathead .ring i{display:block;width:15px;height:20px;border:1.4px solid #3A322E;border-bottom:none;border-radius:999px 999px 0 0}
-.thread{flex:1;min-height:0;overflow-y:auto;padding:24px 28px 10px;display:flex;flex-direction:column;gap:3px}
-.dayline{display:flex;align-items:center;gap:14px;margin:16px 0 14px}
-.dayline span{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:#8A7361;flex:none}
-.dayline b{flex:1;height:1px;background:#E0D2C2}
-.bub{max-width:62%;padding:13px 18px;font-size:15px;line-height:1.6;text-wrap:pretty}
-.bub.them{align-self:flex-start;background:#EFE5D8;color:#241F1C;border-radius:2px 16px 16px 16px}
-.bub.mine{align-self:flex-end;background:#3A322E;color:#F7F1EA;border-radius:16px 2px 16px 16px}
-.bub.run.them{border-top-left-radius:16px}
-.bub.run.mine{border-top-right-radius:16px}
-.tstamp{font-size:11.5px;color:#8A7361;padding:4px 4px 12px}
-.tstamp.mine{align-self:flex-end}
-.tstamp.them{align-self:flex-start}
-.typing{align-self:flex-start;display:flex;gap:5px;padding:16px 18px;background:#EFE5D8;border-radius:2px 16px 16px 16px;margin-top:3px}
-.typing i{width:6px;height:6px;border-radius:50%;background:#8A7361;animation:blip 1.2s infinite}
-.typing i:nth-child(2){animation-delay:.18s}
-.typing i:nth-child(3){animation-delay:.36s}
-@keyframes blip{0%,60%,100%{opacity:.28;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
-.sugg{display:flex;flex:none;gap:8px;flex-wrap:wrap;padding:0 28px 12px}
-.sugg button{min-height:38px;padding:0 16px;border-radius:19px 19px 0 0;background:transparent;border:1px solid #C9B8A4;color:#5C5148;font-size:14px;cursor:pointer;font-family:Mulish,sans-serif}
-.sugg button:hover{border-color:#3A322E;color:#241F1C}
-.composer{display:flex;flex:none;align-items:flex-end;gap:12px;padding:18px 28px;border-top:1px solid #E0D2C2;background:#EFE5D8}
-.composer textarea{flex:1;min-height:48px;max-height:120px;resize:none;background:#F7F1EA;border:1px solid #DED0C0;color:#241F1C;padding:14px 16px;outline:none;font-family:Mulish,sans-serif;font-size:15px;line-height:1.5}
-.composer textarea:focus{border-color:#8A7361}
-.composer textarea::placeholder{color:#8A7361}
-.send{min-height:48px;padding:0 26px;border:none;background:#3A322E;color:#F7F1EA;font-family:Marcellus,serif;font-size:15px;cursor:pointer;border-radius:24px 24px 0 0}
-.send:hover{background:#241F1C}
-.send:disabled{background:#DED0C0;color:#8A7361;cursor:default}
-</style>
-  <link rel="icon" type="image/png" href="amai-favicon-512.png">
-<script src="push-register.js"></script>
+
+    /* Mobile CSS */
+.mobile-shell *, .mobile-shell *::before, .mobile-shell *::after {box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+.mobile-shell {-webkit-text-size-adjust:100%}
+.mobile-shell {margin:0;font-family:Mulish,sans-serif;color:#F7F1EA;background:#241F1C;overscroll-behavior-y:contain}
+.mobile-shell button, .mobile-shell input, .mobile-shell textarea, .mobile-shell select {font-family:inherit;font-size:16px;color:inherit}
+.mobile-shell a {color:#E8D5C4;text-decoration:none}
+.mobile-shell .app {max-width:480px;margin:0 auto;background:#241F1C;min-height:100dvh;position:relative;overflow-x:clip}
+.mobile-shell .serif {font-family:Marcellus,serif;font-weight:400}
+.mobile-shell .lbl {font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:#B39C88}
+.mobile-shell .arch {border-radius:999px 999px 0 0}
+.mobile-shell .hide {display:none!important}
+.mobile-shell .scroll {overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.mobile-shell .scroll::-webkit-scrollbar {display:none}
+@keyframes rise {
+from {opacity:0;transform:translateY(10px)}
+to {opacity:1;transform:none}
+
+}
+@keyframes up {
+from {transform:translateY(100%)}
+to {transform:none}
+
+}
+@keyframes veil {
+from {opacity:0}
+to {opacity:1}
+
+}
+.mobile-shell .view {display:none}
+.mobile-shell .view.on {display:block;animation:rise .34s ease both}
+.mobile-shell .top {position:sticky;top:0;z-index:20;background:rgba(36,31,28,.94);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(232,213,196,.12);padding-top:env(safe-area-inset-top)}
+.mobile-shell .topin {height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 18px}
+.mobile-shell .mark {display:flex;align-items:center;gap:11px}
+.mobile-shell .mark i {display:block;width:13px;height:18px;border:1.4px solid #E8D5C4;border-bottom:none;border-radius:999px 999px 0 0}
+.mobile-shell .mark span {font-family:Marcellus,serif;font-size:16px;letter-spacing:.32em;color:#E8D5C4}
+.mobile-shell .avatar {width:38px;height:38px;border-radius:50%;background:#3A322E;border:1px solid rgba(232,213,196,.24);display:flex;align-items:center;justify-content:center;font-family:Marcellus,serif;font-size:16px;color:#E8D5C4}
+.mobile-shell .tabs {position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(36,31,28,.96);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid rgba(232,213,196,.14);padding-bottom:env(safe-area-inset-bottom)}
+.mobile-shell .tabin {max-width:480px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);height:64px}
+.mobile-shell .tab {display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border:none;background:none;color:#B39C88;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;position:relative;padding:0}
+.mobile-shell .tab i {display:block;width:16px;height:16px;border:1.3px solid currentColor;border-bottom:none;border-radius:999px 999px 0 0}
+.mobile-shell .tab.on {color:#E8D5C4}
+.mobile-shell .tab.on::before {content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);width:24px;height:2px;background:#E8D5C4}
+.mobile-shell .tab:active {opacity:.6}
+.mobile-shell .dot {position:absolute;top:12px;right:calc(50% - 17px);width:7px;height:7px;border-radius:50%;background:#E8D5C4}
+.mobile-shell .sec {padding:24px 20px 0}
+.mobile-shell .sec.last {padding-bottom:34px}
+.mobile-shell .h1 {font-family:Marcellus,serif;font-weight:400;font-size:31px;line-height:1.14;margin:0}
+.mobile-shell .card {border:1px solid rgba(232,213,196,.18);background:#2C2623;padding:20px}
+.mobile-shell .card.warm {background:#3A322E;border-color:rgba(232,213,196,.22)}
+.mobile-shell .row {display:flex;justify-content:space-between;align-items:center;gap:14px;padding:15px 0;border-bottom:1px solid rgba(232,213,196,.13);font-size:15px}
+.mobile-shell .row:last-child {border-bottom:none}
+.mobile-shell .btn {display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:52px;border:none;font-family:Marcellus,serif;font-size:16.5px;border-radius:26px 26px 0 0;background:#E8D5C4;color:#3A322E}
+.mobile-shell .btn:active {background:#F7F1EA}
+.mobile-shell .btn-o {background:transparent;color:#E8D5C4;border:1px solid rgba(232,213,196,.32)}
+.mobile-shell .btn-o:active {background:#3A322E}
+.mobile-shell .btn-sm {min-height:44px;font-size:15px;border-radius:22px 22px 0 0;padding:0 18px}
+.mobile-shell .btn-q {flex-direction:column;gap:9px;min-height:88px;background:#2C2623;border:1px solid rgba(232,213,196,.16);color:#E8D5C4;border-radius:0;font-size:14px}
+.mobile-shell .btn-q i {display:block;width:17px;height:23px;border:1.3px solid #B39C88;border-bottom:none;border-radius:999px 999px 0 0}
+.mobile-shell .btn-q:active {background:#3A322E}
+.mobile-shell .field {width:100%;background:transparent;border:1px solid rgba(232,213,196,.28);color:#F7F1EA;padding:14px 16px;outline:none;border-radius:0}
+.mobile-shell .field:focus {border-color:#E8D5C4}
+.mobile-shell .field::placeholder {color:#B39C88}
+.mobile-shell .flab {display:flex;flex-direction:column;gap:9px;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#B39C88}
+.mobile-shell .chip {min-height:46px;padding:0 16px;border-radius:23px 23px 0 0;background:transparent;border:1px solid rgba(232,213,196,.28);color:#E8D5C4;font-size:15px;width:100%}
+.mobile-shell .chip[aria-pressed="true"] {background:#E8D5C4;color:#3A322E;border-color:#E8D5C4;font-weight:600}
+.mobile-shell .chip[disabled] {color:rgba(232,213,196,.26);border-color:rgba(232,213,196,.12);text-decoration:line-through}
+.mobile-shell .seg {display:grid;grid-auto-flow:column;gap:0;border:1px solid rgba(232,213,196,.22)}
+.mobile-shell .seg button {min-height:44px;background:transparent;border:none;color:#B39C88;font-size:14px;letter-spacing:.04em}
+.mobile-shell .seg button[aria-pressed="true"] {background:#E8D5C4;color:#3A322E;font-weight:600}
+.mobile-shell .loyal {background:linear-gradient(160deg,#463C36 0%,#332C28 58%,#2A2421 100%);border:1px solid rgba(232,213,196,.24);padding:22px;position:relative;overflow:hidden}
+.mobile-shell .loyal::after {content:"";position:absolute;right:20px;top:14px;width:104px;height:132px;border:1px solid rgba(232,213,196,.09);border-bottom:none;border-radius:999px 999px 0 0;pointer-events:none}
+.mobile-shell .stamps {display:grid;grid-template-columns:repeat(5,1fr);gap:7px;position:relative}
+.mobile-shell .stamp {aspect-ratio:1/1;border-radius:50%;border:1px solid rgba(232,213,196,.26);display:flex;align-items:center;justify-content:center;font-family:Marcellus,serif;font-size:14px;color:#B39C88;background:transparent;padding:0}
+.mobile-shell .stamp.on:active {background:#F7F1EA}
+.mobile-shell .stamp.on {background:#E8D5C4;border-color:#E8D5C4;color:#3A322E}
+.mobile-shell .stamp.key {border-color:rgba(232,213,196,.5);color:#CBB49E;font-size:11px;letter-spacing:.04em}
+.mobile-shell .stamp.on.key {color:#3A322E;font-weight:600}
+.mobile-shell .srow {display:flex;align-items:center;gap:14px;width:100%;padding:15px 16px;background:transparent;border:1px solid rgba(232,213,196,.16);color:#E8D5C4;text-align:left}
+.mobile-shell .srow[aria-checked="true"] {background:#3A322E;border-color:#E8D5C4}
+.mobile-shell .tick {flex:none;width:18px;height:18px;border-radius:50%;border:1px solid rgba(232,213,196,.3)}
+.mobile-shell .srow[aria-checked="true"] .tick {background:#E8D5C4;border-color:#E8D5C4}
+.mobile-shell .pick {max-height:244px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.mobile-shell .pick::-webkit-scrollbar {display:none}
+.mobile-shell .cal {border:1px solid rgba(232,213,196,.16);padding:6px 10px 12px}
+.mobile-shell .calbar {display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 0 10px}
+.mobile-shell .calnav {width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:transparent;border:1px solid rgba(232,213,196,.24);color:#E8D5C4;font-size:16px}
+.mobile-shell .calnav[disabled] {opacity:.24}
+.mobile-shell .dow {display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding-bottom:6px}
+.mobile-shell .dow span {text-align:center;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#B39C88}
+.mobile-shell .grid {display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.mobile-shell .dcell {position:relative;aspect-ratio:1/1;min-height:42px;display:flex;align-items:center;justify-content:center;background:transparent;border:none;color:#E8D5C4;font-family:Marcellus,serif;font-size:16px;padding:0}
+.mobile-shell .dcell u {position:absolute;bottom:6px;width:4px;height:4px;border-radius:50%;background:#B39C88}
+.mobile-shell .dcell[disabled] {color:rgba(232,213,196,.18)}
+.mobile-shell .dcell[aria-pressed="true"] {background:#E8D5C4;color:#3A322E;font-weight:600}
+.mobile-shell .dcell[aria-pressed="true"] u {background:#3A322E}
+.mobile-shell .blank {aspect-ratio:1/1;min-height:42px}
+.mobile-shell .sw {position:relative;width:46px;height:28px;border-radius:14px;background:rgba(232,213,196,.2);border:none;flex:none}
+.mobile-shell .sw::after {content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#8A7361;transition:transform .2s ease,background .2s ease}
+.mobile-shell .sw[aria-pressed="true"] {background:#E8D5C4}
+.mobile-shell .sw[aria-pressed="true"]::after {transform:translateX(18px);background:#3A322E}
+.mobile-shell .swrap {position:fixed;inset:0;z-index:40;background:rgba(18,15,14,.62);display:flex;align-items:flex-end;animation:veil .2s ease both}
+.mobile-shell .sheet {width:100%;max-width:480px;margin:0 auto;max-height:90dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#2C2623;border-top:1px solid rgba(232,213,196,.22);padding:14px 20px calc(26px + env(safe-area-inset-bottom));animation:up .3s cubic-bezier(.32,.72,0,1) both;scrollbar-width:none}
+.mobile-shell .sheet::-webkit-scrollbar {display:none}
+.mobile-shell .grab {width:40px;height:4px;border-radius:2px;background:rgba(232,213,196,.28);margin:0 auto 16px}
+.mobile-shell .toast {position:fixed;left:50%;bottom:calc(82px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:50;background:#E8D5C4;color:#3A322E;padding:13px 20px;font-size:14px;line-height:1.5;max-width:86%;text-align:center;animation:rise .24s ease both}
+
+
+    .mobile-shell { display: none; }
+    @media(max-width:860px) {
+      .desktop-shell { display: none !important; }
+      .mobile-shell { display: block; }
+    }
+  </style>
 </head>
 <body>
+  <script>
+    window.__amaiMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if(window.__amaiMobile) { 
+      var ds = document.querySelector('.desktop-shell'); if(ds) ds.remove();
+    } else {
+      var ms = document.querySelector('.mobile-shell'); if(ms) ms.remove();
+    }
+  </script>
+  
+  <div class="desktop-shell">
+
 
 <!-- SIGN IN -->
 <div id="auth" style="min-height:100vh;display:grid;grid-template-columns:1.1fr 1fr">
@@ -192,14 +285,76 @@ button{font-family:Mulish,sans-serif}
 <template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#3A322E"/><text x="50" y="62" font-family="serif" font-size="34" fill="#E8D5C4" text-anchor="middle">A</text></svg></template>
 
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-  var supabaseUrl = 'https://tphyrmweauzfletdlqvi.supabase.co';
-  var supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwaHlybXdlYXV6ZmxldGRscXZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0NTIxOTQsImV4cCI6MjEwMzAyODE5NH0.Z_utKsxYquCoL2LfTjjL8QFB1tnLJZW9j3El7Sykk8o';
-  var sb = window.supabase.createClient(supabaseUrl, supabaseKey);
-</script>
 
-<script>
+
+
+
+
+  </div>
+  
+  <div class="mobile-shell">
+
+<div class="app" id="root">
+  <div class="top">
+    <div class="topin">
+      <a class="mark" href="mobile.html"><i></i><span>AMAI</span></a>
+      <button class="avatar" id="me" aria-label="Account"></button>
+    </div>
+  </div>
+  <main style="padding-bottom:88px">
+    <div class="view on" id="v-home"></div>
+    <div class="view" id="v-visits"></div>
+    <div class="view" id="v-rewards"></div>
+    <div class="view" id="v-account"></div>
+  </main>
+</div>
+
+<nav class="tabs">
+  <div class="tabin">
+    <button class="tab on" data-go="home"><i></i>Today</button>
+    <button class="tab" data-go="visits"><i></i>Visits</button>
+    <button class="tab" data-go="rewards"><i></i>Rewards</button>
+    <button class="tab" data-go="account"><i></i>Account</button>
+  </div>
+</nav>
+
+<div id="host"></div>
+
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#241F1C"/><path d="M36 72 L36 46 A14 14 0 0 1 64 46 L64 72" fill="none" stroke="#E8D5C4" stroke-width="4"/></svg></template>
+
+<div id="m-auth" style="position:fixed;inset:0;z-index:10000;background:#241F1C;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center">
+  <div style="max-width:340px;width:100%">
+    <div style="margin-bottom:32px">
+      <div style="width:24px;height:34px;border:1.5px solid #E8D5C4;border-bottom:none;border-radius:999px 999px 0 0;margin:0 auto 14px"></div>
+      <div class="serif" style="font-size:16px;letter-spacing:.3em;color:#E8D5C4">AMAI</div>
+    </div>
+    <div id="m-step-email">
+      <h2 class="serif" style="color:#E8D5C4;font-size:26px;margin:0 0 10px">Sign in to your hub</h2>
+      <p style="font-size:14px;line-height:1.7;color:#8A7361;margin:0 0 24px">We'll email you a six-digit code. No password needed.</p>
+      <input id="m-email" type="email" placeholder="your@email.com" style="width:100%;padding:14px 16px;border:1px solid #5C5148;border-radius:12px;font-size:16px;background:#3A322E;color:#E8D5C4;margin-bottom:14px;font-family:inherit;outline:none">
+      <button id="m-send" style="width:100%;padding:14px;border:none;border-radius:12px;font-size:16px;font-family:Marcellus,serif;background:#E8D5C4;color:#241F1C;cursor:pointer">Send my code</button>
+      <div id="m-send-err" style="font-size:13px;color:#B39C88;margin-top:12px"></div>
+      <a href="mobile.html" style="display:inline-block;margin-top:24px;font-size:13px;color:#5C5148;text-decoration:none;border-bottom:1px solid #5C5148">Back to the site</a>
+    </div>
+    <div id="m-step-code" style="display:none">
+      <h2 class="serif" style="color:#E8D5C4;font-size:26px;margin:0 0 10px">Enter your code</h2>
+      <p id="m-code-msg" style="font-size:14px;line-height:1.7;color:#8A7361;margin:0 0 24px"></p>
+      <input id="m-code" inputmode="numeric" maxlength="6" placeholder="••••••" style="width:100%;padding:14px 16px;border:1px solid #5C5148;border-radius:12px;font-size:22px;letter-spacing:.4em;text-align:center;background:#3A322E;color:#E8D5C4;margin-bottom:14px;font-family:inherit;outline:none">
+      <button id="m-verify" style="width:100%;padding:14px;border:none;border-radius:12px;font-size:16px;font-family:Marcellus,serif;background:#E8D5C4;color:#241F1C;cursor:pointer">Sign in</button>
+      <div id="m-code-err" style="font-size:13px;color:#B39C88;margin-top:12px"></div>
+      <button id="m-code-back" style="display:inline-block;margin-top:20px;font-size:13px;color:#5C5148;background:none;border:none;border-bottom:1px solid #5C5148;cursor:pointer">Change email</button>
+    </div>
+  </div>
+</div>
+
+
+
+
+  </div>
+  
+  <script>
+
+
 var $=function(id){return document.getElementById(id);};
 var TREATMENTS=[];
 async function loadServices(){
@@ -217,6 +372,12 @@ var GUIDES=[
   {t:"Intimate care aftercare",b:"Loose cotton for the first day. A little redness for a few hours is normal; if anything still feels sore after 48 hours, message us."},
   {t:"Between visits",b:"Exfoliate twice a week from day three to keep ingrowns away. Don't shave in between — it resets the cycle we're working with."}
 ];
+
+var sb = supabase.createClient(
+  'https://tphyrmweauzfletdlqvi.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwaHlybXdlYXV6ZmxldGRscXZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0NTIxOTQsImV4cCI6MjEwMzAyODE5NH0.Z_utKsxYquCoL2LfTjjL8QFB1tnLJZW9j3El7Sykk8o'
+);
+window.sb = sb;
 
 var KEY="amai_hub_v2";
 function load(){ try{ return JSON.parse(localStorage.getItem(KEY))||null; }catch(e){ return null; } }
@@ -280,7 +441,78 @@ $("a-verify").onclick=async function(){
 $("signout").onclick=async function(){ await sb.auth.signOut(); Object.assign(S, DEFAULTS); localStorage.clear(); location.reload(); };
 
 /* ---------- shell ---------- */
-var VIEWS=[
+
+
+var CAL_CACHE = {};
+function timeToMins(t) {
+  if(!t) return 0;
+  var p = String(t).split(/[:.]/);
+  return parseInt(p[0], 10) * 60 + parseInt(p[1]||0, 10);
+}
+function minsToTime(m) {
+  var h = Math.floor(m / 60);
+  var mm = m % 60;
+  return h + "." + (mm < 10 ? "0" + mm : mm);
+}
+function getDuration(name) {
+  var t = TREATMENTS.find(function(i){ return i.name === name; });
+  if(!t) return 60;
+  var match = String(t.time).match(/(\d+)/);
+  return match ? parseInt(match[1], 10) : 60;
+}
+async function fetchMonthBookings(v) {
+  var y = v.getFullYear(), m = v.getMonth();
+  var key = y + "-" + m;
+  if (CAL_CACHE[key]) return CAL_CACHE[key];
+  
+  var startStr = y + "-" + String(m+1).padStart(2,'0') + "-01";
+  var dim = new Date(y, m+1, 0).getDate();
+  var endStr = y + "-" + String(m+1).padStart(2,'0') + "-" + String(dim).padStart(2,'0');
+
+  var { data } = await sb.from('bookings')
+    .select('appointment_date, appointment_time, treatment_name')
+    .gte('appointment_date', startStr)
+    .lte('appointment_date', endStr)
+    .neq('status', 'cancelled');
+  
+  CAL_CACHE[key] = data || [];
+  return CAL_CACHE[key];
+}
+
+function calcSlots(d) {
+  var y = d.getFullYear(), m = d.getMonth(), day = d.getDate();
+  var key = y + "-" + m;
+  var dateStr = y + "-" + String(m+1).padStart(2,'0') + "-" + String(day).padStart(2,'0');
+  
+  var bookings = CAL_CACHE[key] || [];
+  var dayBookings = bookings.filter(function(b){ return b.appointment_date === dateStr; });
+  
+  var dur = getDuration(draft.treat);
+  var start = 9 * 60; // 9:00
+  var end = 18 * 60; // 18:00
+  var step = 15;
+  
+  var slots = [];
+  for (var t = start; t + dur <= end; t += step) {
+    var t_end = t + dur;
+    var overlap = false;
+    for (var i=0; i<dayBookings.length; i++) {
+      var b = dayBookings[i];
+      var b_start = timeToMins(b.appointment_time);
+      var b_dur = getDuration(b.treatment_name);
+      var b_end = b_start + b_dur;
+      if (t < b_end && t_end > b_start) {
+        overlap = true;
+        break;
+      }
+    }
+    if (!overlap) slots.push({ label: minsToTime(t), open: true });
+  }
+  return slots;
+}
+
+if (!window.__amaiMobile) {
+  var VIEWS=[ 
   ["home","Overview"],["bookings","Your bookings"],["book","Book a visit"],["inbox","Messages"],
   ["loyalty","Stamps & rewards"],["plan","Subscription"],["care","Aftercare"],
   ["refer","Refer a friend"],["account","Account"]
@@ -304,8 +536,17 @@ async function boot(){
   if(sess){
     S.signedIn=true; S.email=sess.user.email; save();
   }
-  if(!S.signedIn){ $("auth").className=""; $("hub").className="shell hide"; return; }
-  $("auth").className="hide"; $("hub").className="shell";
+  if(!S.signedIn){
+    if($("auth")) $("auth").className="";
+    if($("hub")) $("hub").className="shell hide";
+    if($("m-step-email")) $("m-step-email").style.display="";
+    if($("m-app")) { $("m-app").style.display="none"; }
+    return;
+  }
+  if($("auth")) $("auth").className="hide";
+  if($("hub")) $("hub").className="shell";
+  if($("m-step-email")) { $("m-step-email").parentElement.style.display="none"; }
+  if($("m-app")) { $("m-app").style.display=""; }
   /* load bookings from Supabase */
   if(S.email){
     try{
@@ -1190,6 +1431,850 @@ if(location.hash === '#admin-push'){
 }
 
 boot();
-</script>
+
+} else {
+  var V={};
+
+V.home=function(){
+  var v=nextVisit(), reward=S.stamps>=10?"free":S.stamps>=5?"quarter":null;
+
+  var hero = v? (function(){
+    var bal=v.price-v.deposit;
+    return '<div class="sec"><div class="card warm" style="padding:0;overflow:hidden">'+
+      '<div style="padding:22px 22px 20px">'+
+        '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:14px">'+
+          '<span class="lbl" style="color:#E8D5C4">'+countdown(v.dateKey)+'</span>'+
+          '<span class="lbl">'+shortD(parseK(v.dateKey))+'</span></div>'+
+        '<div class="serif" style="font-size:27px;line-height:1.18;margin-bottom:7px">'+v.treat+'</div>'+
+        '<div style="font-size:15px;color:#CBB49E">'+when(v.dateKey,v.time)+'</div>'+
+      '</div>'+
+      '<div style="display:flex;justify-content:space-between;gap:14px;padding:14px 22px;background:rgba(232,213,196,.07);font-size:13.5px">'+
+        '<span style="color:#B39C88">£'+v.deposit+' deposit paid</span>'+
+        '<span>'+money(bal)+' in the studio</span></div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:rgba(232,213,196,.16)">'+
+        '<button class="btn btn-o btn-sm" data-move="'+v.id+'" style="border:none;border-radius:0;min-height:50px">Move</button>'+
+        '<button class="btn btn-o btn-sm" data-cancel="'+v.id+'" style="border:none;border-radius:0;min-height:50px">Cancel</button>'+
+        '<button class="btn btn-o btn-sm" data-prep="'+v.id+'" style="border:none;border-radius:0;min-height:50px">Prepare</button>'+
+      '</div></div></div>';
+  })() :
+    '<div class="sec"><div class="card" style="text-align:center;padding:30px 22px">'+
+      '<div class="arch" style="width:26px;height:36px;border:1.4px solid #8A7361;border-bottom:none;margin:0 auto 18px"></div>'+
+      '<div class="serif" style="font-size:22px;margin-bottom:8px">Nothing booked</div>'+
+      '<p style="font-size:14px;line-height:1.7;color:#CBB49E;margin:0 0 20px">Most clients keep the same hour every four to six weeks.</p>'+
+      '<button class="btn" data-book="1">Book a visit</button></div></div>';
+
+  var loyal='<div class="sec"><div class="loyal">'+
+    '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:16px">'+
+      '<span class="lbl">Loyalty card</span>'+
+      '<span class="serif" style="font-size:15px;color:#CBB49E">'+S.stamps+' of 10</span></div>'+
+    '<div class="stamps" style="margin-bottom:14px">'+stampsHTML(S.stamps)+'</div>'+
+    '<div style="font-size:13.5px;line-height:1.65;color:#CBB49E;position:relative">'+rewardLine(S.stamps)+
+      (S.stamps?'<span style="display:block;font-size:12px;color:#B39C88;margin-top:6px">Tap a stamp to see the visit behind it.</span>':'')+'</div>'+
+    (reward?'<button class="btn btn-sm" data-tab="rewards" style="margin-top:16px;position:relative">'+(reward==="free"?"Use my free visit":"Use my 25% off")+'</button>':'')+
+  '</div></div>';
+
+  var usual=(S.plan&&S.plan.treat)||(S.past.length? S.past.slice().sort(function(a,b){ return parseK(b.dateKey)-parseK(a.dateKey); })[0].treat : "");
+  var quick='<div class="sec">'+
+    (usual?'<button class="btn" data-rebook="1" style="margin-bottom:8px">Book '+usual+' again</button>'
+          :'<button class="btn" data-book="1" style="margin-bottom:8px">Book a visit</button>')+
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">'+
+      '<button class="btn btn-q" data-tab="visits"><i></i>My visits</button>'+
+      '<button class="btn btn-q" data-tab="inbox"><i></i>Message'+
+        (chatUnreadCount?'<span style="position:absolute;top:11px;right:11px;width:8px;height:8px;border-radius:50%;background:#E8D5C4"></span>':'')+'</button>'+
+      '<a class="btn btn-q" href="tel:+442000000000"><i></i>Call studio</a>'+
+    '</div></div>';
+
+  var plan = S.plan?
+    '<div class="sec"><div class="card">'+
+      '<div class="lbl" style="margin-bottom:10px">Your plan</div>'+
+      '<div class="serif" style="font-size:20px;margin-bottom:5px">'+S.plan.treat+'</div>'+
+      '<div style="font-size:14px;color:#CBB49E">Every '+S.plan.weeks+' weeks · '+money(S.plan.price)+' a visit</div></div></div>'
+    :
+    '<div class="sec"><div class="card">'+
+      '<div class="lbl" style="margin-bottom:10px">Subscription</div>'+
+      '<div class="serif" style="font-size:20px;line-height:1.3;margin-bottom:8px">Same treatment, same hour, 15% less.</div>'+
+      '<p style="font-size:13.5px;line-height:1.7;color:#CBB49E;margin:0 0 16px">We hold your slot every four to six weeks. Pause or stop whenever you like.</p>'+
+      '<button class="btn btn-o btn-sm" data-plan="1" style="width:auto">See how it works</button></div></div>';
+
+  var recent = S.past.length? '<div class="sec last"><div class="lbl" style="margin-bottom:12px">Last visit</div>'+
+    (function(){ var p=S.past.slice().sort(function(a,b){ return parseK(b.dateKey)-parseK(a.dateKey); })[0];
+      return '<div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:14px">'+
+        '<span style="min-width:0"><span class="serif" style="display:block;font-size:18px;line-height:1.3;margin-bottom:4px">'+p.treat+'</span>'+
+        '<span style="font-size:12.5px;color:#B39C88">'+longD(parseK(p.dateKey))+'</span></span>'+
+        '<button class="btn btn-o btn-sm" data-after="'+p.id+'" style="width:auto;flex:none;min-height:40px;font-size:14px">Aftercare</button></div>';
+    })()+'</div>' : '<div style="height:20px"></div>';
+
+  return '<div class="sec" style="padding-top:26px">'+
+      '<div class="lbl" style="margin-bottom:12px">'+new Date().toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"})+'</div>'+
+      '<h1 class="h1" style="margin-bottom:7px">Hello, '+first()+'.</h1>'+
+      '<p style="font-size:14.5px;line-height:1.7;color:#CBB49E;margin:0">'+
+        (v?"Your room is held. Everything about the visit is here.":"Nothing in the diary. Booking takes about a minute.")+'</p></div>'+
+    hero+loyal+quick+plan+recent;
+};
+
+V.visits=function(){
+  var up=S.upcoming.slice().sort(function(a,b){ return parseK(a.dateKey)-parseK(b.dateKey); });
+  var past=S.past.slice().sort(function(a,b){ return parseK(b.dateKey)-parseK(a.dateKey); });
+  var tab=S.vtab||"up";
+
+  var body = tab==="up"?
+    (up.length? up.map(function(v){
+      return '<div class="card warm" style="margin-bottom:8px">'+
+        '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:6px">'+
+          '<span class="serif" style="font-size:20px;line-height:1.25">'+v.treat+'</span>'+
+          '<span class="lbl" style="flex:none">'+countdown(v.dateKey)+'</span></div>'+
+        '<div style="font-size:14px;color:#CBB49E;margin-bottom:16px">'+when(v.dateKey,v.time)+'</div>'+
+        '<div style="display:flex;gap:8px">'+
+          '<button class="btn btn-o btn-sm" data-move="'+v.id+'" style="flex:1">Move</button>'+
+          '<button class="btn btn-o btn-sm" data-cancel="'+v.id+'" style="flex:1">Cancel</button>'+
+          '<button class="btn btn-o btn-sm" data-prep="'+v.id+'" style="flex:1">Prepare</button></div></div>';
+    }).join("")
+    : '<div class="card" style="text-align:center;padding:28px 22px"><div class="serif" style="font-size:20px;margin-bottom:8px">Nothing booked</div>'+
+      '<p style="font-size:14px;line-height:1.7;color:#CBB49E;margin:0 0 18px">Pick a treatment and an hour that suits you.</p>'+
+      '<button class="btn" data-book="1">Book a visit</button></div>')
+    :
+    (past.length? past.map(function(v){
+      return '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 0;border-bottom:1px solid rgba(232,213,196,.13)">'+
+        '<span style="min-width:0"><span class="serif" style="display:block;font-size:17px;line-height:1.3;margin-bottom:3px">'+v.treat+'</span>'+
+        '<span style="font-size:12.5px;color:#B39C88">'+shortD(parseK(v.dateKey))+' · '+v.time+' · '+money(v.price)+'</span></span>'+
+        '<span style="display:flex;gap:6px;flex:none">'+
+          '<button class="btn btn-o btn-sm" data-again="'+v.id+'" style="min-height:40px;font-size:14px;padding:0 13px">Again</button>'+
+          '<button class="btn btn-o btn-sm" data-after="'+v.id+'" style="min-height:40px;font-size:14px;padding:0 13px">Care</button></span></div>';
+    }).join("")+
+      '<div style="display:flex;justify-content:space-between;gap:14px;padding:18px 0 0;font-size:13.5px;color:#B39C88">'+
+      '<span>'+past.length+' visits · spent with us</span><span style="color:#E8D5C4">'+money(past.reduce(function(a,b){ return a+b.price; },0))+'</span></div>'
+    : '<p style="font-size:14px;color:#CBB49E;margin:0">Your first visit will show here.</p>');
+
+  return '<div class="sec" style="padding-top:26px">'+
+      '<h1 class="h1" style="margin-bottom:7px">My visits.</h1>'+
+      '<p style="font-size:14.5px;line-height:1.7;color:#CBB49E;margin:0 0 20px">'+up.length+' booked · '+past.length+' behind you</p>'+
+      '<div class="seg" style="grid-template-columns:1fr 1fr">'+
+        '<button data-vtab="up" aria-pressed="'+(tab==="up")+'">Coming up</button>'+
+        '<button data-vtab="past" aria-pressed="'+(tab==="past")+'">Been and gone</button></div></div>'+
+    '<div class="sec last" style="padding-top:16px">'+body+'</div>';
+};
+
+V.rewards=function(){
+  var card='<div class="sec"><div class="loyal" style="padding:24px">'+
+    '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:18px">'+
+      '<span class="serif" style="font-size:21px">Loyalty card</span><span class="lbl">'+S.stamps+' / 10</span></div>'+
+    '<div class="stamps" style="margin-bottom:16px">'+stampsHTML(S.stamps)+'</div>'+
+    '<div style="font-size:14px;line-height:1.7;color:#CBB49E;position:relative;margin-bottom:16px">'+rewardLine(S.stamps)+'</div>'+
+    '<div style="position:relative;padding-top:14px;border-top:1px solid rgba(232,213,196,.18)">'+
+      '<div style="display:flex;justify-content:space-between;gap:14px;font-size:13.5px;padding-bottom:8px"><span style="color:#B39C88">5 stamps</span><span>25% off a visit</span></div>'+
+      '<div style="display:flex;justify-content:space-between;gap:14px;font-size:13.5px"><span style="color:#B39C88">10 stamps</span><span>Visit free</span></div></div>'+
+  '</div></div>';
+
+  var plan='<div class="sec"><div class="lbl" style="margin-bottom:12px">Subscription</div>'+
+    (S.plan?
+      '<div class="card">'+
+        '<div class="serif" style="font-size:21px;margin-bottom:5px">'+S.plan.treat+'</div>'+
+        '<div style="font-size:14px;color:#CBB49E;margin-bottom:16px">Every '+S.plan.weeks+' weeks · '+money(S.plan.price)+' a visit, 15% off</div>'+
+        '<div style="display:flex;gap:8px">'+
+          '<button class="btn btn-o btn-sm" data-plan="1" style="flex:1">Change</button>'+
+          '<button class="btn btn-o btn-sm" id="planstop" style="flex:1">Stop plan</button></div></div>'
+      :
+      '<div class="card">'+
+        '<div class="serif" style="font-size:21px;line-height:1.3;margin-bottom:8px">A standing appointment.</div>'+
+        '<p style="font-size:14px;line-height:1.7;color:#CBB49E;margin:0 0 18px">Pick a treatment and a rhythm. We hold the same hour and take 15% off every visit. Pause or stop any time.</p>'+
+        '<button class="btn" data-plan="1">Set up a plan</button></div>')+
+  '</div>';
+
+  var code=(first()||"AMAI").toUpperCase().slice(0,6)+"10";
+  var refer='<div class="sec last"><div class="lbl" style="margin-bottom:12px">Refer a friend</div>'+
+    '<div class="card">'+
+      '<p style="font-size:14px;line-height:1.7;color:#CBB49E;margin:0 0 16px">They get £10 off a first visit. You get a stamp when they come in.</p>'+
+      '<div style="display:flex;align-items:center;gap:10px;border:1px dashed rgba(232,213,196,.3);padding:15px 16px;margin-bottom:14px">'+
+        '<span id="code" class="serif" style="font-size:19px;letter-spacing:.16em;flex:1">'+code+'</span>'+
+        '<button class="btn btn-o btn-sm" id="copy" style="width:auto;min-height:38px;font-size:13.5px;padding:0 14px">Copy</button></div>'+
+      (S.referrals.length? S.referrals.map(function(r){
+        return '<div class="row"><span style="min-width:0"><span style="display:block">'+r.who+'</span>'+
+          '<span style="font-size:12.5px;color:#B39C88">'+r.when+'</span></span>'+
+          '<span style="font-size:13px;color:#B39C88;flex:none">'+r.state+'</span></div>';
+      }).join("") : '<p style="font-size:13.5px;color:#B39C88;margin:0">No referrals yet.</p>')+
+    '</div></div>';
+
+  return '<div class="sec" style="padding-top:26px">'+
+      '<h1 class="h1" style="margin-bottom:7px">Rewards.</h1>'+
+      '<p style="font-size:14.5px;line-height:1.7;color:#CBB49E;margin:0">A stamp a visit, a plan if you come often, and something for a friend.</p></div>'+
+    card+plan+refer;
+};
+
+V.account=function(){
+  var n=S.notify;
+  return '<div class="sec" style="padding-top:26px">'+
+      '<h1 class="h1" style="margin-bottom:7px">Account.</h1>'+
+      '<p style="font-size:14.5px;line-height:1.7;color:#CBB49E;margin:0">Client since '+S.since+'</p></div>'+
+
+    '<div class="sec"><div class="lbl" style="margin-bottom:12px">Your details</div>'+
+      '<div class="card" style="display:flex;flex-direction:column;gap:14px">'+
+        '<label class="flab">Name<input id="a-name" class="field" value="'+(S.name||"")+'"></label>'+
+        '<label class="flab">Mobile<input id="a-phone" class="field" inputmode="tel" value="'+(S.phone||"")+'"></label>'+
+        '<label class="flab">Email<input id="a-email" class="field" inputmode="email" value="'+(S.email||"")+'"></label>'+
+        '<button class="btn btn-o btn-sm" id="a-save" style="width:auto;align-self:flex-start">Save details</button></div></div>'+
+
+    '<div class="sec"><div class="lbl" style="margin-bottom:12px">For your practitioner</div>'+
+      '<div class="card">'+
+        '<label class="flab" style="margin-bottom:14px">Skin, sensitivities, anything to know'+
+          '<textarea id="a-notes" class="field" rows="3" style="resize:vertical">'+(S.notes||"")+'</textarea></label>'+
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">'+
+          '<label class="flab">Room<input id="a-room" class="field" value="'+S.prefs.room+'"></label>'+
+          '<label class="flab">Music<input id="a-music" class="field" value="'+S.prefs.music+'"></label></div>'+
+        '<button class="btn btn-o btn-sm" id="a-savenotes" style="width:auto">Save preferences</button></div></div>'+
+
+    '<div class="sec"><div class="lbl" style="margin-bottom:12px">Payment</div>'+
+      '<div class="card">'+
+        (S.card? '<div style="display:flex;justify-content:space-between;gap:14px;align-items:baseline;margin-bottom:16px">'+
+            '<span class="serif" style="font-size:19px">'+S.card.brand+' ···· '+S.card.last4+'</span>'+
+            '<span style="font-size:13px;color:#B39C88">Expires '+S.card.exp+'</span></div>'
+          : '<p style="font-size:14px;line-height:1.7;color:#CBB49E;margin:0 0 16px">No card saved. You can pay the deposit with Apple Pay when you book.</p>')+
+        '<div style="display:flex;gap:8px">'+
+          '<button class="btn btn-o btn-sm" id="a-card" style="flex:1">'+(S.card?"Replace card":"Add a card")+'</button>'+
+          (S.card?'<button class="btn btn-o btn-sm" id="a-cardoff" style="flex:1">Remove</button>':'')+'</div>'+
+        '<p style="font-size:12.5px;line-height:1.7;color:#B39C88;margin:14px 0 0">Deposits are £10 and come off the treatment price. Refunded in full up to 24 hours before.</p></div></div>'+
+
+    '<div class="sec"><div class="lbl" style="margin-bottom:12px">Notifications</div>'+
+      '<div class="card">'+
+        '<div class="row"><span style="min-width:0"><span style="display:block;margin-bottom:3px">Push notifications</span>'+
+          '<span style="font-size:12.5px;color:#B39C88">Alerts on your phone for bookings</span></span>'+
+          '<button class="btn btn-sm" id="enable-push" style="flex:none;padding:8px 16px;font-size:13px">Enable</button></div>'+
+        [["reminder","Appointment reminders","A text the day before"],
+         ["aftercare","Aftercare notes","Sent after each visit"],
+         ["openings","Last-minute openings","Only for your usual treatment"],
+         ["news","Studio news","New treatments, a few times a year"]].map(function(r){
+          return '<div class="row"><span style="min-width:0"><span style="display:block;margin-bottom:3px">'+r[1]+'</span>'+
+            '<span style="font-size:12.5px;color:#B39C88">'+r[2]+'</span></span>'+
+            '<button class="sw" data-notify="'+r[0]+'" aria-pressed="'+(!!n[r[0]])+'" aria-label="'+r[1]+'"></button></div>';
+        }).join("")+'</div></div>'+
+
+    '<div class="sec" id="pwa-card" style="display:none"><div class="lbl" style="margin-bottom:12px">AMAI on your phone</div>'+
+      '<div class="card">'+
+        '<div class="serif" style="font-size:21px;line-height:1.3;margin-bottom:8px">Add AMAI to your home screen.</div>'+
+        '<p style="font-size:14px;line-height:1.7;color:#CBB49E;margin:0 0 16px">Opens full screen like an app, straight into your bookings. Nothing to download.</p>'+
+        '<button class="btn" style="background:#E8D5C4" id="a-pwa">Add to home screen</button></div></div>'+
+    '<div class="sec last" style="display:flex;flex-direction:column;gap:8px">'+
+      '<a class="btn btn-o" href="mobile.html">Back to the site</a>'+
+      '<button class="btn btn-o" id="signout">Sign out</button></div>';
+};
+
+/* ---------------- sheets ---------------- */
+var draft={};
+function closeSheet(){ $("host").innerHTML=""; }
+function sheet(html){
+  $("host").innerHTML='<div class="swrap" id="swrap"><div class="sheet"><div class="grab"></div>'+html+'</div></div>';
+  $("swrap").onclick=function(e){ if(e.target===this) closeSheet(); };
+  wire($("host"));
+}
+async function calHTML(){
+  var v=new Date(d0().getFullYear(),d0().getMonth()+draft.off,1), t=d0();
+  await fetchMonthBookings(v);
+  var firstDow=(v.getDay()+6)%7, dim=new Date(v.getFullYear(),v.getMonth()+1,0).getDate(), cells="";
+  for(var i=0;i<firstDow;i++) cells+='<div class="blank"></div>';
+  for(var n=1;n<=dim;n++){
+    var d=new Date(v.getFullYear(),v.getMonth(),n), k=key(d);
+    var slots = calcSlots(d);
+    var ok = d>=t && d.getDay()!==0 && d.getDay()!==1 && slots.length>0;
+    cells+='<button class="dcell" data-day="'+k+'" aria-pressed="'+(draft.dateKey===k)+'"'+(ok?"":" disabled")+'>'+n+(ok?'<u></u>':'')+'</button>';
+  }
+  return '<div class="cal"><div class="calbar">'+
+    '<button class="calnav" data-hop="-1"'+(draft.off<=0?" disabled":"")+'>←</button>'+
+    '<span class="serif" style="font-size:18px">'+v.toLocaleDateString("en-GB",{month:"long",year:"numeric"})+'</span>'+
+    '<button class="calnav" data-hop="1"'+(draft.off>=5?" disabled":"")+'>→</button></div>'+
+    '<div class="dow"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>'+
+    '<div class="grid">'+cells+'</div></div>';
+}
+function slotHTML(){
+  if(!draft.dateKey) return '<p style="font-size:13px;color:#8A7361;margin:0">Select a day above.</p>';
+  var d=parseK(draft.dateKey);
+  var slots = calcSlots(d);
+  if(!slots || slots.length===0) return '<p style="font-size:13px;color:#8A7361;margin:0">Fully booked.</p>';
+  return '<div class="sgrid">'+slots.map(function(s){
+    return '<button class="stok" aria-pressed="'+(draft.time===s.label)+'" data-time="'+s.label+'">'+s.label+'</button>';
+  }).join("")+'</div>';
+}
+function bookSheet(){
+  var moving=draft.mode==="move";
+  sheet('<div class="lbl" style="margin-bottom:12px">'+(moving?"Move a visit":"New booking")+'</div>'+
+    '<h2 class="serif" style="font-size:25px;line-height:1.2;margin:0 0 8px">'+(moving?draft.treat:"Book a visit")+'</h2>'+
+    '<p style="font-size:14px;line-height:1.7;color:#CBB49E;margin:0 0 18px">'+
+      (moving?"Your deposit moves with the appointment. Free of charge up to 24 hours before."
+             :"Dotted days have hours free. The studio is closed Sunday and Monday.")+'</p>'+
+    (moving?"":'<input id="s-q" class="field" placeholder="Search treatments" style="margin-bottom:12px">'+
+      '<div id="s-pick">'+pickHTML()+'</div><div class="lbl" style="margin:20px 0 10px">Day</div>')+
+    '<div id="s-cal">'+(await calHTML())+'</div>'+
+    '<div class="lbl" id="s-slotlbl" style="margin:20px 0 10px">'+(draft.dateKey?"Times on "+longD(parseK(draft.dateKey)):"Times")+'</div>'+
+    '<div id="s-slots">'+slotHTML()+'</div>'+
+    '<div id="s-sum" style="margin-top:18px"></div>'+
+    '<div style="display:flex;gap:8px;margin-top:20px">'+
+      '<button class="btn btn-o btn-sm" data-close="1" style="width:auto">Close</button>'+
+      '<button class="btn" id="s-ok" style="flex:1">'+(moving?"Confirm new time":"Confirm booking")+'</button></div>');
+  refreshBook();
+}
+async function refreshBook(){
+  if($("s-cal")) $("s-cal").innerHTML=await calHTML();
+  if($("s-slots")) $("s-slots").innerHTML=slotHTML();
+  if($("s-slotlbl")) $("s-slotlbl").textContent=draft.dateKey?"Times on "+longD(parseK(draft.dateKey)):"Times";
+  if($("s-pick")) $("s-pick").innerHTML=pickHTML();
+  var ready=!!(draft.treat&&draft.dateKey&&draft.time);
+  if($("s-sum")) $("s-sum").innerHTML = ready?
+    (function(){ var s=svc(draft.treat), p=s?s.p:0;
+      return '<div class="card" style="padding:16px 18px;font-size:13.5px;line-height:1.9">'+
+        '<div style="display:flex;justify-content:space-between;gap:14px"><span style="color:#B39C88">Treatment</span><span>'+draft.treat+'</span></div>'+
+        '<div style="display:flex;justify-content:space-between;gap:14px"><span style="color:#B39C88">When</span><span>'+shortD(parseK(draft.dateKey))+' · '+draft.time+'</span></div>'+
+        (draft.mode==="move"?'':'<div style="display:flex;justify-content:space-between;gap:14px"><span style="color:#B39C88">Deposit today</span><span>£10</span></div>'+
+        '<div style="display:flex;justify-content:space-between;gap:14px"><span style="color:#B39C88">In the studio</span><span>'+money(p-10)+'</span></div>')+
+      '</div>'; })() : "";
+  var b=$("s-ok"); if(b) b.style.background=ready?"#E8D5C4":"rgba(232,213,196,.3)";
+  wire($("host"));
+}
+function startBook(treat){
+  draft={mode:"new",treat:treat||"",dateKey:"",time:"",off:0,q:"",keep:null};
+  bookSheet();
+}
+function startMove(id){
+  var v=S.upcoming.filter(function(x){ return String(x.id)===String(id); })[0]; if(!v) return;
+  var d=parseK(v.dateKey), t=d0();
+  draft={mode:"move",id:id,treat:v.treat,dateKey:v.dateKey,time:v.time,keep:v.time,q:"",
+         off:Math.max(0,(d.getFullYear()-t.getFullYear())*12+(d.getMonth()-t.getMonth()))};
+  bookSheet();
+}
+function cancelSheet(id){
+  var v=S.upcoming.filter(function(x){ return String(x.id)===String(id); })[0]; if(!v) return;
+  var refund=daysTo(v.dateKey)>=1;
+  sheet('<div class="lbl" style="margin-bottom:12px">Cancel a visit</div>'+
+    '<h2 class="serif" style="font-size:25px;line-height:1.2;margin:0 0 8px">'+v.treat+'</h2>'+
+    '<p style="font-size:14px;line-height:1.7;color:#CBB49E;margin:0 0 18px">'+when(v.dateKey,v.time)+'</p>'+
+    '<div class="card" style="font-size:14px;line-height:1.75;color:#CBB49E;margin-bottom:18px">'+
+      (refund? 'More than 24 hours away, so your £'+v.deposit+' deposit is refunded in full.'
+             : 'Less than 24 hours away, so the £'+v.deposit+' deposit is kept. If something has happened, call the studio — we are reasonable people.')+'</div>'+
+    '<button class="btn btn-o" data-move="'+v.id+'" style="margin-bottom:8px">Move it instead</button>'+
+    '<div style="display:flex;gap:8px">'+
+      '<button class="btn btn-o btn-sm" data-close="1" style="flex:1">Keep it</button>'+
+      '<button class="btn" data-dropit="'+v.id+'" style="flex:1">Cancel visit</button></div>');
+}
+function prepSheet(treat){
+  sheet('<div class="lbl" style="margin-bottom:12px">Before your visit</div>'+
+    '<h2 class="serif" style="font-size:25px;line-height:1.2;margin:0 0 18px">'+treat+'</h2>'+
+    '<div style="display:flex;flex-direction:column;gap:0">'+
+      PREP.map(function(p,i){
+        return '<div style="padding:16px 0;'+(i<PREP.length-1?'border-bottom:1px solid rgba(232,213,196,.13)':'')+'">'+
+          '<div class="serif" style="font-size:18px;margin-bottom:6px">'+p[0]+'</div>'+
+          '<p style="font-size:14px;line-height:1.75;color:#CBB49E;margin:0">'+p[1]+'</p></div>';
+      }).join("")+'</div>'+
+    '<button class="btn btn-o" data-close="1" style="margin-top:18px">Close</button>');
+}
+function afterSheet(treat){
+  sheet('<div class="lbl" style="margin-bottom:12px">Aftercare</div>'+
+    '<h2 class="serif" style="font-size:25px;line-height:1.2;margin:0 0 14px">'+treat+'</h2>'+
+    '<p style="font-size:14.5px;line-height:1.8;color:#CBB49E;margin:0 0 20px">'+
+      (AFTER[treat]||"Keep the area cool and dry for 24 hours, avoid friction, and moisturise daily.")+'</p>'+
+    '<button class="btn btn-o" data-again2="'+treat+'" style="margin-bottom:8px">Book this again</button>'+
+    '<button class="btn btn-o" data-close="1">Close</button>');
+}
+function planSheet(){
+  if(!draft.plan) draft={plan:{treat:(S.plan&&S.plan.treat)||"Hollywood wax",weeks:(S.plan&&S.plan.weeks)||5}};
+  var opts=["Hollywood wax","Brazilian wax","Bikini wax","Full leg wax"];
+  var s=svc(draft.plan.treat);
+  sheet('<div class="lbl" style="margin-bottom:12px">Subscription</div>'+
+    '<h2 class="serif" style="font-size:25px;line-height:1.2;margin:0 0 8px">Same treatment, same hour.</h2>'+
+    '<p style="font-size:14px;line-height:1.7;color:#CBB49E;margin:0 0 18px">15% off every visit, and we hold your slot. Pause or stop any time.</p>'+
+    '<div class="lbl" style="margin-bottom:10px">Treatment</div>'+
+    '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">'+
+      opts.map(function(o){ var v=svc(o);
+        return '<button class="srow" data-plantreat="'+o+'" aria-checked="'+(draft.plan.treat===o)+'">'+
+          '<span class="serif" style="flex:1;font-size:16.5px">'+o+'</span>'+
+          '<span style="font-size:13px;color:#B39C88;text-decoration:line-through">'+money(v.p)+'</span>'+
+          '<span style="font-size:15px;font-weight:600">'+money(Math.round(v.p*0.85))+'</span>'+
+          '<span class="tick"></span></button>';
+      }).join("")+'</div>'+
+    '<div class="lbl" style="margin-bottom:10px">How often</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:18px">'+
+      [4,5,6].map(function(w){ return '<button class="chip" data-planweeks="'+w+'" aria-pressed="'+(draft.plan.weeks===w)+'">'+w+' weeks</button>'; }).join("")+'</div>'+
+    '<div class="card" style="font-size:13.5px;line-height:1.9;margin-bottom:20px">'+
+      '<div style="display:flex;justify-content:space-between;gap:14px"><span style="color:#B39C88">Per visit</span><span>'+money(Math.round(s.p*0.85))+'</span></div>'+
+      '<div style="display:flex;justify-content:space-between;gap:14px"><span style="color:#B39C88">You save each visit</span><span>'+money(s.p-Math.round(s.p*0.85))+'</span></div>'+
+      '<div style="display:flex;justify-content:space-between;gap:14px"><span style="color:#B39C88">Roughly a year</span><span>'+money(Math.round((52/draft.plan.weeks))*Math.round(s.p*0.85))+'</span></div></div>'+
+    '<div style="display:flex;gap:8px">'+
+      '<button class="btn btn-o btn-sm" data-close="1" style="width:auto">Close</button>'+
+      '<button class="btn" id="plan-ok" style="flex:1">'+(S.plan?"Update plan":"Start plan")+'</button></div>');
+}
+function cardSheet(){
+  sheet('<div class="lbl" style="margin-bottom:12px">Payment</div>'+
+    '<h2 class="serif" style="font-size:25px;line-height:1.2;margin:0 0 18px">'+(S.card?"Replace your card":"Add a card")+'</h2>'+
+    '<label class="flab" style="margin-bottom:14px">Card number<input id="k-num" class="field" inputmode="numeric" placeholder="1234 5678 9012 3456"></label>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">'+
+      '<label class="flab">Expiry<input id="k-exp" class="field" placeholder="MM / YY"></label>'+
+      '<label class="flab">Code<input id="k-cvc" class="field" inputmode="numeric" placeholder="123"></label></div>'+
+    '<div style="display:flex;gap:8px">'+
+      '<button class="btn btn-o btn-sm" data-close="1" style="width:auto">Close</button>'+
+      '<button class="btn" id="k-ok" style="flex:1">Save card</button></div>');
+}
+
+/* ---------------- wiring ---------------- */
+function wire(scope){
+  var root=scope||document;
+  var q=function(s){ return [].slice.call(root.querySelectorAll(s)); };
+  var one=function(id){ return root.querySelector("#"+id); };
+
+  q("[data-go]").forEach(function(b){ b.onclick=function(){ go(b.dataset.go); }; });
+  q("[data-tab]").forEach(function(b){ b.onclick=function(){ closeSheet(); go(b.dataset.tab); }; });
+  q("[data-vtab]").forEach(function(b){ b.onclick=function(){ S.vtab=b.dataset.vtab; save(); render(); }; });
+  q("[data-book]").forEach(function(b){ b.onclick=function(){ startBook(S.plan?S.plan.treat:""); }; });
+  q("[data-rebook]").forEach(function(b){ b.onclick=function(){
+    var last=S.past.slice().sort(function(x,y){ return parseK(y.dateKey)-parseK(x.dateKey); })[0];
+    startBook(S.plan?S.plan.treat:(last?last.treat:"")); }; });
+  q("[data-move]").forEach(function(b){ b.onclick=function(){ closeSheet(); startMove(b.dataset.move); }; });
+  q("[data-cancel]").forEach(function(b){ b.onclick=function(){ cancelSheet(b.dataset.cancel); }; });
+  q("[data-dropit]").forEach(function(b){ b.onclick=async function(){
+    var bid=b.dataset.dropit;
+    S.upcoming=S.upcoming.filter(function(x){ return String(x.id)!==bid&&x.id!==bid; });
+    if(sb) await sb.from('bookings').update({status:'cancelled'}).eq('id',bid);
+    save(); closeSheet(); render(); toast("Cancelled. Your deposit is on its way back."); }; });
+  q("[data-prep]").forEach(function(b){ b.onclick=function(){
+    var v=S.upcoming.filter(function(x){ return String(x.id)===String(b.dataset.prep); })[0]; if(v) prepSheet(v.treat); }; });
+  q("[data-after]").forEach(function(b){ b.onclick=function(){
+    var v=S.past.filter(function(x){ return String(x.id)===String(b.dataset.after); })[0]; if(v) afterSheet(v.treat); }; });
+  q("[data-again]").forEach(function(b){ b.onclick=function(){
+    var v=S.past.filter(function(x){ return String(x.id)===String(b.dataset.again); })[0]; if(v) startBook(v.treat); }; });
+  q("[data-again2]").forEach(function(b){ b.onclick=function(){ startBook(b.dataset.again2); }; });
+  q("[data-after2]").forEach(function(b){ b.onclick=function(){ afterSheet(b.dataset.after2); }; });
+  q("[data-stamp]").forEach(function(b){ b.onclick=function(){ stampSheet(+b.dataset.stamp); }; });
+  q("[data-close]").forEach(function(b){ b.onclick=closeSheet; });
+  q("[data-quick]").forEach(function(b){ b.onclick=function(){ sendMsg(b.dataset.quick); }; });
+  q("[data-treat]").forEach(function(b){ b.onclick=function(){ draft.treat=b.dataset.treat; refreshBook(); }; });
+  q("[data-day]").forEach(function(b){ b.onclick=function(){ draft.dateKey=b.dataset.day; draft.time=""; refreshBook(); }; });
+  q("[data-slot]").forEach(function(b){ b.onclick=function(){ draft.time=b.dataset.slot; refreshBook(); }; });
+  q("[data-hop]").forEach(function(b){ b.onclick=function(){ draft.off=Math.min(5,Math.max(0,draft.off+ +b.dataset.hop)); refreshBook(); }; });
+  q("[data-plan]").forEach(function(b){ b.onclick=function(){ draft={}; planSheet(); }; });
+  q("[data-plantreat]").forEach(function(b){ b.onclick=function(){ draft.plan.treat=b.dataset.plantreat; planSheet(); }; });
+  q("[data-planweeks]").forEach(function(b){ b.onclick=function(){ draft.plan.weeks=+b.dataset.planweeks; planSheet(); }; });
+  /* Push notification enable button */
+  if(q("#enable-push")[0]){
+    var pushBtn=q("#enable-push")[0];
+    if('serviceWorker' in navigator && 'PushManager' in window){
+      navigator.serviceWorker.ready.then(function(reg){
+        reg.pushManager.getSubscription().then(function(sub){
+          if(sub){ pushBtn.textContent="Enabled ✓"; pushBtn.disabled=true; pushBtn.style.opacity=".5"; }
+        });
+      }).catch(function(){});
+    }
+    pushBtn.onclick=async function(){
+      pushBtn.textContent="Enabling…"; pushBtn.disabled=true;
+      var ok=await registerPush('client', S.id||null);
+      pushBtn.textContent=ok?"Enabled ✓":"Not available";
+      pushBtn.style.opacity=".5";
+    };
+  }
+  /* Admin push via hash */
+  if(location.hash==='#admin-push'){
+    (async function(){
+      if(typeof registerPush!=='function') return;
+      var ok=await registerPush('admin');
+      toast(ok?'Admin notifications enabled ✓':'Could not enable notifications');
+      history.replaceState(null,'',location.pathname);
+    })();
+  }
+  q("[data-notify]").forEach(function(b){ b.onclick=function(){
+    var k=b.dataset.notify; S.notify[k]=!S.notify[k]; b.setAttribute("aria-pressed",String(S.notify[k])); save(); }; });
+
+  var sq=one("s-q"); if(sq) sq.oninput=function(){
+    draft.q=this.value; if($("s-pick")) $("s-pick").innerHTML=pickHTML(); wire($("host")); };
+  var ok=one("s-ok"); if(ok) ok.onclick=async function(){
+    if(!draft.dateKey||!draft.time) return;
+    var btn = $("s-ok");
+    btn.disabled = true;
+    btn.textContent = "Confirming...";
+    
+    if(draft.mode==="move"){
+      S.upcoming.forEach(function(b){ if(String(b.id)===String(draft.id)){ b.dateKey=draft.dateKey; b.time=draft.time; } });
+      if(sb) await sb.from('bookings').update({appointment_date: dayKeyToDate(draft.dateKey), appointment_time: draft.time}).eq('id', draft.id);
+      save(); closeSheet(); render();
+      toast("Moved to "+longD(parseK(draft.dateKey))+", "+draft.time+".");
+    } else {
+      var s=svc(draft.treat);
+      var price=s?s.p:0;
+      if(sb&&S.clientId){
+        var ins=await sb.from('bookings').insert([{
+          client_id:S.clientId,treatment_name:draft.treat,
+          appointment_date:dayKeyToDate(draft.dateKey),appointment_time:draft.time,
+          price:price,deposit_amount:10,
+          duration_minutes:getDuration(draft.treat),status:'confirmed'
+        }]).select().single();
+        var newId=ins.data?ins.data.id:Date.now();
+        S.upcoming.push({id:newId,treat:draft.treat,dateKey:draft.dateKey,time:draft.time,price:price,deposit:10});
+      } else {
+        S.upcoming.push({id:Date.now(),treat:draft.treat,dateKey:draft.dateKey,time:draft.time,price:price,deposit:10});
+      }
+      save(); closeSheet(); go("home");
+      toast("Booked — "+longD(parseK(draft.dateKey))+", "+draft.time+".");
+    }
+  };
+  var pok=one("plan-ok"); if(pok) pok.onclick=function(){
+    var s=svc(draft.plan.treat);
+    S.plan={treat:draft.plan.treat,weeks:draft.plan.weeks,price:Math.round(s.p*0.85)};
+    save(); closeSheet(); render(); toast("Plan set — "+S.plan.treat+" every "+S.plan.weeks+" weeks."); };
+  var pst=one("planstop"); if(pst) pst.onclick=function(){
+    S.plan=null; save(); render(); toast("Plan stopped. Your bookings stay as they are."); };
+  var cp=one("copy"); if(cp) cp.onclick=function(){
+    try{ navigator.clipboard.writeText($("code").textContent); }catch(e){}
+    toast("Code copied — send it to a friend."); };
+  var ac=one("a-card"); if(ac) ac.onclick=cardSheet;
+  var aco=one("a-cardoff"); if(aco) aco.onclick=function(){ S.card=null; save(); render(); toast("Card removed."); };
+  var kok=one("k-ok"); if(kok) kok.onclick=function(){
+    var num=$("k-num").value.replace(/\D/g,"");
+    if(num.length<15){ toast("That card number looks short."); return; }
+    S.card={brand:"Visa",last4:num.slice(-4),exp:$("k-exp").value.trim()||"—"};
+    save(); closeSheet(); render(); toast("Card saved."); };
+  var as=one("a-save"); if(as) as.onclick=async function(){
+    S.name=one("a-name").value.trim()||S.name;
+    S.phone=one("a-phone").value.trim();
+    S.email=one("a-email").value.trim();
+    if(S.clientId) {
+      await sb.from('clients').update({ name: S.name, phone: S.phone }).eq('id', S.clientId);
+    }
+    save(); toast("Details saved.");
+  };
+  var an=one("a-savenotes"); if(an) an.onclick=async function(){
+    S.notes=one("a-notes").value.trim();
+    S.prefs.room=one("a-room").value.trim();
+    S.prefs.music=one("a-music").value.trim();
+    if(S.clientId) {
+      await sb.from('clients').update({ notes: S.notes }).eq('id', S.clientId);
+    }
+    save(); toast("Preferences saved.");
+  };
+  var so=one("signout"); if(so) so.onclick=async function(){ await sb.auth.signOut(); Object.assign(S, DEFAULTS); localStorage.clear(); location.href="mobile.html"; };
+
+  var apwa = one("a-pwa"); if(apwa) apwa.onclick = async function() {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      var choice = await deferredPrompt.userChoice;
+      if (choice.outcome === 'accepted') { deferredPrompt = null; checkPWA(); }
+    } else if (isIos()) {
+      sheet('<div class="lbl" style="margin-bottom:12px">Install AMAI</div>'+
+        '<h2 class="serif" style="font-size:25px;line-height:1.2;margin:0 0 18px">Add to Home Screen</h2>'+
+        '<ol style="font-size:15px;line-height:1.75;color:#CBB49E;padding-left:18px;margin:0 0 24px">'+
+          '<li style="margin-bottom:12px">Tap the <strong>Share</strong> icon (square with an up arrow) at the bottom of Safari.</li>'+
+          '<li style="margin-bottom:12px">Scroll down and tap <strong>Add to Home Screen</strong>.</li>'+
+        '</ol>'+
+        '<button class="btn btn-o" data-close="1">Close</button>');
+    }
+  };
+
+}
+
+
+
+
+
+
+
+var chatBuilt=false, typing=false, convId=null, chatUnreadCount=0, chatSub=null;
+function clock(ts){ return new Date(ts).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}); }
+function dayStamp(ts){
+  var d=new Date(ts); d.setHours(0,0,0,0);
+  var diff=Math.round((d0()-d)/86400000);
+  if(diff===0) return "Today";
+  if(diff===1) return "Yesterday";
+  if(diff<7) return new Date(ts).toLocaleDateString("en-GB",{weekday:"long"});
+  return new Date(ts).toLocaleDateString("en-GB",{day:"numeric",month:"long"});
+}
+function fitChat(){
+  var w=document.querySelector(".chatwrap"); if(!w) return;
+  var tabs=document.querySelector(".tabs");
+  var top=w.getBoundingClientRect().top+ (document.documentElement.scrollTop||0) - (document.documentElement.scrollTop||0);
+  var h=innerHeight - top - (tabs?tabs.getBoundingClientRect().height:64);
+  w.style.height=Math.max(320,Math.round(h))+"px";
+}
+function renderSugg(){
+  var box=$("sugg"); if(!box) return;
+  var lastMine=S.chat&&S.chat.length&&S.chat[S.chat.length-1].who==="me";
+  var v=nextVisit();
+  var opts=[];
+  if(!lastMine){
+    if(v) opts.push("Could I move my appointment?");
+    opts.push("What should I do beforehand?");
+    if(!v) opts.push("Do you have anything this week?");
+    opts.push("Thank you!");
+  }
+  box.style.display=opts.length?"flex":"none";
+  box.innerHTML=opts.map(function(o){ return '<button data-quick="'+o.replace(/"/g,"&quot;")+'">'+o+'</button>'; }).join("");
+  wire(box);
+}
+function buildChat(){
+  var box = $("v-inbox");
+  if(!box) return;
+  box.innerHTML=
+    '<div class="chatwrap">'+
+      '<div class="chathead">'+
+        '<span class="ring"><i></i></span>'+
+        '<span style="flex:1;min-width:0">'+
+          '<span class="serif" style="display:block;font-size:18px;line-height:1.25">Amai Studio</span>'+
+          '<span id="c-status" style="font-size:12.5px;color:#B39C88"></span></span>'+
+        '<a href="tel:+442000000000" style="width:40px;height:40px;border-radius:50%;border:1px solid rgba(232,213,196,.24);display:flex;align-items:center;justify-content:center;flex:none" aria-label="Call the studio">'+
+          '<span style="display:block;width:13px;height:18px;border:1.3px solid #CBB49E;border-bottom:none;border-radius:999px 999px 0 0"></span></a>'+
+      '</div>'+
+      '<div class="thread" id="thread"></div>'+
+      '<div class="sugg" id="sugg"></div>'+
+      '<div class="composer">'+
+        '<textarea id="c-in" rows="1" placeholder="Message the studio"></textarea>'+
+        '<button class="send" id="c-send" disabled aria-label="Send">→</button>'+
+      '</div>'+
+    '</div>';
+  var ta=$("c-in");
+  ta.oninput=function(){
+    this.style.height="auto";
+    this.style.height=Math.min(112,this.scrollHeight)+"px";
+    $("c-send").disabled=!this.value.trim();
+  };
+  ta.onkeydown=function(e){
+    if(e.key==="Enter"&&!e.shiftKey&&this.value.trim()){ e.preventDefault(); sendMsg(this.value); }
+  };
+  $("c-send").onclick=function(){ sendMsg(ta.value); };
+  chatBuilt=true;
+  fitChat();
+  addEventListener("resize",fitChat);
+  if(window.visualViewport) visualViewport.addEventListener("resize",fitChat);
+  loadConversation();
+}
+async function loadConversation() {
+  if (!S.clientId && !S.phone) return;
+  var data = null;
+  if(S.clientId) { var r1 = await sb.from('conversations').select('id, client_unread').eq('client_id', S.clientId).maybeSingle(); data = r1.data; }
+  if(!data && S.phone) { var r2 = await sb.from('conversations').select('id, client_unread').eq('client_phone', S.phone).maybeSingle(); data = r2.data; }
+  if (data) {
+    convId = data.id;
+    chatUnreadCount = data.client_unread || 0;
+    /* Backfill missing fields */
+    var patch = {};
+    if(S.clientId) patch.client_id = S.clientId;
+    if(S.phone && !data.client_phone) patch.client_phone = S.phone;
+    if(Object.keys(patch).length) sb.from('conversations').update(patch).eq('id', convId).then(function(){});
+    
+    var {data: msgs} = await sb.from('chat_messages').select('*').eq('conversation_id', convId).order('created_at', {ascending: true});
+    if (msgs) {
+      S.chat = msgs.map(m => ({
+        id: m.id,
+        who: m.sender === 'client' ? 'me' : 'them',
+        at: new Date(m.created_at).getTime(),
+        body: m.body,
+        seen: m.seen
+      }));
+    } else {
+      S.chat = [];
+    }
+
+    if (!chatSub) {
+      chatSub = sb.channel('client-inbox').on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_messages',filter:'conversation_id=eq.'+convId},function(payload){
+        if(payload.new.sender==='studio'){
+          if (!S.chat) S.chat = [];
+          S.chat.push({
+            id: payload.new.id,
+            who: 'them',
+            at: new Date(payload.new.created_at).getTime(),
+            body: payload.new.body,
+            seen: payload.new.seen
+          });
+          chatUnreadCount++;
+          if (view === 'inbox') {
+            chatUnreadCount = 0;
+            sb.from('conversations').update({client_unread: 0}).eq('id', convId).then(function(){});
+          }
+          renderThread(true);
+          badge();
+        }
+      }).subscribe();
+    }
+  } else {
+    convId = null;
+    chatUnreadCount = 0;
+    S.chat = [];
+  }
+  save();
+  renderThread(true);
+  badge();
+}
+function renderThread(stick){
+  var t=$("thread"); if(!t) return;
+  if (!S.chat) S.chat = [];
+  var atBottom = stick || (t.scrollHeight-t.scrollTop-t.clientHeight)<80;
+  var last="", out="";
+  S.chat.forEach(function(m,i){
+    var day=dayStamp(m.at);
+    if(day!==last){ out+='<div class="dayline"><b></b><span>'+day+'</span><b></b></div>'; last=day; }
+    var prev=S.chat[i-1], next=S.chat[i+1];
+    var run = prev && prev.who===m.who && dayStamp(prev.at)===day && (m.at-prev.at)<600000;
+    var lastOfRun = !(next && next.who===m.who && dayStamp(next.at)===day && (next.at-m.at)<600000);
+    out+='<div class="bub '+(m.who==="me"?"mine":"them")+(run?" run":"")+'">'+m.body+'</div>';
+    if(lastOfRun) out+='<div class="stamp2 '+(m.who==="me"?"mine":"them")+'">'+clock(m.at)+
+      (m.who==="me"?' · '+(m.seen?"Read":"Sent"):'')+'</div>';
+  });
+  if(typing) out+='<div class="typing"><i></i><i></i><i></i></div>';
+  t.innerHTML=out;
+  if($("c-status")) $("c-status").textContent = typing? "Typing…" : "Replies within the hour";
+  if(atBottom) t.scrollTop=t.scrollHeight;
+  renderSugg();
+}
+async function sendMsg(text){
+  var body=(text||"").trim(); if(!body) return;
+  if (!S.chat) S.chat = [];
+  var tempId = Date.now();
+  S.chat.push({id:tempId,who:"me",at:Date.now(),body:body});
+  var ta=$("c-in"); if(ta) { ta.value=""; ta.style.height="auto"; }
+  var btn=$("c-send"); if(btn) btn.disabled=true;
+  renderThread(true);
+  
+  if (!convId) {
+    var {data, error} = await sb.from('conversations').insert({
+      client_phone: S.phone,
+      client_name: S.name || '',
+      client_id: S.clientId || null,
+      last_message_at: new Date().toISOString(),
+      last_message_preview: body,
+      last_sender: 'client',
+      admin_unread: 0,
+      client_unread: 0
+    }).select().single();
+    if (data) convId = data.id;
+  }
+  
+  if (convId) {
+    await sb.from('chat_messages').insert({
+      conversation_id: convId,
+      sender: 'client',
+      body: body,
+      seen: false
+    });
+  }
+}
+async function markRead() {
+  chatUnreadCount = 0;
+  badge();
+  if (convId) {
+    await sb.from('conversations').update({client_unread: 0}).eq('id', convId);
+  }
+}
+function badge(){
+  var t=document.querySelector('.tab[data-go="rewards"]');
+  if(t){
+    var old=t.querySelector(".dot"); if(old) old.remove();
+    if(S.stamps>=5){ var d=document.createElement("span"); d.className="dot"; t.appendChild(d); }
+  }
+  var i=document.querySelector('.tab[data-go="inbox"]');
+  if(i){
+    var oc=i.querySelector(".count"); if(oc) oc.remove();
+    if(chatUnreadCount){ var c=document.createElement("span"); c.className="count"; c.textContent=chatUnreadCount; i.appendChild(c); }
+  }
+}
+function go(name){
+  view=name;
+  if(name==="inbox"){
+    markRead();
+  }
+  ["home","visits","inbox","rewards","account"].forEach(function(v){ var el=$("v-"+v); if(el) el.className = v===name?"view on":"view"; });
+  [].forEach.call(document.querySelectorAll(".tab"),function(t){ t.className = t.dataset.go===name?"tab on":"tab"; });
+  window.scrollTo(0,0);
+  render();
+  if(name==="inbox"){ fitChat(); renderThread(true); var ta=$("c-in"); if(ta) ta.blur(); }
+}
+function render(){
+  ["home","visits","rewards","account"].forEach(function(v){ var el=$("v-"+v); if(el) el.innerHTML=V[v](); });
+  var justBuilt=!chatBuilt;
+  if(justBuilt) buildChat();
+  renderThread(justBuilt);
+  $("me").textContent=(first()[0]||"A").toUpperCase();
+  badge(); wire(document);
+  checkPWA();
+}
+
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  checkPWA();
+});
+
+function isIos() { return /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()); }
+function checkPWA() {
+  var pwa = $("pwa-card"); if(!pwa) return;
+  var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  if(isStandalone) { pwa.style.display = "none"; }
+  else if (isIos() || deferredPrompt) { pwa.style.display = "block"; }
+  else { pwa.style.display = "none"; }
+}
+
+if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js'); }
+
+async function initSupabase() {
+  await loadServices();
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) {
+    /* show login overlay */
+    document.getElementById("m-auth").style.display="flex";
+    document.getElementById("m-send").onclick=async function(){
+      var email=document.getElementById("m-email").value.trim().toLowerCase();
+      if(!email||!email.includes("@")){ document.getElementById("m-send-err").textContent="Please enter a valid email."; return; }
+      this.disabled=true; this.textContent="Sending\u2026";
+      var res=await sb.auth.signInWithOtp({email:email,options:{shouldCreateUser:true}});
+      this.disabled=false; this.textContent="Send my code";
+      if(res.error){ document.getElementById("m-send-err").textContent=res.error.message; return; }
+      window.__pendingEmail=email;
+      document.getElementById("m-code-msg").textContent="Code sent to "+email+". It lasts ten minutes.";
+      document.getElementById("m-step-email").style.display="none";
+      document.getElementById("m-step-code").style.display="block";
+      document.getElementById("m-code").focus();
+    };
+    document.getElementById("m-code-back").onclick=function(){
+      document.getElementById("m-step-code").style.display="none";
+      document.getElementById("m-step-email").style.display="block";
+    };
+    document.getElementById("m-verify").onclick=async function(){
+      var code=document.getElementById("m-code").value.replace(/\D/g,"");
+      if(code.length<6){ document.getElementById("m-code-err").textContent="Six digits, please."; return; }
+      this.disabled=true; this.textContent="Verifying\u2026";
+      var res=await sb.auth.verifyOtp({email:window.__pendingEmail,token:code,type:'email'});
+      this.disabled=false; this.textContent="Sign in";
+      if(res.error){ document.getElementById("m-code-err").textContent=res.error.message; return; }
+      document.getElementById("m-auth").style.display="none";
+      location.reload();
+    };
+    await loadServices();
+    $("me").onclick=function(){ go("account"); };
+    [].forEach.call(document.querySelectorAll(".tab"),function(t){ t.onclick=function(){ go(t.dataset.go); }; });
+    render();
+    return;
+  }
+  /* session exists — hide login, load data */
+  document.getElementById("m-auth").style.display="none";
+    S.email = session.user.email;
+    let res = await sb.from('clients').select('*').eq('email', S.email);
+    if (res.data && res.data.length > 0) {
+      var c = res.data[0];
+      S.name = c.name || S.name;
+      S.stamps = c.stamps || 0;
+      S.notes = c.notes || "";
+      S.clientId = c.id;
+      var today = new Date(); today.setHours(0,0,0,0);
+      var bk = await sb.from('bookings').select('*').eq('client_id',c.id).neq('status','cancelled');
+      if(bk.data){
+        S.upcoming=[]; S.past=[];
+        bk.data.forEach(function(b){
+          var v={id:b.id,treat:b.treatment_name,dateKey:dateToDayKey(b.appointment_date),time:b.appointment_time,price:Number(b.price),deposit:Number(b.deposit_amount||10)};
+          var d=parseK(dateToDayKey(b.appointment_date));
+          if(b.status==='completed'||d<today) S.past.push(v);
+          else S.upcoming.push(v);
+        });
+      }
+    }
+  
+  $("me").onclick=function(){ go("account"); };
+  [].forEach.call(document.querySelectorAll(".tab"),function(t){ t.onclick=function(){ go(t.dataset.go); }; });
+  render();
+}
+initSupabase();
+
+}
+
+  </script>
 </body>
 </html>
