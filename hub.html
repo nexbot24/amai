@@ -534,11 +534,13 @@ async function boot(){
   await loadServices();
   /* check Supabase session first */
   var sess=null;
-  try{ var sr=await sb.auth.getSession(); sess=sr.data.session; }catch(e){}
+  try{ var sr=await sb.auth.getSession(); sess=sr.data.session; }catch(e){ console.warn('getSession error',e); }
+  console.log('boot: supabase session=', !!sess, 'S.signedIn=', S.signedIn, 'S.email=', S.email);
   if(sess){
     S.signedIn=true; S.email=sess.user.email; save();
   }
   if(!S.signedIn){
+    console.log('boot: NOT signed in, showing auth');
     if($("auth")) $("auth").className="";
     if($("hub")) $("hub").className="shell hide";
     if($("m-step-email")) $("m-step-email").style.display="";
