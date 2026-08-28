@@ -83,9 +83,26 @@
 .desktop-shell .nav button {white-space:nowrap;padding:12px 16px}
 .desktop-shell .main {padding:24px 20px 48px}
 .desktop-shell .grid2, .desktop-shell .grid3 {grid-template-columns:1fr}
-.desktop-shell .chatbox {height:calc(100vh - 190px)}
-.desktop-shell .bub {max-width:82%}
-.desktop-shell .thread, .desktop-shell .chathead, .desktop-shell .sugg, .desktop-shell .composer {padding-left:18px;padding-right:18px}
+.desktop-shell .chatbox{display:flex;flex-direction:column;height:calc(100vh - 230px);min-height:360px;background:#F7F1EA;border:1px solid #E0D2C2}
+.desktop-shell .chathead{display:flex;align-items:center;gap:14px;padding:20px 28px;border-bottom:1px solid #E0D2C2;background:#EFE5D8}
+.desktop-shell .chathead .ring{width:44px;height:44px;border-radius:50%;border:1px solid #C9B8A4;display:flex;align-items:center;justify-content:center;flex:none}
+.desktop-shell .chathead .ring i{display:block;width:15px;height:20px;border:1.4px solid #3A322E;border-bottom:none;border-radius:999px 999px 0 0}
+.desktop-shell .thread{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:4px;padding:20px 28px}
+.desktop-shell .tstamp{font-size:11px;color:#8A7361;margin-top:12px;letter-spacing:.04em}
+.desktop-shell .bub{max-width:62%;padding:13px 18px;font-size:15px;line-height:1.6;text-wrap:pretty}
+.desktop-shell .bub.them{align-self:flex-start;background:#EFE5D8;color:#241F1C;border-radius:2px 16px 16px 16px}
+.desktop-shell .bub.mine{align-self:flex-end;background:#3A322E;color:#F7F1EA;border-radius:16px 2px 16px 16px}
+.desktop-shell .bub.run.them{border-top-left-radius:16px}
+.desktop-shell .bub.run.mine{border-top-right-radius:16px}
+.desktop-shell .tstamp.mine{align-self:flex-end}
+.desktop-shell .tstamp.them{align-self:flex-start}
+.desktop-shell .sugg{display:flex;flex:none;gap:8px;flex-wrap:wrap;padding:0 28px 12px}
+.desktop-shell .sugg button{min-height:38px;padding:0 16px;border-radius:19px 19px 0 0;background:transparent;border:1px solid #C9B8A4;color:#5C5148;font-size:14px;cursor:pointer;font-family:Mulish,sans-serif}
+.desktop-shell .sugg button:hover{border-color:#3A322E;color:#241F1C}
+.desktop-shell .composer{display:flex;flex:none;align-items:flex-end;gap:12px;padding:18px 28px;border-top:1px solid #E0D2C2;background:#EFE5D8}
+.desktop-shell .composer textarea{flex:1;min-height:48px;max-height:120px;resize:none;background:#F7F1EA;border:1px solid #DED0C0;color:#241F1C;padding:14px 16px;outline:none;font-family:Mulish,sans-serif;font-size:15px;line-height:1.5}
+.desktop-shell .composer textarea:focus{border-color:#8A7361}
+.desktop-shell .composer textarea::placeholder{color:#8A7361}
 
 }
 
