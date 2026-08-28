@@ -383,10 +383,15 @@ function slotIndex(t){ var h=Math.floor(parseFloat(t))+".00"; return TIMES.index
 function spanOf(dur){ return Math.max(1,Math.ceil((dur||60)/60)); }
 function occupancy(k){
   var map={};
-  dayAppts(k).forEach(function(a){
-    var i=slotIndex(a.t); if(i<0) return;
+  var appts=dayAppts(k);
+  console.log('OCCUPANCY: dayKey=',k,'appts=',appts.length, appts.map(function(a){return{t:a.t,s:a.s,day:a.day};}));
+  appts.forEach(function(a){
+    var i=slotIndex(a.t);
+    console.log('  slotIndex(',a.t,')=',i,'for',a.s);
+    if(i<0) return;
     for(var j=0;j<spanOf(a.dur)&&i+j<TIMES.length;j++) map[TIMES[i+j]]={appt:a,start:j===0};
   });
+  console.log('  map keys=',Object.keys(map));
   return map;
 }
 function fitsAt(k,t,dur,ignoreId){
