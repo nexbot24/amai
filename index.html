@@ -1132,6 +1132,7 @@ var G=[
 (async function(){
   /* wait for sb to be ready (loaded by the home IIFE) */
   for(var tries=0;tries<40&&!window.sb;tries++) await new Promise(function(r){setTimeout(r,250);});
+  console.log('MOBILE TREATMENTS: sb=', !!window.sb, 'tries=', tries);
   if(!window.sb) return;
   var r=await sb.from('services').select('*').eq('available',true).order('sort_order');
   if(r.data){
