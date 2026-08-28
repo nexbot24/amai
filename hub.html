@@ -148,7 +148,7 @@ to {opacity:1}
 .mobile-shell .mark span {font-family:Marcellus,serif;font-size:16px;letter-spacing:.32em;color:#E8D5C4}
 .mobile-shell .avatar {width:38px;height:38px;border-radius:50%;background:#3A322E;border:1px solid rgba(232,213,196,.24);display:flex;align-items:center;justify-content:center;font-family:Marcellus,serif;font-size:16px;color:#E8D5C4}
 .mobile-shell .tabs {position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(36,31,28,.96);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid rgba(232,213,196,.14);padding-bottom:env(safe-area-inset-bottom)}
-.mobile-shell .tabin {max-width:480px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);height:64px}
+.mobile-shell .tabin {max-width:480px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);height:64px}
 .mobile-shell .tab {display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border:none;background:none;color:#B39C88;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;position:relative;padding:0}
 .mobile-shell .tab i {display:block;width:16px;height:16px;border:1.3px solid currentColor;border-bottom:none;border-radius:999px 999px 0 0}
 .mobile-shell .tab.on {color:#E8D5C4}
@@ -325,6 +325,7 @@ to {opacity:1}
   <main style="padding-bottom:88px">
     <div class="view on" id="v-home"></div>
     <div class="view" id="v-visits"></div>
+    <div class="view" id="v-inbox"></div>
     <div class="view" id="v-rewards"></div>
     <div class="view" id="v-account"></div>
   </main>
@@ -334,6 +335,7 @@ to {opacity:1}
   <div class="tabin">
     <button class="tab on" data-go="home"><i></i>Today</button>
     <button class="tab" data-go="visits"><i></i>Visits</button>
+    <button class="tab" data-go="inbox"><i></i>Messages</button>
     <button class="tab" data-go="rewards"><i></i>Rewards</button>
     <button class="tab" data-go="account"><i></i>Account</button>
   </div>
@@ -1319,6 +1321,41 @@ boot();
 
 } else {
   var V={};
+
+/* ─── Mobile view helpers ─── */
+function nextVisit(){
+  if(!S.upcoming||!S.upcoming.length) return null;
+  return S.upcoming.slice().sort(function(a,b){ return parseKey(a.dateKey)-parseKey(b.dateKey); })[0];
+}
+function countdown(dateKey){
+  var d=Math.round((parseKey(dateKey)-addDays(0))/86400000);
+  if(d===0) return "Today";
+  if(d===1) return "Tomorrow";
+  return "In "+d+" days";
+}
+function when(dateKey,time){
+  return longDate(parseKey(dateKey))+", "+time;
+}
+function first(){
+  return (S.name||"").split(/\s/)[0]||"";
+}
+function stampsHTML(count){
+  var out="";
+  for(var i=1;i<=10;i++){
+    var done=i<=count;
+    var isReward=(i===5||i===10);
+    var cls="stamp"+(done?" done":"")+(isReward?" reward":"");
+    var label=i===5?"25%":i===10?"Free":String(i);
+    out+='<span class="'+cls+'">'+label+'</span>';
+  }
+  return out;
+}
+function rewardLine(count){
+  if(count>=10) return "You've earned a free visit. Use it any time.";
+  if(count>=5) return "You've earned 25% off your next visit.";
+  var to5=5-count;
+  return to5+" more visit"+(to5===1?"":"s")+" and you get 25% off.";
+}
 
 V.home=function(){
   var v=nextVisit(), reward=S.stamps>=10?"free":S.stamps>=5?"quarter":null;
