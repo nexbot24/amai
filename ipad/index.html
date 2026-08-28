@@ -471,7 +471,9 @@ V.today=function(){
     (info?'<div class="card" style="margin-bottom:14px;background:#3A322E;border-color:#3A322E;color:#E8D5C4">'+
       '<div class="serif" style="font-size:19px;margin-bottom:5px">The studio is closed this day.</div>'+
       '<div style="font-size:13.5px;line-height:1.7;color:#CBB49E">'+(info.why? info.why+" · " : "")+'Clients cannot book it. Anything already in the diary below needs a call.</div></div>':'')+
-    '<div style="display:flex;flex-direction:column;gap:8px">'+rows+'</div>');
+    '<div style="display:flex;flex-direction:column;gap:8px">'+
+    '<div style="background:#333;color:#0f0;padding:10px;font-size:11px;font-family:monospace;margin-bottom:8px">DEBUG: dayKey='+S.dayKey+' | appts='+JSON.stringify(list.map(function(a){return{t:a.t,s:a.s,day:a.day};}))+'<br>occ keys='+JSON.stringify(Object.keys(occ))+'</div>'+
+    rows+'</div>');
 };
 
 function weekGrid(){
