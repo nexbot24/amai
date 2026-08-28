@@ -415,30 +415,32 @@ var S=(function(){
 })();
 
 /* ---------- auth ---------- */
-$("a-send").onclick=async function(){
-  var p=$("a-email").value.trim().toLowerCase();
-  if(!p||p.length<5||!p.includes("@")){ $("a-hint")&&($("a-hint").textContent="Please enter a valid email."); return; }
-  $("a-send").disabled=true; $("a-send").textContent="Sending…";
-  var res=await sb.auth.signInWithOtp({email:p,options:{shouldCreateUser:true}});
-  $("a-send").disabled=false; $("a-send").textContent="Send my code";
-  if(res.error){ $("a-hint")&&($("a-hint").textContent=res.error.message); return; }
-  S.email=p;
-  $("a-sent").textContent="We've sent a six-digit code to "+p+". It lasts ten minutes.";
-  $("a-hint").textContent="";
-  $("step-phone").className="hide"; $("step-code").className="";
-  $("a-code").focus();
-};
-$("a-back").onclick=function(){ $("step-code").className="hide"; $("step-phone").className=""; };
-$("a-verify").onclick=async function(){
-  var c=$("a-code").value.replace(/\D/g,"");
-  if(c.length<6){ $("a-hint").textContent="Six digits, please."; return; }
-  $("a-verify").disabled=true; $("a-verify").textContent="Verifying…";
-  var res=await sb.auth.verifyOtp({email:S.email,token:c,type:'email'});
-  $("a-verify").disabled=false; $("a-verify").textContent="Sign in";
-  if(res.error){ $("a-hint").textContent=res.error.message; return; }
-  S.signedIn=true; save(); boot();
-};
-$("signout").onclick=async function(){ await sb.auth.signOut(); Object.assign(S, DEFAULTS); localStorage.clear(); location.reload(); };
+if($("a-send")){
+  $("a-send").onclick=async function(){
+    var p=$("a-email").value.trim().toLowerCase();
+    if(!p||p.length<5||!p.includes("@")){ $("a-hint")&&($("a-hint").textContent="Please enter a valid email."); return; }
+    $("a-send").disabled=true; $("a-send").textContent="Sending…";
+    var res=await sb.auth.signInWithOtp({email:p,options:{shouldCreateUser:true}});
+    $("a-send").disabled=false; $("a-send").textContent="Send my code";
+    if(res.error){ $("a-hint")&&($("a-hint").textContent=res.error.message); return; }
+    S.email=p;
+    $("a-sent").textContent="We've sent a six-digit code to "+p+". It lasts ten minutes.";
+    $("a-hint").textContent="";
+    $("step-phone").className="hide"; $("step-code").className="";
+    $("a-code").focus();
+  };
+  $("a-back").onclick=function(){ $("step-code").className="hide"; $("step-phone").className=""; };
+  $("a-verify").onclick=async function(){
+    var c=$("a-code").value.replace(/\D/g,"");
+    if(c.length<6){ $("a-hint").textContent="Six digits, please."; return; }
+    $("a-verify").disabled=true; $("a-verify").textContent="Verifying…";
+    var res=await sb.auth.verifyOtp({email:S.email,token:c,type:'email'});
+    $("a-verify").disabled=false; $("a-verify").textContent="Sign in";
+    if(res.error){ $("a-hint").textContent=res.error.message; return; }
+    S.signedIn=true; save(); boot();
+  };
+}
+if($("signout")) $("signout").onclick=async function(){ await sb.auth.signOut(); Object.assign(S, DEFAULTS); localStorage.clear(); location.reload(); };
 
 /* ---------- shell ---------- */
 

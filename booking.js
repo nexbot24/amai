@@ -319,7 +319,7 @@ async function confirm(how){
     /* Already signed in? Skip OTP entirely */
     var alreadySignedIn = false;
     try {
-      var h = JSON.parse(localStorage.getItem('amai_hub')||'{}');
+      var h = JSON.parse(localStorage.getItem(HUB_KEY)||'{}');;
       if(h && h.signedIn) alreadySignedIn = true;
     } catch(e){}
     if(!alreadySignedIn && sb){
@@ -394,7 +394,7 @@ async function showDone(how,acct){
   if($("d-paid"))$("d-paid").textContent=how==="apple"?"\u00a310 paid \u00b7 Apple Pay":"\u00a310 deposit to be paid later";
   if($("d-bal"))$("d-bal").textContent=balanceOf(S.treatment)+" in the studio";
   var hasHub = acct;
-  try { var h=JSON.parse(localStorage.getItem('amai_hub')||'{}'); if(h&&h.signedIn) hasHub=true; } catch(e){}
+  try { var h=JSON.parse(localStorage.getItem(HUB_KEY)||'{}'); if(h&&h.signedIn) hasHub=true; } catch(e){}
   if($("d-hub"))$("d-hub").className=hasHub?"btn":"hide";
 
   /* hide everything, show done */
