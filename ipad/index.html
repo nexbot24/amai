@@ -283,7 +283,7 @@ async function loadAll(){
     if(br.data){
       S.appts=br.data.map(function(r){
         var cid=r.client_id||0;
-        return {id:r.id,c:cid,s:r.treatment_name||'',t:r.appointment_time||'10.00',dur:r.duration_minutes||r.duration||45,p:Number(r.price)||0,dep:Number(r.deposit_amount||10),day:dateToDayKey(r.appointment_date),st:r.status==='completed'?'done':r.status==='cancelled'?'cancelled':'due',dbId:r.id, promo:r.promo_code||'', disc:Number(r.discount_amount)||0, notes:r.notes||''};
+        return {id:r.id,c:cid,s:r.treatment_name||'',t:(r.appointment_time||'10.00').replace(':','.'),dur:r.duration_minutes||r.duration||45,p:Number(r.price)||0,dep:Number(r.deposit_amount||10),day:dateToDayKey(r.appointment_date),st:r.status==='completed'?'done':r.status==='cancelled'?'cancelled':'due',dbId:r.id, promo:r.promo_code||'', disc:Number(r.discount_amount)||0, notes:r.notes||''};
       }).filter(function(a){ return a.st!=='cancelled'; });
     }
     /* requests */
@@ -379,7 +379,7 @@ function bill(a){
 function takings(k){ return dayAppts(k).reduce(function(s,a){ return s+bill(a).due; },0); }
 function outstanding(k){ return dayAppts(k).reduce(function(s,a){ return s+(a.st==="done"?0:bill(a).balance); },0); }
 function bookable(){ return S.services.filter(function(s){ return s.on!==false; }); }
-function slotIndex(t){ return TIMES.indexOf(t); }
+function slotIndex(t){ var h=Math.floor(parseFloat(t))+".00"; return TIMES.indexOf(h); }
 function spanOf(dur){ return Math.max(1,Math.ceil((dur||60)/60)); }
 function occupancy(k){
   var map={};
