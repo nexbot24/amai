@@ -1696,7 +1696,7 @@ function slotHTML(){
     return '<button class="stok" aria-pressed="'+(draft.time===s.label)+'" data-time="'+s.label+'">'+s.label+'</button>';
   }).join("")+'</div>';
 }
-function bookSheet(){
+async function bookSheet(){
   var moving=draft.mode==="move";
   sheet('<div class="lbl" style="margin-bottom:12px">'+(moving?"Move a visit":"New booking")+'</div>'+
     '<h2 class="serif" style="font-size:25px;line-height:1.2;margin:0 0 8px">'+(moving?draft.treat:"Book a visit")+'</h2>'+
