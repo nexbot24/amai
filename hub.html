@@ -181,7 +181,7 @@ to {opacity:1}
 .mobile-shell .seg button {min-height:44px;background:transparent;border:none;color:#B39C88;font-size:14px;letter-spacing:.04em}
 .mobile-shell .seg button[aria-pressed="true"] {background:#E8D5C4;color:#3A322E;font-weight:600}
 .mobile-shell .loyal {background:linear-gradient(160deg,#463C36 0%,#332C28 58%,#2A2421 100%);border:1px solid rgba(232,213,196,.24);padding:22px;position:relative;overflow:hidden}
-.mobile-shell .loyal::after {content:"";position:absolute;right:20px;top:14px;width:104px;height:132px;border:1px solid rgba(232,213,196,.09);border-bottom:none;border-radius:999px 999px 0 0;pointer-events:none}
+.mobile-shell .loyal::after {content:none}
 .mobile-shell .stamps {display:grid;grid-template-columns:repeat(5,1fr);gap:7px;position:relative}
 .mobile-shell .stamp {aspect-ratio:1/1;border-radius:50%;border:1px solid rgba(232,213,196,.26);display:flex;align-items:center;justify-content:center;font-family:Marcellus,serif;font-size:14px;color:#B39C88;background:transparent;padding:0}
 .mobile-shell .stamp.on:active {background:#F7F1EA}
@@ -216,6 +216,29 @@ to {opacity:1}
 .mobile-shell .sheet::-webkit-scrollbar {display:none}
 .mobile-shell .grab {width:40px;height:4px;border-radius:2px;background:rgba(232,213,196,.28);margin:0 auto 16px}
 .mobile-shell .toast {position:fixed;left:50%;bottom:calc(82px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:50;background:#E8D5C4;color:#3A322E;padding:13px 20px;font-size:14px;line-height:1.5;max-width:86%;text-align:center;animation:rise .24s ease both}
+.mobile-shell .chatwrap{display:flex;flex-direction:column;height:calc(100dvh - 130px);background:#1E1A17}
+.mobile-shell .chathead{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid rgba(232,213,196,.14);background:rgba(36,31,28,.96)}
+.mobile-shell .chathead .ring{width:40px;height:40px;border-radius:50%;border:1px solid rgba(232,213,196,.24);display:flex;align-items:center;justify-content:center;flex:none}
+.mobile-shell .chathead .ring i{display:block;width:13px;height:18px;border:1.3px solid #CBB49E;border-bottom:none;border-radius:999px 999px 0 0}
+.mobile-shell .thread{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:4px;padding:16px 20px}
+.mobile-shell .dayline{display:flex;align-items:center;gap:10px;margin:14px 0 6px;font-size:10px;color:#8A7361;letter-spacing:.06em}
+.mobile-shell .dayline b{flex:1;height:1px;background:rgba(232,213,196,.14)}
+.mobile-shell .tstamp{font-size:10px;color:#8A7361;margin-top:10px;letter-spacing:.04em}
+.mobile-shell .tstamp.mine{align-self:flex-end}
+.mobile-shell .tstamp.them{align-self:flex-start}
+.mobile-shell .bub{max-width:78%;padding:12px 16px;font-size:15px;line-height:1.6}
+.mobile-shell .bub.them{align-self:flex-start;background:#2C2623;color:#E8D5C4;border-radius:2px 16px 16px 16px}
+.mobile-shell .bub.mine{align-self:flex-end;background:#E8D5C4;color:#241F1C;border-radius:16px 2px 16px 16px}
+.mobile-shell .bub.run.them{border-top-left-radius:16px}
+.mobile-shell .bub.run.mine{border-top-right-radius:16px}
+.mobile-shell .sugg{display:flex;flex:none;gap:6px;flex-wrap:wrap;padding:0 20px 10px}
+.mobile-shell .sugg button{min-height:34px;padding:0 14px;border-radius:17px 17px 0 0;background:transparent;border:1px solid rgba(232,213,196,.24);color:#CBB49E;font-size:13px;cursor:pointer;font-family:Mulish,sans-serif}
+.mobile-shell .composer{display:flex;flex:none;align-items:flex-end;gap:10px;padding:14px 20px calc(14px + env(safe-area-inset-bottom));border-top:1px solid rgba(232,213,196,.14);background:rgba(36,31,28,.96)}
+.mobile-shell .composer textarea{flex:1;min-height:44px;max-height:112px;resize:none;background:#2C2623;border:1px solid rgba(232,213,196,.18);color:#F7F1EA;padding:12px 14px;outline:none;font-family:Mulish,sans-serif;font-size:15px;line-height:1.5;border-radius:0}
+.mobile-shell .composer textarea:focus{border-color:#8A7361}
+.mobile-shell .composer textarea::placeholder{color:#8A7361}
+.mobile-shell .send{width:44px;height:44px;border-radius:50%;background:#E8D5C4;color:#3A322E;border:none;font-size:18px;flex:none;cursor:pointer}
+.mobile-shell .send:disabled{opacity:.3}
 
 
     .mobile-shell { display: none; }
@@ -1344,7 +1367,7 @@ function stampsHTML(count){
   for(var i=1;i<=10;i++){
     var done=i<=count;
     var isReward=(i===5||i===10);
-    var cls="stamp"+(done?" done":"")+(isReward?" reward":"");
+    var cls="stamp"+(done?" on":"")+(isReward?" key":"");
     var label=i===5?"25%":i===10?"Free":String(i);
     out+='<span class="'+cls+'">'+label+'</span>';
   }
@@ -1431,7 +1454,7 @@ V.home=function(){
       '<h1 class="h1" style="margin-bottom:7px">Hello, '+first()+'.</h1>'+
       '<p style="font-size:14.5px;line-height:1.7;color:#CBB49E;margin:0">'+
         (v?"Your room is held. Everything about the visit is here.":"Nothing in the diary. Booking takes about a minute.")+'</p></div>'+
-    hero+loyal+quick+plan+recent;
+    hero+loyal+plan+recent;
 };
 
 V.visits=function(){
