@@ -505,7 +505,15 @@ async function boot(){
           bk.data.forEach(function(b){
             var v={id:b.id,treat:b.treatment_name,dateKey:dateToDayKey(b.appointment_date),time:b.appointment_time,price:Number(b.price),deposit:Number(b.deposit_amount||10)};
             var d=parseKey(dateToDayKey(b.appointment_date));
-            if(b.status==='completed'||d<today) S.past.push(v);
+            var isPast = b.status==='completed' || d<today;
+            /* For today's bookings, also check if the appointment time has passed */
+            if(!isPast && d.getTime()===today.getTime() && b.appointment_time){
+              var now=new Date();
+              var apptMins=timeToMins(b.appointment_time);
+              var nowMins=now.getHours()*60+now.getMinutes();
+              if(apptMins+getDuration(b.treatment_name) <= nowMins) isPast=true;
+            }
+            if(isPast) S.past.push(v);
             else S.upcoming.push(v);
           });
         }
