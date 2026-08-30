@@ -383,15 +383,10 @@ function slotIndex(t){ var h=Math.floor(parseFloat(t))+".00"; return TIMES.index
 function spanOf(dur){ return Math.max(1,Math.ceil((dur||60)/60)); }
 function occupancy(k){
   var map={};
-  var appts=dayAppts(k);
-  console.log('OCCUPANCY: dayKey=',k,'appts=',appts.length, appts.map(function(a){return{t:a.t,s:a.s,day:a.day};}));
-  appts.forEach(function(a){
-    var i=slotIndex(a.t);
-    console.log('  slotIndex(',a.t,')=',i,'for',a.s);
-    if(i<0) return;
+  dayAppts(k).forEach(function(a){
+    var i=slotIndex(a.t); if(i<0) return;
     for(var j=0;j<spanOf(a.dur)&&i+j<TIMES.length;j++) map[TIMES[i+j]]={appt:a,start:j===0};
   });
-  console.log('  map keys=',Object.keys(map));
   return map;
 }
 function fitsAt(k,t,dur,ignoreId){
@@ -471,9 +466,7 @@ V.today=function(){
     (info?'<div class="card" style="margin-bottom:14px;background:#3A322E;border-color:#3A322E;color:#E8D5C4">'+
       '<div class="serif" style="font-size:19px;margin-bottom:5px">The studio is closed this day.</div>'+
       '<div style="font-size:13.5px;line-height:1.7;color:#CBB49E">'+(info.why? info.why+" · " : "")+'Clients cannot book it. Anything already in the diary below needs a call.</div></div>':'')+
-    '<div style="display:flex;flex-direction:column;gap:8px">'+
-    '<div style="background:#333;color:#0f0;padding:10px;font-size:11px;font-family:monospace;margin-bottom:8px">DEBUG: dayKey='+S.dayKey+' | appts='+JSON.stringify(list.map(function(a){return{t:a.t,s:a.s,day:a.day};}))+'<br>occ keys='+JSON.stringify(Object.keys(occ))+'</div>'+
-    rows+'</div>');
+    '<div style="display:flex;flex-direction:column;gap:8px">'+rows+'</div>');
 };
 
 function weekGrid(){
