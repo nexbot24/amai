@@ -1210,7 +1210,7 @@ function wire(scope){
   q("[data-new]").forEach(function(b){ b.onclick=function(){ var p=b.dataset.new.split("|"); newSheet(p[0],p[1]); }; });
   q("[data-jump]").forEach(function(b){ b.onclick=function(){ S.dayKey=b.dataset.jump; S.view="today"; save(); render(); }; });
   q("[data-day]").forEach(function(b){ b.onclick=function(){
-    if(b.dataset.day==="today"){ S.dayKey=iso(nextOpen(0)); }
+    if(b.dataset.day==="today"){ S.dayKey=iso(new Date()); }
     else { var d=shift(parseKey(S.dayKey),+b.dataset.day); while(!open(d)) d=shift(d,+b.dataset.day); S.dayKey=iso(d); }
     save(); render(); }; });
   q("[data-arrive]").forEach(function(b){ b.onclick=async function(){
@@ -1359,7 +1359,7 @@ function tick(){
   $("clock").textContent=n.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});
 }
 $("quick").onclick=function(){ newSheet(S.dayKey,""); };
-$("clock").onclick=function(){ closeSheet(); S.view="today"; S.dayKey=iso(nextOpen(0)); save(); render(); };
+$("clock").onclick=function(){ closeSheet(); S.view="today"; S.dayKey=iso(new Date()); save(); render(); };
 tick(); setInterval(tick,20000);
 /* boot with Supabase data then render */
 (async function(){
