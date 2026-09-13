@@ -197,7 +197,7 @@ function d0(){ var d=new Date(); d.setHours(0,0,0,0); return d; }
 function shift(base,n){ var d=new Date(base); d.setDate(d.getDate()+n); return d; }
 function iso(d){ return d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate(); }
 function parseKey(k){ var p=k.split("-"); return new Date(+p[0],+p[1],+p[2]); }
-function open(d){ return d.getDay()!==0&&d.getDay()!==1; }
+function open(d){ var dk=['sun','mon','tue','wed','thu','fri','sat'][d.getDay()]; var h=S.hours[dk]; return h && !h.closed; }
 function nextOpen(n){
   var d=d0(), seen=0;
   while(!open(d)) d=shift(d,1);
@@ -244,7 +244,7 @@ var S=load()||seed();
 if(!S.clients) S=seed();
 if(!S.services||!S.services.length) S.services=DEFAULT_SERVICES.map(function(s,i){ return {id:i+1,n:s.n,d:s.d,p:s.p,on:true}; });
 if(!S.conversations) S.conversations=[];
-if(!S.hours) S.hours={tue:{open:'9.00',close:'18.00'},wed:{open:'9.00',close:'18.00'},thu:{open:'9.00',close:'18.00'},fri:{open:'9.00',close:'18.00'},sat:{open:'9.00',close:'18.00'}};
+if(!S.hours) S.hours={sun:{closed:true},mon:{closed:true},tue:{open:'9.00',close:'18.00'},wed:{open:'9.00',close:'18.00'},thu:{open:'9.00',close:'18.00'},fri:{open:'9.00',close:'18.00'},sat:{open:'9.00',close:'18.00'}};
 if(!S.promos) S.promos=[];
 if(!S.dmode) S.dmode="day";
 if(!S.itab) S.itab="messages";
@@ -599,8 +599,8 @@ V.settings=function(){
     '</div>'+
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start">'+
       '<div class="card"><div class="lbl" style="margin-bottom:14px">Opening hours</div>'+
-        [{n:"Tuesday",k:"tue"},{n:"Wednesday",k:"wed"},{n:"Thursday",k:"thu"},{n:"Friday",k:"fri"},{n:"Saturday",k:"sat"}].map(function(d){ var h=S.hours[d.k]||{open:"9.00",close:"18.00"}; return '<button class="kv" data-editday="'+d.k+'" style="cursor:pointer;background:none;border:none;width:100%;text-align:left;padding:14px 0;border-top:1px solid #E0D2C2;display:flex;justify-content:space-between;font:inherit;color:inherit"><span style="color:#6E5B49">'+d.n+'</span><span>'+h.open+' \u2013 '+h.close+'</span></button>'; }).join("")+
-        '<div class="kv" style="border-bottom:1px solid #E0D2C2;color:#6E5B49"><span>Sunday &amp; Monday</span><span>Closed</span></div></div>'+
+        [{n:"Sunday",k:"sun"},{n:"Monday",k:"mon"},{n:"Tuesday",k:"tue"},{n:"Wednesday",k:"wed"},{n:"Thursday",k:"thu"},{n:"Friday",k:"fri"},{n:"Saturday",k:"sat"}].map(function(d){ var h=S.hours[d.k]||{closed:true}; return '<button class="kv" data-editday="'+d.k+'" style="cursor:pointer;background:none;border:none;width:100%;text-align:left;padding:14px 0;border-top:1px solid #E0D2C2;display:flex;justify-content:space-between;font:inherit;color:inherit"><span style="color:#6E5B49">'+d.n+'</span><span'+(h.closed?' style="color:#B39C88"':'')+'>'+( h.closed ? 'Closed' : h.open+' \u2013 '+h.close )+'</span></button>'; }).join("")+
+        '</div>'+
       '<div style="display:flex;flex-direction:column;gap:10px">'+
         '<div class="card"><div class="lbl" style="margin-bottom:14px">Deposit</div>'+
           '<div class="kv"><span style="color:#6E5B49">Amount</span><span>£10</span></div>'+
@@ -918,21 +918,37 @@ function spanNote(){
     : "Holds "+slots+" slots — the hours after the start show as continuing.";
 }
 var HR_OPTS=['7.00','7.30','8.00','8.30','9.00','9.30','10.00','10.30','11.00','11.30','12.00','12.30','13.00','13.30','14.00','14.30','15.00','15.30','16.00','16.30','17.00','17.30','18.00','18.30','19.00','19.30','20.00','20.30','21.00'];
-var DAY_NAMES={tue:'Tuesday',wed:'Wednesday',thu:'Thursday',fri:'Friday',sat:'Saturday'};
+var DAY_NAMES={sun:'Sunday',mon:'Monday',tue:'Tuesday',wed:'Wednesday',thu:'Thursday',fri:'Friday',sat:'Saturday'};
 function hoursSheet(dayKey){
   var h=S.hours[dayKey]||{open:'9.00',close:'18.00'};
+  var isClosed=!!h.closed;
   sheet('<div class="lbl" style="margin-bottom:10px">Opening hours</div>'+
     '<div class="serif" style="font-size:28px;margin-bottom:22px">'+DAY_NAMES[dayKey]+'</div>'+
-    '<div class="lbl" style="margin-bottom:10px">Opens at</div>'+
-    '<select class="field" id="h-open" style="margin-bottom:20px">'+HR_OPTS.map(function(t){return '<option'+(t===h.open?' selected':'')+'>'+t+'</option>';}).join('')+'</select>'+
-    '<div class="lbl" style="margin-bottom:10px">Closes at</div>'+
-    '<select class="field" id="h-close" style="margin-bottom:24px">'+HR_OPTS.map(function(t){return '<option'+(t===h.close?' selected':'')+'>'+t+'</option>';}).join('')+'</select>'+
+    '<div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-top:1px solid #E0D2C2;margin-bottom:16px">'+
+      '<span style="font-size:16px">Closed this day</span>'+
+      '<button id="h-toggle" style="width:52px;height:30px;border-radius:15px;border:none;cursor:pointer;position:relative;transition:background .2s;background:'+(isClosed?'#8A7361':'#D1C4B4')+'">'+
+        '<span style="display:block;width:24px;height:24px;border-radius:50%;background:#fff;position:absolute;top:3px;transition:left .2s;left:'+(isClosed?'25px':'3px')+'"></span>'+
+      '</button></div>'+
+    '<div id="h-times" style="'+(isClosed?'display:none':'')+'">'+
+      '<div class="lbl" style="margin-bottom:10px">Opens at</div>'+
+      '<select class="field" id="h-open" style="margin-bottom:20px">'+HR_OPTS.map(function(t){return '<option'+(t===(h.open||'9.00')?' selected':'')+'>'+t+'</option>';}).join('')+'</select>'+
+      '<div class="lbl" style="margin-bottom:10px">Closes at</div>'+
+      '<select class="field" id="h-close" style="margin-bottom:24px">'+HR_OPTS.map(function(t){return '<option'+(t===(h.close||'18.00')?' selected':'')+'>'+t+'</option>';}).join('')+'</select>'+
+    '</div>'+
     '<div style="display:flex;gap:10px">'+
       '<button class="btn btn-o btn-sm" id="sclose">Cancel</button>'+
       '<button class="btn btn-sm" id="h-save" style="flex:1">Save</button></div>');
+  var closed=isClosed;
+  $("h-toggle").onclick=function(){
+    closed=!closed;
+    this.style.background=closed?'#8A7361':'#D1C4B4';
+    this.firstChild.style.left=closed?'25px':'3px';
+    $("h-times").style.display=closed?'none':'';
+  };
   $("sclose").onclick=closeSheet;
   $("h-save").onclick=async function(){
-    S.hours[dayKey]={open:$("h-open").value,close:$("h-close").value};
+    if(closed){ S.hours[dayKey]={closed:true}; }
+    else { S.hours[dayKey]={open:$("h-open").value,close:$("h-close").value}; }
     await sb.from('studio_settings').upsert({key:'opening_hours',value:S.hours,updated_at:new Date().toISOString()},{onConflict:'key'});
     save(); closeSheet(); render();
   };

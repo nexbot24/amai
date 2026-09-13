@@ -4,6 +4,8 @@
 var CAL_CACHE = {};
 
 var OPENING_HOURS = {
+  sun: { closed: true },
+  mon: { closed: true },
   tue: { open: '9.00', close: '18.00' },
   wed: { open: '9.00', close: '18.00' },
   thu: { open: '9.00', close: '18.00' },
@@ -66,6 +68,7 @@ function calcSlots(d, treatmentName) {
   var dayMap = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
   var dk = dayMap[d.getDay()];
   var hrs = OPENING_HOURS[dk] || { open: '9.00', close: '18.00' };
+  if (hrs.closed) return [];
   var start = timeToMins(hrs.open), end = timeToMins(hrs.close), step = 15;
 
   /* If today, skip times that have already passed */
@@ -91,8 +94,10 @@ function calcSlots(d, treatmentName) {
 
 /* ─── Day availability checks ─── */
 function dayOpen(d) {
-  var w = d.getDay();
-  if (w === 0 || w === 1) return false; /* closed Sun & Mon */
+  var dayMap = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+  var dk = dayMap[d.getDay()];
+  var hrs = OPENING_HOURS[dk];
+  if (!hrs || hrs.closed) return false;
   var k = d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate();
   return !CLOSED_DAYS[k];
 }

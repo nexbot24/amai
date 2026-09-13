@@ -145,7 +145,7 @@ function syncNext(){
   b.style.cursor=ok?"pointer":"default";
   if($("back"))$("back").className=S.step>1?"":"hide";
   if($("helper"))$("helper").textContent=S.step===1?"First visits include a consultation and extra time, at no extra cost."
-    :S.step===2?"Crossed-out times are already taken. Closed Sunday and Monday."
+    :S.step===2?"Crossed-out times are already taken."
     :S.step===3?(wantsAccount()?"We\u2019ll email you a six-digit code after payment \u2014 that opens your account. No password.":"Next: a \u00a310 deposit holds the room. Refundable up to 24 hours before.")
     :"Payment is secure. The balance is paid in the studio.";
 }
@@ -423,7 +423,21 @@ async function initBooking(){
       var sh=await sb.from('studio_settings').select('value').eq('key','opening_hours').single();
       if(sh.data&&sh.data.value){
         OPENING_HOURS=sh.data.value;
-        if($('footer-hours')){var t=OPENING_HOURS.tue||{open:'9.00',close:'18.00'};$('footer-hours').innerHTML='Tuesday to Saturday<br>'+t.open+' \u2013 '+t.close;}
+        if($('footer-hours')){
+          var allDays=[{k:'sun',n:'Sunday'},{k:'mon',n:'Monday'},{k:'tue',n:'Tuesday'},{k:'wed',n:'Wednesday'},{k:'thu',n:'Thursday'},{k:'fri',n:'Friday'},{k:'sat',n:'Saturday'}];
+          var openDays=allDays.filter(function(d){var h=OPENING_HOURS[d.k];return h&&!h.closed;});
+          var closedDays=allDays.filter(function(d){var h=OPENING_HOURS[d.k];return !h||h.closed;});
+          var lines=openDays.map(function(d){var h=OPENING_HOURS[d.k];return d.n+': '+h.open+' \u2013 '+h.close;});
+          if(closedDays.length) lines.push(closedDays.map(function(d){return d.n;}).join(' & ')+': Closed');
+          $('footer-hours').innerHTML=lines.join('<br>');
+        }
+        if($('contact-hours')){
+          var summary=openDays.map(function(d){return d.n;});
+          var first=summary[0],last=summary[summary.length-1];
+          var range=summary.length>2?first+' to '+last:summary.join(' & ');
+          var t=OPENING_HOURS[openDays[0].k];
+          $('contact-hours').textContent=range+', '+t.open+'\u2013'+t.close;
+        }
       }
     }catch(e){}
   }
