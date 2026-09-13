@@ -445,9 +445,17 @@ async function initBooking(){
       var cr=await sb.from('studio_settings').select('value').eq('key','studio_contact').single();
       if(cr.data&&cr.data.value){
         var ci=cr.data.value;
-        document.querySelectorAll('[data-phone]').forEach(function(el){ el.textContent=ci.phone; if(el.href) el.href='tel:+44'+ci.phone.replace(/\s/g,'').replace(/^0/,''); });
-        document.querySelectorAll('[data-email]').forEach(function(el){ el.textContent=ci.email; if(el.href) el.href='mailto:'+ci.email; });
-        document.querySelectorAll('[data-instagram]').forEach(function(el){ el.textContent='@'+ci.instagram; if(el.href) el.href='https://instagram.com/'+ci.instagram; });
+        function updateContact(sel,val,hrefFn){
+          document.querySelectorAll(sel).forEach(function(el){
+            var txt=el.querySelector('.serif')||el; 
+            if(txt.children.length===0) txt.textContent=val;
+            else txt.childNodes[0].textContent=val;
+            if(el.tagName==='A'&&hrefFn) el.href=hrefFn(val);
+          });
+        }
+        updateContact('[data-phone]',ci.phone,function(v){return 'tel:+44'+v.replace(/\s/g,'').replace(/^0/,'');});
+        updateContact('[data-email]',ci.email,function(v){return 'mailto:'+v;});
+        updateContact('[data-instagram]','@'+ci.instagram,function(v){return 'https://instagram.com/'+ci.instagram;});
       }
     }catch(e){}
   }

@@ -984,6 +984,17 @@ if(!window.__amaiMobile){
 /* Remove mobile shell so no duplicate IDs */
 var _ms=document.querySelector('.mobile-shell');if(_ms)_ms.remove();
 
+/* el(tag, attrs, innerHTML) — create a DOM element */
+function el(tag,attrs,html){
+  var e=document.createElement(tag);
+  if(attrs) Object.keys(attrs).forEach(function(k){
+    if(typeof attrs[k]==='function') e[k]=attrs[k];
+    else e.setAttribute(k,attrs[k]);
+  });
+  if(html) e.innerHTML=html;
+  return e;
+}
+
 /* Desktop-specific: treatment tabs, reasons */
 function renderTabs(){
   var t=$("tabs"); t.innerHTML="";
