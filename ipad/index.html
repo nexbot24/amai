@@ -2,7 +2,7 @@
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -17,7 +17,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Mulish:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+*,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 html,body{height:100%;overflow:hidden}
 body{margin:0;font-family:Mulish,sans-serif;color:#241F1C;background:#1A1614;display:flex;align-items:center;justify-content:center}
 button{font-family:Mulish,sans-serif;cursor:pointer;color:#241F1C}
@@ -246,6 +246,7 @@ if(!S.services||!S.services.length) S.services=DEFAULT_SERVICES.map(function(s,i
 if(!S.conversations) S.conversations=[];
 if(!S.hours) S.hours={sun:{closed:true},mon:{closed:true},tue:{open:'9.00',close:'18.00'},wed:{open:'9.00',close:'18.00'},thu:{open:'9.00',close:'18.00'},fri:{open:'9.00',close:'18.00'},sat:{open:'9.00',close:'18.00'}};
 if(!S.promos) S.promos=[];
+if(!S.contact) S.contact={phone:'020 0000 0000',email:'hello@AMAI',instagram:'AMAI'};
 if(!S.dmode) S.dmode="day";
 if(!S.itab) S.itab="messages";
 if(S.view==="requests") S.view="inbox";
@@ -307,6 +308,9 @@ async function loadAll(){
     /* opening hours */
     var sh=await sb.from('studio_settings').select('value').eq('key','opening_hours').single();
     if(sh.data && sh.data.value) S.hours=sh.data.value;
+    /* contact details */
+    var ct=await sb.from('studio_settings').select('value').eq('key','studio_contact').single();
+    if(ct.data && ct.data.value) S.contact=ct.data.value;
     
     /* conversations */
     var cv=await sb.from('conversations').select('*').order('last_message_at', {ascending: false});
@@ -614,7 +618,13 @@ V.settings=function(){
       '<div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 0">'+
         '<div><div class="serif" style="font-size:17px;margin-bottom:4px">Push notifications</div>'+
           '<div style="font-size:13px;color:#6E5B49;line-height:1.6">Get alerted when a booking or enquiry comes in.</div></div>'+
-        '<button class="btn btn-sm" id="push-btn" style="flex:none">Enable</button></div></div>';
+        '<button class="btn btn-sm" id="push-btn" style="flex:none">Enable</button></div></div>'+
+    '<div class="card" style="margin-top:10px"><div class="lbl" style="margin-bottom:14px">Contact details</div>'+
+      '<button class="kv" id="edit-contact" style="cursor:pointer;background:none;border:none;width:100%;text-align:left;padding:14px 0;border-top:1px solid #E0D2C2;display:flex;flex-direction:column;gap:8px;font:inherit;color:inherit">'+
+        '<div style="display:flex;justify-content:space-between;width:100%"><span style="color:#6E5B49">Phone</span><span>'+(S.contact&&S.contact.phone||'020 0000 0000')+'</span></div>'+
+        '<div style="display:flex;justify-content:space-between;width:100%"><span style="color:#6E5B49">Email</span><span>'+(S.contact&&S.contact.email||'hello@AMAI')+'</span></div>'+
+        '<div style="display:flex;justify-content:space-between;width:100%"><span style="color:#6E5B49">Instagram</span><span>@'+(S.contact&&S.contact.instagram||'AMAI')+'</span></div>'+
+      '</button></div>';
 };
 
 V.closures=function(){
@@ -953,6 +963,26 @@ function hoursSheet(dayKey){
     save(); closeSheet(); render();
   };
 }
+function contactSheet(){
+  var c=S.contact||{phone:'020 0000 0000',email:'hello@AMAI',instagram:'AMAI'};
+  sheet('<div class="lbl" style="margin-bottom:10px">Contact details</div>'+
+    '<div class="serif" style="font-size:28px;margin-bottom:22px">Edit contact info</div>'+
+    '<div class="lbl" style="margin-bottom:10px">Phone number</div>'+
+    '<input class="field" id="c-phone" value="'+c.phone+'" style="margin-bottom:20px">'+
+    '<div class="lbl" style="margin-bottom:10px">Email address</div>'+
+    '<input class="field" id="c-email" value="'+c.email+'" style="margin-bottom:20px">'+
+    '<div class="lbl" style="margin-bottom:10px">Instagram username (without @)</div>'+
+    '<input class="field" id="c-ig" value="'+c.instagram+'" style="margin-bottom:24px">'+
+    '<div style="display:flex;gap:10px">'+
+      '<button class="btn btn-o btn-sm" id="sclose">Cancel</button>'+
+      '<button class="btn btn-sm" id="c-save" style="flex:1">Save</button></div>');
+  $("sclose").onclick=closeSheet;
+  $("c-save").onclick=async function(){
+    S.contact={phone:$("c-phone").value.trim(),email:$("c-email").value.trim(),instagram:$("c-ig").value.trim().replace(/^@/,'')};
+    await sb.from('studio_settings').upsert({key:'studio_contact',value:S.contact,updated_at:new Date().toISOString()},{onConflict:'key'});
+    save(); closeSheet(); render();
+  };
+}
 var svcDraft={d:30};
 function clientSheet(c){
   var hist=S.appts.filter(function(a){ return a.c===c.id; });
@@ -1271,6 +1301,7 @@ function wire(scope){
     $("r-yes").onclick=async function(){ S.services=S.services.filter(function(x){ return String(x.id)!==id; }); await sb.from('services').delete().eq('id',id); save(); closeSheet(); render(); };
   }; });
   q("[data-editday]").forEach(function(b){ b.onclick=function(){ hoursSheet(b.dataset.editday); }; });
+  if($("edit-contact")) $("edit-contact").onclick=function(){ contactSheet(); };
   q("[data-stamp]").forEach(function(b){ b.onclick=async function(){ var c=client(b.dataset.stamp); c.stamps=Math.min(10,c.stamps+1); if(c.id) await sb.from('clients').update({stamps: c.stamps}).eq('id', c.id); save(); clientSheet(c); }; });
   q("[data-bookfor]").forEach(function(b){ b.onclick=function(){ closeSheet(); newSheet(S.dayKey,""); setTimeout(function(){ $("n-client").value=b.dataset.bookfor; },0); }; });
   q("[data-msgclient]").forEach(function(b){ b.onclick=async function(){

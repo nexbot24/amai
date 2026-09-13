@@ -424,22 +424,30 @@ async function initBooking(){
       if(sh.data&&sh.data.value){
         OPENING_HOURS=sh.data.value;
         if($('footer-hours')){
-          var allDays=[{k:'sun',n:'Sunday'},{k:'mon',n:'Monday'},{k:'tue',n:'Tuesday'},{k:'wed',n:'Wednesday'},{k:'thu',n:'Thursday'},{k:'fri',n:'Friday'},{k:'sat',n:'Saturday'}];
-          var openDays=allDays.filter(function(d){var h=OPENING_HOURS[d.k];return h&&!h.closed;});
-          var closedDays=allDays.filter(function(d){var h=OPENING_HOURS[d.k];return !h||h.closed;});
-          var lines=openDays.map(function(d){var h=OPENING_HOURS[d.k];return d.n+': '+h.open+' \u2013 '+h.close;});
-          if(closedDays.length) lines.push(closedDays.map(function(d){return d.n;}).join(' & ')+': Closed');
-          $('footer-hours').innerHTML=lines.join('<br>');
+        var allDays=[{k:'sun',n:'Sunday'},{k:'mon',n:'Monday'},{k:'tue',n:'Tuesday'},{k:'wed',n:'Wednesday'},{k:'thu',n:'Thursday'},{k:'fri',n:'Friday'},{k:'sat',n:'Saturday'}];
+        var openDays=allDays.filter(function(d){var h=OPENING_HOURS[d.k];return h&&!h.closed;});
+        var closedDays=allDays.filter(function(d){var h=OPENING_HOURS[d.k];return !h||h.closed;});
+        var lines=openDays.map(function(d){var h=OPENING_HOURS[d.k];return d.n+': '+h.open+' \u2013 '+h.close;});
+        if(closedDays.length) lines.push(closedDays.map(function(d){return d.n;}).join(' & ')+': Closed');
+        if($('footer-hours')) $('footer-hours').innerHTML=lines.join('<br>');
+        if(openDays.length){
+          var names=openDays.map(function(d){return d.n;});
+          var range=names.length>2?names[0]+' to '+names[names.length-1]:names.join(' & ');
+          var t0=OPENING_HOURS[openDays[0].k];
+          if($('contact-hours')) $('contact-hours').textContent=range+', '+t0.open+'\u2013'+t0.close;
+          if($('hero-hours')) $('hero-hours').innerHTML=range+'<br>by appointment';
+          if($('book-hours')) $('book-hours').textContent=range+', '+t0.open+'\u2013'+t0.close;
         }
-        if($('contact-hours')){
-          var summary=openDays.map(function(d){return d.n;});
-          var first=summary[0],last=summary[summary.length-1];
-          var range=summary.length>2?first+' to '+last:summary.join(' & ');
-          var t=OPENING_HOURS[openDays[0].k];
-          $('contact-hours').textContent=range+', '+t.open+'\u2013'+t.close;
-        }
-        if($('hero-hours')) $('hero-hours').innerHTML=range+'<br>by appointment';
-        if($('book-hours')) $('book-hours').textContent=range+', '+t.open+'\u2013'+t.close;
+      }
+    }catch(e){}
+    /* contact details */
+    try{
+      var cr=await sb.from('studio_settings').select('value').eq('key','studio_contact').single();
+      if(cr.data&&cr.data.value){
+        var ci=cr.data.value;
+        document.querySelectorAll('[data-phone]').forEach(function(el){ el.textContent=ci.phone; if(el.href) el.href='tel:+44'+ci.phone.replace(/\s/g,'').replace(/^0/,''); });
+        document.querySelectorAll('[data-email]').forEach(function(el){ el.textContent=ci.email; if(el.href) el.href='mailto:'+ci.email; });
+        document.querySelectorAll('[data-instagram]').forEach(function(el){ el.textContent='@'+ci.instagram; if(el.href) el.href='https://instagram.com/'+ci.instagram; });
       }
     }catch(e){}
   }
