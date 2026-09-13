@@ -423,7 +423,6 @@ async function initBooking(){
       var sh=await sb.from('studio_settings').select('value').eq('key','opening_hours').single();
       if(sh.data&&sh.data.value){
         OPENING_HOURS=sh.data.value;
-        if($('footer-hours')){
         var allDays=[{k:'sun',n:'Sunday'},{k:'mon',n:'Monday'},{k:'tue',n:'Tuesday'},{k:'wed',n:'Wednesday'},{k:'thu',n:'Thursday'},{k:'fri',n:'Friday'},{k:'sat',n:'Saturday'}];
         var openDays=allDays.filter(function(d){var h=OPENING_HOURS[d.k];return h&&!h.closed;});
         var closedDays=allDays.filter(function(d){var h=OPENING_HOURS[d.k];return !h||h.closed;});
