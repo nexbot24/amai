@@ -438,6 +438,8 @@ async function initBooking(){
           var t=OPENING_HOURS[openDays[0].k];
           $('contact-hours').textContent=range+', '+t.open+'\u2013'+t.close;
         }
+        if($('hero-hours')) $('hero-hours').innerHTML=range+'<br>by appointment';
+        if($('book-hours')) $('book-hours').textContent=range+', '+t.open+'\u2013'+t.close;
       }
     }catch(e){}
   }

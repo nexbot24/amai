@@ -269,7 +269,7 @@ div[id],section[id]{scroll-margin-top:84px}
 
       <div style="display:flex;flex-direction:column;gap:16px;font-size:14px;line-height:1.7">
         <span style="font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:#8A7361">Studio</span>
-        <span style="color:#CBB49E">Tuesday to Saturday<br>9.00 – 18.00</span>
+        <span style="color:#CBB49E" id="footer-hours">Tuesday to Saturday<br>9.00 – 18.00</span>
         <span style="color:#CBB49E">North London, by appointment<br>Full address sent on booking</span>
         <div class="fnav" style="display:flex;flex-direction:column;gap:9px">
           <a href="tel:+442000000000">020 0000 0000</a>
@@ -290,6 +290,7 @@ div[id],section[id]{scroll-margin-top:84px}
 <script>
 (async function(){
   var sb=supabase.createClient('https://tphyrmweauzfletdlqvi.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwaHlybXdlYXV6ZmxldGRscXZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0NTIxOTQsImV4cCI6MjEwMzAyODE5NH0.Z_utKsxYquCoL2LfTjjL8QFB1tnLJZW9j3El7Sykk8o');
+  try{var sh=await sb.from('studio_settings').select('value').eq('key','opening_hours').single();if(sh.data&&sh.data.value){var OH=sh.data.value;var allDays=[{k:'sun',n:'Sunday'},{k:'mon',n:'Monday'},{k:'tue',n:'Tuesday'},{k:'wed',n:'Wednesday'},{k:'thu',n:'Thursday'},{k:'fri',n:'Friday'},{k:'sat',n:'Saturday'}];var od=allDays.filter(function(d){var h=OH[d.k];return h&&!h.closed;});var cd=allDays.filter(function(d){var h=OH[d.k];return !h||h.closed;});var lines=od.map(function(d){var h=OH[d.k];return d.n+': '+h.open+' \u2013 '+h.close;});if(cd.length)lines.push(cd.map(function(d){return d.n;}).join(' & ')+': Closed');var el=document.getElementById('footer-hours');if(el)el.innerHTML=lines.join('<br>');}}catch(e){}
   var {data}=await sb.from('services').select('*').eq('available',true).order('sort_order');
   if(!data) return;
   function makeRow(s,border){

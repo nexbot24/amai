@@ -147,12 +147,7 @@ a{color:#E8D5C4;text-decoration:none}
       <div class="lbl" style="margin-bottom:20px">The studio</div>
       <h2 class="h2" style="font-size:32px;margin-bottom:28px;max-width:16ch">Where to find us, and when.</h2>
       <div style="display:flex;flex-direction:column" id="hours-list">
-        <div style="display:flex;justify-content:space-between;gap:24px;padding:15px 0;border-top:1px solid #E0D2C2;font-size:14.5px"><span style="color:#6E5B49">Tuesday</span><span>9.00 – 18.00</span></div>
-        <div style="display:flex;justify-content:space-between;gap:24px;padding:15px 0;border-top:1px solid #E0D2C2;font-size:14.5px"><span style="color:#6E5B49">Wednesday</span><span>9.00 – 18.00</span></div>
-        <div style="display:flex;justify-content:space-between;gap:24px;padding:15px 0;border-top:1px solid #E0D2C2;font-size:14.5px"><span style="color:#6E5B49">Thursday</span><span>9.00 – 18.00</span></div>
-        <div style="display:flex;justify-content:space-between;gap:24px;padding:15px 0;border-top:1px solid #E0D2C2;font-size:14.5px"><span style="color:#6E5B49">Friday</span><span>9.00 – 18.00</span></div>
-        <div style="display:flex;justify-content:space-between;gap:24px;padding:15px 0;border-top:1px solid #E0D2C2;font-size:14.5px"><span style="color:#6E5B49">Saturday</span><span>9.00 – 18.00</span></div>
-        <div style="display:flex;justify-content:space-between;gap:24px;padding:15px 0;border-top:1px solid #E0D2C2;border-bottom:1px solid #E0D2C2;font-size:14.5px;color:#6E5B49"><span>Sunday &amp; Monday</span><span>Closed</span></div>
+        <div id="hours-table"></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:34px">
         <div>
@@ -324,17 +319,32 @@ var sb=supabase.createClient('https://tphyrmweauzfletdlqvi.supabase.co','eyJhbGc
     var r=await sb.from('studio_settings').select('value').eq('key','opening_hours').single();
     if(!r.data||!r.data.value) return;
     var h=r.data.value;
-    var days=[{n:'Tuesday',k:'tue'},{n:'Wednesday',k:'wed'},{n:'Thursday',k:'thu'},{n:'Friday',k:'fri'},{n:'Saturday',k:'sat'}];
-    var el=$('hours-list'); if(!el) return;
-    el.innerHTML=days.map(function(d){
-      var hrs=h[d.k]||{open:'9.00',close:'18.00'};
-      return '<div style="display:flex;justify-content:space-between;gap:24px;padding:15px 0;border-top:1px solid #E0D2C2;font-size:14.5px"><span style="color:#6E5B49">'+d.n+'</span><span>'+hrs.open+' \u2013 '+hrs.close+'</span></div>';
-    }).join('')+'<div style="display:flex;justify-content:space-between;gap:24px;padding:15px 0;border-top:1px solid #E0D2C2;border-bottom:1px solid #E0D2C2;font-size:14.5px;color:#6E5B49"><span>Sunday &amp; Monday</span><span>Closed</span></div>';
-    /* Also update footer hours */
+    var days=[
+      {n:'Sunday',k:'sun'},{n:'Monday',k:'mon'},{n:'Tuesday',k:'tue'},
+      {n:'Wednesday',k:'wed'},{n:'Thursday',k:'thu'},{n:'Friday',k:'fri'},{n:'Saturday',k:'sat'}
+    ];
+    var el=$('hours-table'); if(!el) return;
+    el.innerHTML=days.map(function(d,i){
+      var hrs=h[d.k]||{closed:true};
+      var isLast=i===days.length-1;
+      var borderStyle='border-top:1px solid #E0D2C2'+(isLast?';border-bottom:1px solid #E0D2C2':'');
+      if(hrs.closed){
+        return '<div style="display:flex;justify-content:space-between;gap:24px;padding:15px 0;'+borderStyle+';font-size:14.5px"><span style="color:#6E5B49">'+d.n+'</span><span style="color:#B39C88">Closed</span></div>';
+      }
+      return '<div style="display:flex;justify-content:space-between;gap:24px;padding:15px 0;'+borderStyle+';font-size:14.5px"><span style="color:#6E5B49">'+d.n+'</span><span>'+hrs.open+' \u2013 '+hrs.close+'</span></div>';
+    }).join('');
+    /* Also update footer hours dynamically */
     var fh=document.getElementById('footer-hours');
     if(fh){
-      var first=h.tue||{open:'9.00',close:'18.00'};
-      fh.innerHTML='Tuesday to Saturday<br>'+first.open+' \u2013 '+first.close;
+      var openDays=days.filter(function(d){ var hrs=h[d.k]; return hrs && !hrs.closed; });
+      if(openDays.length>0){
+        var firstDay=openDays[0], lastDay=openDays[openDays.length-1];
+        var sample=h[firstDay.k]||{open:'9.00',close:'18.00'};
+        var label=openDays.length===1?firstDay.n:firstDay.n+' to '+lastDay.n;
+        fh.innerHTML=label+'<br>'+sample.open+' \u2013 '+sample.close;
+      } else {
+        fh.innerHTML='Currently closed';
+      }
     }
   } catch(e){}
 })();

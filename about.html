@@ -203,7 +203,7 @@ a{color:#E8D5C4;text-decoration:none}
 
       <div style="display:flex;flex-direction:column;gap:16px;font-size:14px;line-height:1.7">
         <span style="font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:#8A7361">Studio</span>
-        <span style="color:#CBB49E">Tuesday to Saturday<br>9.00 – 18.00</span>
+        <span id="footer-hours" style="color:#CBB49E">Tuesday to Saturday<br>9.00 – 18.00</span>
         <span style="color:#CBB49E">North London, by appointment<br>Full address sent on booking</span>
         <div class="fnav" style="display:flex;flex-direction:column;gap:9px">
           <a href="tel:+442000000000">020 0000 0000</a>
@@ -230,6 +230,25 @@ a{color:#E8D5C4;text-decoration:none}
       
     }
   } catch(e) {}
+})();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script>
+(async function(){
+  if(!window.sb) return;
+  try{
+    var r=await sb.from('studio_settings').select('value').eq('key','opening_hours').single();
+    if(!r.data||!r.data.value) return;
+    var OH=r.data.value;
+    var allDays=[{k:'sun',n:'Sunday'},{k:'mon',n:'Monday'},{k:'tue',n:'Tuesday'},{k:'wed',n:'Wednesday'},{k:'thu',n:'Thursday'},{k:'fri',n:'Friday'},{k:'sat',n:'Saturday'}];
+    var open=allDays.filter(function(d){var h=OH[d.k];return h&&!h.closed;});
+    var closed=allDays.filter(function(d){var h=OH[d.k];return !h||h.closed;});
+    var lines=open.map(function(d){var h=OH[d.k];return d.n+': '+h.open+' \u2013 '+h.close;});
+    if(closed.length) lines.push(closed.map(function(d){return d.n;}).join(' & ')+': Closed');
+    var el=document.getElementById('footer-hours');
+    if(el) el.innerHTML=lines.join('<br>');
+  }catch(e){}
 })();
 </script>
 </body>
