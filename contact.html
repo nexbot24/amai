@@ -160,8 +160,8 @@ a{color:#E8D5C4;text-decoration:none}
         </div>
       </div>
       <div style="display:flex;gap:22px;align-items:center;margin-top:26px;flex-wrap:wrap">
-        <a href="tel:+442000000000" style="color:#241F1C;font-family:Marcellus,serif;font-size:18px;border-bottom:1px solid #8A7361;padding-bottom:5px">020 0000 0000</a>
-        <a href="mailto:hello@AMAI" style="color:#241F1C;font-family:Marcellus,serif;font-size:18px;border-bottom:1px solid #8A7361;padding-bottom:5px">hello@AMAI</a>
+        <a href="tel:+442000000000" data-phone style="color:#241F1C;font-family:Marcellus,serif;font-size:18px;border-bottom:1px solid #8A7361;padding-bottom:5px">020 0000 0000</a>
+        <a href="mailto:hello@AMAI" data-email style="color:#241F1C;font-family:Marcellus,serif;font-size:18px;border-bottom:1px solid #8A7361;padding-bottom:5px">hello@AMAI</a>
       </div>
     </div>
 
@@ -247,8 +247,8 @@ a{color:#E8D5C4;text-decoration:none}
         <span style="color:#CBB49E" id="footer-hours">Tuesday to Saturday<br>9.00 – 18.00</span>
         <span style="color:#CBB49E">North London, by appointment<br>Full address sent on booking</span>
         <div class="fnav" style="display:flex;flex-direction:column;gap:9px">
-          <a href="tel:+442000000000">020 0000 0000</a>
-          <a href="mailto:hello@AMAI">hello@AMAI</a>
+          <a href="tel:+442000000000" data-phone>020 0000 0000</a>
+          <a href="mailto:hello@AMAI" data-email>hello@AMAI</a>
         </div>
         <span style="color:#B39C88;font-size:13px">£10 deposit, refundable up to 24 hours before</span>
       </div>
@@ -347,6 +347,14 @@ var sb=supabase.createClient('https://tphyrmweauzfletdlqvi.supabase.co','eyJhbGc
       }
     }
   } catch(e){}
+  try{
+    var cr=await sb.from('studio_settings').select('value').eq('key','studio_contact').single();
+    if(cr.data&&cr.data.value){
+      var ci=cr.data.value;
+      document.querySelectorAll('[data-phone]').forEach(function(e){e.textContent=ci.phone;if(e.href)e.href='tel:+44'+ci.phone.replace(/\s/g,'').replace(/^0/,'');});
+      document.querySelectorAll('[data-email]').forEach(function(e){e.textContent=ci.email;if(e.href)e.href='mailto:'+ci.email;});
+    }
+  }catch(e){}
 })();
 
 $("c-send").onclick=async function(){

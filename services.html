@@ -272,8 +272,8 @@ div[id],section[id]{scroll-margin-top:84px}
         <span style="color:#CBB49E" id="footer-hours">Tuesday to Saturday<br>9.00 – 18.00</span>
         <span style="color:#CBB49E">North London, by appointment<br>Full address sent on booking</span>
         <div class="fnav" style="display:flex;flex-direction:column;gap:9px">
-          <a href="tel:+442000000000">020 0000 0000</a>
-          <a href="mailto:hello@AMAI">hello@AMAI</a>
+          <a href="tel:+442000000000" data-phone>020 0000 0000</a>
+          <a href="mailto:hello@AMAI" data-email>hello@AMAI</a>
         </div>
         <span style="color:#B39C88;font-size:13px">£10 deposit, refundable up to 24 hours before</span>
       </div>
@@ -291,6 +291,7 @@ div[id],section[id]{scroll-margin-top:84px}
 (async function(){
   var sb=supabase.createClient('https://tphyrmweauzfletdlqvi.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwaHlybXdlYXV6ZmxldGRscXZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0NTIxOTQsImV4cCI6MjEwMzAyODE5NH0.Z_utKsxYquCoL2LfTjjL8QFB1tnLJZW9j3El7Sykk8o');
   try{var sh=await sb.from('studio_settings').select('value').eq('key','opening_hours').single();if(sh.data&&sh.data.value){var OH=sh.data.value;var allDays=[{k:'sun',n:'Sunday'},{k:'mon',n:'Monday'},{k:'tue',n:'Tuesday'},{k:'wed',n:'Wednesday'},{k:'thu',n:'Thursday'},{k:'fri',n:'Friday'},{k:'sat',n:'Saturday'}];var od=allDays.filter(function(d){var h=OH[d.k];return h&&!h.closed;});var cd=allDays.filter(function(d){var h=OH[d.k];return !h||h.closed;});var lines=od.map(function(d){var h=OH[d.k];return d.n+': '+h.open+' \u2013 '+h.close;});if(cd.length)lines.push(cd.map(function(d){return d.n;}).join(' & ')+': Closed');var el=document.getElementById('footer-hours');if(el)el.innerHTML=lines.join('<br>');}}catch(e){}
+  try{var cr=await sb.from('studio_settings').select('value').eq('key','studio_contact').single();if(cr.data&&cr.data.value){var ci=cr.data.value;document.querySelectorAll('[data-phone]').forEach(function(e){e.textContent=ci.phone;if(e.href)e.href='tel:+44'+ci.phone.replace(/\s/g,'').replace(/^0/,'');});document.querySelectorAll('[data-email]').forEach(function(e){e.textContent=ci.email;if(e.href)e.href='mailto:'+ci.email;});}}catch(e){}
   var {data}=await sb.from('services').select('*').eq('available',true).order('sort_order');
   if(!data) return;
   function makeRow(s,border){
