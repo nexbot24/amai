@@ -197,7 +197,7 @@ function d0(){ var d=new Date(); d.setHours(0,0,0,0); return d; }
 function shift(base,n){ var d=new Date(base); d.setDate(d.getDate()+n); return d; }
 function iso(d){ return d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate(); }
 function parseKey(k){ var p=k.split("-"); return new Date(+p[0],+p[1],+p[2]); }
-function open(d){ var dk=['sun','mon','tue','wed','thu','fri','sat'][d.getDay()]; var h=S.hours[dk]; return h && !h.closed; }
+function open(d){ var dk=['sun','mon','tue','wed','thu','fri','sat'][d.getDay()]; if(typeof S==='undefined'||!S.hours) return dk!=='sun'&&dk!=='mon'; var h=S.hours[dk]; return h && !h.closed; }
 function nextOpen(n){
   var d=d0(), seen=0;
   while(!open(d)) d=shift(d,1);
