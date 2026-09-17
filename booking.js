@@ -306,17 +306,24 @@ async function showDone(how,acct){
         if(phone&&r.data[0].phone!==phone)await sb.from('clients').update({phone:phone}).eq('id',clientId);
       }
       if(clientId){
-        await sb.from('bookings').insert([{
-          client_id:clientId,
-          treatment_name:S.treatment,
-          appointment_date:dayKeyToDate(S.dateKey),appointment_time:S.time.replace('.',':'),
-          price:priceNum(S.treatment),deposit_amount:10,
-          duration_minutes:getDuration(S.treatment),status:'confirmed',
-          notes:notes,
-          promo_code:S.promo?S.promo.code:null,
-          discount_amount:S.promo?S.promo.discount:0
-        }]);
-      }
+         var bkRes = await sb.from('bookings').insert([{
+           client_id:clientId,
+           treatment_name:S.treatment,
+           appointment_date:dayKeyToDate(S.dateKey),appointment_time:S.time.replace('.',':'),
+           price:priceNum(S.treatment),deposit_amount:10,
+           duration_minutes:getDuration(S.treatment),status:'confirmed',
+           notes:notes,
+           promo_code:S.promo?S.promo.code:null,
+           discount_amount:S.promo?S.promo.discount:0
+         }]).select().single();
+         /* Push to Google Calendar (non-blocking) */
+         if(bkRes.data){
+           fetch('/.netlify/functions/gcal-push',{method:'POST',headers:{'Content-Type':'application/json'},
+             body:JSON.stringify({bookingId:bkRes.data.id,treatmentName:S.treatment,date:dayKeyToDate(S.dateKey),
+               time:S.time,duration:getDuration(S.treatment),clientName:name})
+           }).catch(function(e){console.warn('gcal push error',e);});
+         }
+       }
     }catch(e){console.warn('booking save error',e);}
   }
 

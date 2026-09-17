@@ -63,6 +63,7 @@ button{font-family:Mulish,sans-serif;cursor:pointer;color:#241F1C}
 .appt{border-left:3px solid #3A322E;background:#F7F1EA;border-top:1px solid #E0D2C2;border-right:1px solid #E0D2C2;border-bottom:1px solid #E0D2C2;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:64px;color:#241F1C;width:100%}
 .appt.done{border-left-color:#B39C88;background:#EFE5D8;color:#6E5B49;opacity:1}
 .appt.now{border-left-color:#E8D5C4;background:#3A322E;color:#E8D5C4}
+.appt.fresha{border-left-color:#5B9A8B;background:#F0F6F4}
 .appt.cont{border-left-color:#C9B8A4;background:#EFE9E1;min-height:44px}
 .free{border:1px dashed #D6C4B2;min-height:64px;display:flex;align-items:center;justify-content:space-between;padding:12px 14px;color:#8A7361;font-size:13.5px;background:transparent;width:100%}
 
@@ -284,7 +285,7 @@ async function loadAll(){
     if(br.data){
       S.appts=br.data.map(function(r){
         var cid=r.client_id||0;
-        return {id:r.id,c:cid,s:r.treatment_name||'',t:(r.appointment_time||'10.00').replace(':','.'),dur:r.duration_minutes||r.duration||45,p:Number(r.price)||0,dep:Number(r.deposit_amount||10),day:dateToDayKey(r.appointment_date),st:r.status==='completed'?'done':r.status==='cancelled'?'cancelled':'due',dbId:r.id, promo:r.promo_code||'', disc:Number(r.discount_amount)||0, notes:r.notes||''};
+        return {id:r.id,c:cid,s:r.treatment_name||r.external_title||'',t:(r.appointment_time||'10.00').replace(':','.'),dur:r.duration_minutes||r.duration||45,p:Number(r.price)||0,dep:Number(r.deposit_amount||10),day:dateToDayKey(r.appointment_date),st:r.status==='completed'?'done':r.status==='cancelled'?'cancelled':'due',dbId:r.id, promo:r.promo_code||'', disc:Number(r.discount_amount)||0, notes:r.notes||'', source:r.source||'amai', gcalId:r.gcal_event_id||''};
       }).filter(function(a){ return a.st!=='cancelled'; });
     }
     /* requests */
@@ -438,12 +439,13 @@ V.today=function(){
     if(!a) return '<div class="slotline"><div class="lbl" style="padding-top:22px">'+tm+'</div>'+
       '<button class="free" data-fill="'+tm+'"><span>Free</span><span style="font-size:19px;color:#C9B8A4">+</span></button></div>';
     var c=client(a.c);
-    var cls="appt"+(a.st==="done"?" done":(a.t===now?" now":""));
+    var isFresha=a.source==='fresha';
+    var cls="appt"+(a.st==="done"?" done":(a.t===now?" now":""))+(isFresha?" fresha":"");
     return '<div class="slotline"><div class="lbl" style="padding-top:22px">'+tm+'</div>'+
       '<button class="'+cls+'" data-appt="'+a.id+'" style="text-align:left">'+
         '<span style="display:flex;flex-direction:column;gap:3px;min-width:0">'+
-          '<span class="serif" style="font-size:18px">'+c.name+'</span>'+
-          '<span style="font-size:13px;opacity:.75">'+a.s+' · '+a.dur+' min</span></span>'+
+          '<span class="serif" style="font-size:18px">'+(isFresha?(a.s||'Fresha booking'):c.name)+'</span>'+
+          '<span style="font-size:13px;opacity:.75">'+(isFresha?'via Fresha · '+a.dur+' min':a.s+' · '+a.dur+' min')+'</span></span>'+
         '<span style="display:flex;align-items:center;gap:10px;flex:none">'+
           (c.stamps>=9?'<span class="pill warn">Reward due</span>':'')+
           (a.promo?'<span class="pill">'+a.promo+'</span>':'')+
@@ -869,6 +871,13 @@ function newSheet(dayKey,time){
     var sv=bookable()[+$("n-svc").value];
     var bRes = await sb.from('bookings').insert({client_id:cid, treatment_name:sv.n, appointment_date: dayKeyToDate(draft.day), appointment_time: draft.time, price: sv.p, deposit_amount:10, duration_minutes: sv.d, status:'confirmed'}).select().single();
     var dbId = bRes.data ? bRes.data.id : null;
+    /* Push to Google Calendar */
+    if(dbId){
+      var cn=S.clients.filter(function(c){return c.id===cid;})[0];
+      fetch('/.netlify/functions/gcal-push',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({bookingId:dbId,treatmentName:sv.n,date:dayKeyToDate(draft.day),time:draft.time,duration:sv.d,clientName:cn?cn.name:'Client'})
+      }).catch(function(e){console.warn('gcal push error',e);});
+    }
     S.appts.push({id:dbId||Date.now()+1,c:cid,s:sv.n,t:draft.time,dur:sv.d,p:sv.p,dep:10,day:draft.day,st:"due", dbId:dbId});
     save(); closeSheet(); render();
   };
