@@ -1,10 +1,15 @@
 /**
  * Shared Google Calendar helper for Netlify Functions
  * Uses service account credentials to manage events
+ * 
+ * Two calendars:
+ *  - PUSH calendar (primary): where AMAI events go so Fresha sees them
+ *  - PULL calendar (Fresha): where we read Fresha bookings from
  */
 const { GoogleAuth } = require('google-auth-library');
 
-const CALENDAR_ID = process.env.GCAL_CALENDAR_ID;
+const PUSH_CALENDAR_ID = process.env.GCAL_PUSH_CALENDAR_ID;  // primary calendar
+const PULL_CALENDAR_ID = process.env.GCAL_CALENDAR_ID;        // Fresha calendar
 const SCOPES = ['https://www.googleapis.com/auth/calendar'];
 
 let _auth = null;
@@ -28,11 +33,12 @@ async function getToken() {
 const BASE = 'https://www.googleapis.com/calendar/v3';
 
 /**
- * Create a calendar event
+ * Create a calendar event on the PRIMARY calendar (so Fresha sees it)
  */
 async function createEvent({ summary, description, startTime, endTime, bookingId }) {
   const token = await getToken();
-  const url = `${BASE}/calendars/${encodeURIComponent(CALENDAR_ID)}/events`;
+  const calId = PUSH_CALENDAR_ID;
+  const url = `${BASE}/calendars/${encodeURIComponent(calId)}/events`;
 
   const body = {
     summary,
@@ -66,11 +72,12 @@ async function createEvent({ summary, description, startTime, endTime, bookingId
 }
 
 /**
- * Delete a calendar event
+ * Delete a calendar event from the PRIMARY calendar
  */
 async function deleteEvent(eventId) {
   const token = await getToken();
-  const url = `${BASE}/calendars/${encodeURIComponent(CALENDAR_ID)}/events/${eventId}`;
+  const calId = PUSH_CALENDAR_ID;
+  const url = `${BASE}/calendars/${encodeURIComponent(calId)}/events/${eventId}`;
 
   const res = await fetch(url, {
     method: 'DELETE',
@@ -85,10 +92,11 @@ async function deleteEvent(eventId) {
 }
 
 /**
- * List events in a time range
+ * List events from the FRESHA calendar (to pull Fresha bookings)
  */
 async function listEvents(timeMin, timeMax) {
   const token = await getToken();
+  const calId = PULL_CALENDAR_ID;
   const params = new URLSearchParams({
     timeMin,
     timeMax,
@@ -98,7 +106,7 @@ async function listEvents(timeMin, timeMax) {
     maxResults: '250',
   });
 
-  const url = `${BASE}/calendars/${encodeURIComponent(CALENDAR_ID)}/events?${params}`;
+  const url = `${BASE}/calendars/${encodeURIComponent(calId)}/events?${params}`;
   const res = await fetch(url, {
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -108,31 +116,4 @@ async function listEvents(timeMin, timeMax) {
   return data;
 }
 
-/**
- * Incremental sync using syncToken
- */
-async function incrementalSync(syncToken) {
-  const token = await getToken();
-  const params = new URLSearchParams({ singleEvents: 'true' });
-  if (syncToken) params.append('syncToken', syncToken);
-
-  const url = `${BASE}/calendars/${encodeURIComponent(CALENDAR_ID)}/events?${params}`;
-  const res = await fetch(url, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-  // 410 Gone = syncToken expired, need full sync
-  if (res.status === 410) {
-    return { expired: true, items: [], nextSyncToken: null };
-  }
-  if (!res.ok) throw new Error(`GCal sync failed: ${await res.text()}`);
-
-  const data = await res.json();
-  return {
-    expired: false,
-    items: data.items || [],
-    nextSyncToken: data.nextSyncToken || null,
-  };
-}
-
-module.exports = { createEvent, deleteEvent, listEvents, incrementalSync, CALENDAR_ID };
+module.exports = { createEvent, deleteEvent, listEvents, PUSH_CALENDAR_ID, PULL_CALENDAR_ID };
