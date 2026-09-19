@@ -78,6 +78,42 @@ exports.handler = async (event) => {
       else console.warn('Insert error for event', ev.id, error.message);
     }
 
+    // Check for MOVED Fresha events (time/date changed)
+    let updated = 0;
+    const { data: allFreshaBookings } = await supabase
+      .from('bookings')
+      .select('id, gcal_event_id, appointment_date, appointment_time')
+      .eq('source', 'fresha')
+      .eq('status', 'confirmed');
+
+    if (allFreshaBookings) {
+      const gcalMap = {};
+      for (const ev of gcalEvents) {
+        if (ev.start && ev.start.dateTime) gcalMap[ev.id] = ev;
+      }
+
+      for (const fb of allFreshaBookings) {
+        const ev = gcalMap[fb.gcal_event_id];
+        if (!ev) continue; // handled by deletion check below
+
+        const start = new Date(ev.start.dateTime);
+        const newDate = `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}-${String(start.getDate()).padStart(2, '0')}`;
+        const newTime = `${String(start.getHours()).padStart(2, '0')}:${String(start.getMinutes()).padStart(2, '0')}`;
+        const end = new Date(ev.end.dateTime);
+        const newDur = Math.round((end - start) / 60000);
+
+        if (fb.appointment_date !== newDate || fb.appointment_time !== newTime) {
+          await supabase.from('bookings').update({
+            appointment_date: newDate,
+            appointment_time: newTime,
+            duration_minutes: newDur || 60,
+            external_title: ev.summary || '',
+          }).eq('id', fb.id);
+          updated++;
+        }
+      }
+    }
+
     // Check for deleted/cancelled external events
     // Get all fresha bookings and see if their gcal events still exist
     const { data: freshaBookings } = await supabase
@@ -100,11 +136,11 @@ exports.handler = async (event) => {
       }
     }
 
-    console.log(`gcal-pull: synced=${synced}, removed=${removed}, total_events=${gcalEvents.length}`);
+    console.log(`gcal-pull: synced=${synced}, updated=${updated}, removed=${removed}, total_events=${gcalEvents.length}`);
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ synced, removed, totalEvents: gcalEvents.length }),
+      body: JSON.stringify({ synced, updated, removed, totalEvents: gcalEvents.length }),
     };
   } catch (err) {
     console.error('gcal-pull error:', err);

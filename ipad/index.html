@@ -1032,7 +1032,14 @@ function bindSheet(){
       if(b.disabled) return;
       draft.time=b.dataset.time;
       [].forEach.call(document.querySelectorAll("[data-time]"),function(x){ x.setAttribute("aria-pressed",String(x.dataset.time===draft.time)); });
-      if(draft.id){ S.appts.forEach(function(a){ if(String(a.id)===String(draft.id)){ a.t=draft.time; if(a.dbId||a.id) sb.from('bookings').update({appointment_time:draft.time}).eq('id',a.dbId||a.id); } }); save(); render(); }
+      if(draft.id){ S.appts.forEach(function(a){ if(String(a.id)===String(draft.id)){ a.t=draft.time; if(a.dbId||a.id) sb.from('bookings').update({appointment_time:draft.time}).eq('id',a.dbId||a.id);
+        /* Update Google Calendar */
+        if(a.gcalId){
+          fetch('/.netlify/functions/gcal-update',{method:'POST',headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({gcalEventId:a.gcalId,date:dayKeyToDate(a.day),time:draft.time,duration:a.dur})
+          }).catch(function(e){console.warn('gcal update error',e);});
+        }
+      } }); save(); render(); }
     };
   });
   wire(document);
@@ -1284,6 +1291,12 @@ function wire(scope){
     var a = S.appts.filter(function(x){ return String(x.id)===String(b.dataset.cancelappt); })[0];
     if(!a) return;
     if(a.dbId||a.id) await sb.from('bookings').update({status:'cancelled'}).eq('id', a.dbId||a.id);
+    /* Delete from Google Calendar */
+    if(a.gcalId){
+      fetch('/.netlify/functions/gcal-delete',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({gcalEventId:a.gcalId})
+      }).catch(function(e){console.warn('gcal delete error',e);});
+    }
     S.appts=S.appts.filter(function(x){ return String(x.id)!==String(b.dataset.cancelappt); }); save(); closeSheet(); render(); }; });
   q("[data-svcedit]").forEach(function(b){ b.onclick=function(){ svcSheet(b.dataset.svcedit); }; });
   q("[data-svctoggle]").forEach(function(b){ b.onclick=async function(){
