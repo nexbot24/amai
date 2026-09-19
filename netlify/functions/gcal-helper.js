@@ -39,6 +39,8 @@ async function createEvent({ summary, description, startTime, endTime, bookingId
     description,
     start: { dateTime: startTime, timeZone: 'Europe/London' },
     end: { dateTime: endTime, timeZone: 'Europe/London' },
+    transparency: 'opaque',  // Shows as "Busy" — required for Fresha to pick it up
+    status: 'confirmed',
     extendedProperties: {
       private: {
         bookingId: String(bookingId || ''),
