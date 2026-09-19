@@ -47,6 +47,12 @@ section[id]{scroll-margin-top:84px}
 .pick::-webkit-scrollbar-thumb{background:#8A7361}
 .field{width:100%;background:transparent;border:1px solid rgba(232,213,196,.3);color:#F7F1EA;padding:14px 16px;font-family:Mulish,sans-serif;font-size:15px;outline:none;border-radius:0}
 .field:focus{border-color:#E8D5C4}
+.srow{display:flex;align-items:center;gap:12px;padding:15px 18px;cursor:pointer;font-family:Mulish,sans-serif;color:#E8D5C4;background:transparent;border:1px solid rgba(232,213,196,.18);width:100%;text-align:left}
+.srow[aria-checked="true"]{background:#443B36;border-color:#E8D5C4}
+.tick{flex:none;width:19px;height:19px;border-radius:50%;border:1px solid rgba(232,213,196,.32);display:flex;align-items:center;justify-content:center;font-size:11px;line-height:1;color:transparent}
+.srow[aria-checked="true"] .tick{background:#E8D5C4;border-color:#E8D5C4;color:#3A322E}
+.infob{width:22px;height:22px;flex:none;border-radius:50%;border:1px solid rgba(232,213,196,.4);background:transparent;color:#CBB49E;font-family:Marcellus,serif;font-size:12px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.infob:hover,.infob[aria-expanded="true"]{border-color:#E8D5C4;color:#E8D5C4}
 .flab{display:flex;flex-direction:column;gap:9px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#B39C88}
 .tile{background:#EFE5D8;padding:16px 20px;display:flex;flex-direction:column;gap:5px}
 .tab{text-align:left;cursor:pointer;border:none;font-family:Mulish,sans-serif;display:flex;flex-direction:column;gap:9px;padding:20px 22px;background:#EFE5D8;color:#241F1C}
@@ -403,10 +409,23 @@ section[id]{scroll-margin-top:84px}
         </div>
 
         <div id="step1">
-          <h3 style="font-family:Marcellus,serif;font-size:26px;font-weight:400;margin:0 0 6px">What are you booking?</h3>
-          <p style="font-size:14.5px;line-height:1.7;color:#CBB49E;margin:0 0 18px">Not sure? Choose a first visit and we'll talk it through before anything begins.</p>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+            <h3 style="font-family:Marcellus,serif;font-size:26px;font-weight:400;margin:0">What are you booking?</h3>
+            <button id="info-btn" class="infob" aria-expanded="false" aria-controls="info-panel" aria-label="What is a bundle?">i</button>
+          </div>
+          <p style="font-size:14.5px;line-height:1.7;color:#CBB49E;margin:0 0 16px">Choose as many as you like — booking two or more treatments in one visit takes money off.</p>
+          <div id="info-panel" class="hide" style="border:1px solid rgba(232,213,196,.3);padding:20px 22px;margin-bottom:16px">
+            <div style="font-family:Marcellus,serif;font-size:19px;margin-bottom:8px">Bundles</div>
+            <p style="font-size:13.5px;line-height:1.75;color:#CBB49E;margin:0 0 16px">Book more than one treatment in the same appointment and we take a percentage off the lot.</p>
+            <div style="display:flex;flex-direction:column;gap:9px;font-size:13.5px;padding-top:14px;border-top:1px solid rgba(232,213,196,.18)">
+              <div style="display:flex;justify-content:space-between;gap:18px"><span style="color:#CBB49E">Two treatments</span><span id="info-2-pct">10% off</span></div>
+              <div style="display:flex;justify-content:space-between;gap:18px"><span style="color:#CBB49E">Three or more</span><span id="info-3-pct">15% off</span></div>
+            </div>
+            <p style="font-size:12.5px;line-height:1.7;color:#B39C88;margin:16px 0 0">Every treatment can be bundled, and the £10 deposit stays £10 however many you add.</p>
+          </div>
           <input id="q" class="field" placeholder="Search treatments" style="margin-bottom:14px">
           <div id="picker" class="pick" style="display:flex;flex-direction:column;gap:8px"></div>
+          <div id="basket" class="hide" style="margin-top:18px;background:#443B36;padding:18px 20px;display:flex;flex-direction:column;gap:9px;font-size:14px"></div>
         </div>
 
         <div id="step2" class="hide">
@@ -454,6 +473,7 @@ section[id]{scroll-margin-top:84px}
           <div style="margin-top:24px;background:#443B36;padding:20px 22px;display:flex;flex-direction:column;gap:7px">
             <span style="font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:#B39C88">Your appointment</span>
             <span id="s3-treat" style="font-family:Marcellus,serif;font-size:19px"></span>
+            <div id="s3-list" style="font-size:13.5px;color:#CBB49E;line-height:1.7"></div>
             <span id="s3-when" style="font-size:14px;color:#CBB49E"></span>
           </div>
         </div>
@@ -471,13 +491,7 @@ section[id]{scroll-margin-top:84px}
             <label class="flab">Security code<input id="c-cvc" class="field" placeholder="123"></label>
           </div>
           <div id="promo-row" style="display:flex;gap:10px;margin-top:24px;margin-bottom:18px"><input class="field" id="f-promo" placeholder="Promo code" style="flex:1;text-transform:uppercase;letter-spacing:.08em"><button class="btn btn-o btn-sm" id="apply-promo">Apply</button></div><div id="promo-result" style="font-size:14px;margin-bottom:12px"></div>
-          <div style="background:#443B36;padding:20px 22px;display:flex;flex-direction:column;gap:10px;font-size:14px">
-            <div style="display:flex;justify-content:space-between;gap:20px"><span style="color:#CBB49E" id="s4-treat"></span><span id="s4-price"></span></div>
-            <div style="display:flex;justify-content:space-between;gap:20px" id="s4-promo-row" class="hide"><span style="color:#CBB49E" id="s4-promo-code"></span><span style="color:#4ADE80" id="s4-promo-discount"></span></div>
-            <div style="display:flex;justify-content:space-between;gap:20px"><span style="color:#CBB49E" id="s4-when"></span><span style="color:#CBB49E" id="s4-name"></span></div>
-            <div style="display:flex;justify-content:space-between;gap:20px;padding-top:10px;border-top:1px solid rgba(232,213,196,.18)"><span style="color:#CBB49E">Deposit today</span><span style="font-weight:600">£10.00</span></div>
-            <div style="display:flex;justify-content:space-between;gap:20px"><span style="color:#CBB49E">Balance in the studio</span><span id="s4-bal"></span></div>
-          </div>
+          <div id="s4-sum" style="background:#443B36;padding:20px 22px;display:flex;flex-direction:column;gap:10px;font-size:14px"></div>
         </div>
 
         <div style="display:flex;align-items:center;gap:14px;margin-top:32px;padding-top:26px;border-top:1px solid rgba(232,213,196,.16)">
@@ -680,10 +694,21 @@ section[id]{scroll-margin-top:84px}
       </div>
 
       <div id="step1">
-        <h3 class="serif" style="font-size:23px;margin:0 0 6px">What are you booking?</h3>
-        <p style="font-size:14.5px;line-height:1.65;color:#CBB49E;margin:0 0 16px">Not sure? Choose a first visit and we'll talk it through.</p>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+          <h3 class="serif" style="font-size:23px;margin:0">What are you booking?</h3>
+          <button id="info-btn" class="infob" aria-expanded="false" aria-controls="info-panel" aria-label="Bundle info">i</button>
+        </div>
+        <p style="font-size:14.5px;line-height:1.65;color:#CBB49E;margin:0 0 14px">Choose as many as you like — two or more takes money off.</p>
+        <div id="info-panel" class="hide" style="border:1px solid rgba(232,213,196,.3);padding:18px;margin-bottom:14px">
+          <div class="serif" style="font-size:17px;margin-bottom:8px">Bundles</div>
+          <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;padding-top:12px;border-top:1px solid rgba(232,213,196,.18)">
+            <div style="display:flex;justify-content:space-between"><span style="color:#CBB49E">Two treatments</span><span id="info-2-pct">10% off</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:#CBB49E">Three or more</span><span id="info-3-pct">15% off</span></div>
+          </div>
+        </div>
         <input id="q" class="field" placeholder="Search treatments" style="margin-bottom:12px">
         <div id="picker" class="pick"></div>
+        <div id="basket" class="hide" style="margin-top:16px;background:#443B36;padding:16px;display:flex;flex-direction:column;gap:8px;font-size:14px"></div>
       </div>
 
       <div id="step2" class="hide">
@@ -738,12 +763,8 @@ section[id]{scroll-margin-top:84px}
           <label class="flab">Expiry<input id="c-exp" class="field" placeholder="MM / YY"></label>
           <label class="flab">Code<input id="c-cvc" class="field" inputmode="numeric" placeholder="123"></label>
         </div>
-        <div style="margin-top:20px;background:#443B36;padding:18px;display:flex;flex-direction:column;gap:9px;font-size:14px">
-          <div style="display:flex;justify-content:space-between;gap:16px"><span style="color:#CBB49E" id="s4-treat"></span><span id="s4-price"></span></div>
-          <div style="display:flex;justify-content:space-between;gap:16px"><span style="color:#CBB49E" id="s4-when"></span></div>
-          <div style="display:flex;justify-content:space-between;gap:16px;padding-top:9px;border-top:1px solid rgba(232,213,196,.18)"><span style="color:#CBB49E">Deposit today</span><span style="font-weight:600">£10</span></div>
-          <div style="display:flex;justify-content:space-between;gap:16px"><span style="color:#CBB49E">In the studio</span><span id="s4-bal"></span></div>
-        </div>
+        <div style="display:flex;gap:10px;margin-top:18px;margin-bottom:14px"><input class="field" id="f-promo" placeholder="Promo code" style="flex:1;text-transform:uppercase;letter-spacing:.08em"><button class="btn btn-o btn-sm" id="apply-promo">Apply</button></div><div id="promo-result" style="font-size:14px;margin-bottom:10px"></div>
+        <div id="s4-sum" style="background:#443B36;padding:18px;display:flex;flex-direction:column;gap:9px;font-size:14px"></div>
       </div>
 
       <div id="verify-side" class="hide">

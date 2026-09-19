@@ -21,7 +21,8 @@ var GROUPS=[
 ];
 var BOOKABLE=[];
 var HUB_KEY="amai_hub_v2";
-var S={group:0,step:1,treatment:"",monthOffset:0,dateKey:"",time:"",query:"",paid:"",how:"",sent:false,returning:false,promo:null};
+window._bundlePcts = {two: 10, three: 15};
+var S={group:0,step:1,picked:[],monthOffset:0,dateKey:"",time:"",query:"",paid:"",how:"",sent:false,returning:false,promo:null};
 
 
 /* ─── DOM helpers ─── */
@@ -38,6 +39,26 @@ function whenLabel(){var d=chosenDate();if(!d)return"Not chosen yet";return S.ti
 function digits(v){return String(v).replace(/\D/g,"");}
 function priceNum(n){return parseFloat(String(priceOf(n)).replace(/[^0-9.]/g,""))||0;}
 function wantsAccount(){return $("f-acct")&&$("f-acct").checked;}
+
+function bundleCount(){ return S.picked.length; }
+function tierPct(n){ return n>=3 ? window._bundlePcts.three : n>=2 ? window._bundlePcts.two : 0; }
+function pct(){ return tierPct(bundleCount()); }
+function subtotal(){ return S.picked.reduce(function(s,n){ return s+priceNum(n); },0); }
+function discount(){ var base=subtotal(); return Math.round(base*pct()/100); }
+function total(){ return Math.max(0, subtotal()-discount()); }
+function treatLabel(){
+  if(!S.picked.length) return "Not chosen yet";
+  if(S.picked.length===1) return S.picked[0];
+  if(bundleCount()>=2) return "Bundle \u00b7 "+S.picked.length+" treatments";
+  return S.picked.length+" treatments";
+}
+function money(v){ return "\u00a3"+v.toFixed(2).replace(/\.00$/,''); }
+function minsOf(n){
+  var i; for(var j=0;j<BOOKABLE.length;j++){ if(BOOKABLE[j].name===n) i=BOOKABLE[j]; }
+  return i? (parseInt(String(i.time),10)||0) : 0;
+}
+function totalMins(){ return S.picked.reduce(function(s,n){ return s+minsOf(n); },0); }
+function balanceLabel(){ var v=total()-10; return v>0? money(v) : "Nothing left to pay"; }
 
 /* ─── Data loading ─── */
 async function loadServicesIntoGroups(){
@@ -57,21 +78,35 @@ async function loadServicesIntoGroups(){
 
 
 /* ─── Rendering: Picker ─── */
+function toggle(name){
+  var i=S.picked.indexOf(name);
+  if(i>-1) S.picked.splice(i,1); else S.picked.push(name);
+  renderPicker(); renderBasket(); showStep();
+}
 function renderPicker(){
   var q=S.query.trim().toLowerCase();
-  var list=q?BOOKABLE.filter(function(i){return i.name.toLowerCase().indexOf(q)>-1;}):BOOKABLE;
-  var box=$("picker");if(!box)return;
-  box.innerHTML="";
-  if(!list.length){
-    box.appendChild(el("div",{style:"padding:18px 2px;font-size:14px;color:#B39C88"},'No treatment by that name. Clear the search to see everything, or tell us in the notes at the next step.'));
-  }
+  var list=q? BOOKABLE.filter(function(i){ return i.name.toLowerCase().indexOf(q)>-1; }) : BOOKABLE;
+  var box=$("picker"); if(!box) return; box.innerHTML="";
+  if(!list.length){ box.innerHTML='<div style="padding:18px 2px;font-size:14px;color:#B39C88">No treatment found.</div>'; return; }
   list.forEach(function(it){
-    var b=el("button",{class:"srow","aria-checked":String(S.treatment===it.name),onclick:function(){S.treatment=it.name;renderPicker();if(typeof renderTracker==='function')renderTracker();syncNext();}});
-    b.innerHTML='<span style="flex:1;text-align:left;font-family:Marcellus,serif;font-size:17px">'+it.name+'</span>'+
-      '<span style="font-size:12.5px;color:#B39C88">'+it.time+'</span>'+
-      '<span style="font-size:14.5px;font-weight:600;min-width:78px;text-align:right">'+it.price+'</span><span class="tick"></span>';
+    var on=S.picked.indexOf(it.name)>-1;
+    var b=document.createElement("button");
+    b.className="srow"; b.setAttribute("aria-checked",String(on));
+    b.innerHTML='<span style="flex:1;min-width:0;text-align:left;font-family:Marcellus,serif;font-size:17px">'+it.name+'</span><span style="flex:none;font-size:12.5px;color:#B39C88">'+it.time+'</span><span style="flex:none;font-size:14.5px;font-weight:600;min-width:64px;text-align:right">'+it.price+'</span><span class="tick">&#10003;</span>';
+    b.onclick=function(){ toggle(it.name); };
     box.appendChild(b);
   });
+}
+function renderBasket(){
+  var box=$("basket"); if(!box) return;
+  if(!S.picked.length){ box.className="hide"; box.innerHTML=""; return; }
+  box.className="";
+  var rows=S.picked.map(function(n){ return '<div style="display:flex;justify-content:space-between;gap:18px"><span style="color:#CBB49E">'+n+'</span><span>'+priceOf(n)+'</span></div>'; }).join("");
+  var head='<div style="display:flex;justify-content:space-between;gap:18px;padding-bottom:4px"><span style="font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:#B39C88">'+(bundleCount()>=2?"Your bundle":"Your treatment")+'</span><span style="font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:#B39C88">'+totalMins()+' min</span></div>';
+  var foot='';
+  if(pct()){ foot='<div style="display:flex;justify-content:space-between;gap:18px;padding-top:10px;border-top:1px solid rgba(232,213,196,.18)"><span style="color:#CBB49E">Bundle discount \u00b7 '+pct()+'% off</span><span>\u2212\u00a3'+discount()+'</span></div><div style="display:flex;justify-content:space-between;gap:18px"><span style="font-family:Marcellus,serif;font-size:18px">Total</span><span style="font-family:Marcellus,serif;font-size:18px">'+money(total())+'</span></div>'; }
+  else { foot='<div style="display:flex;justify-content:space-between;gap:18px;padding-top:10px;border-top:1px solid rgba(232,213,196,.18)"><span style="font-family:Marcellus,serif;font-size:18px">Total</span><span style="font-family:Marcellus,serif;font-size:18px">'+money(total())+'</span></div>'+(bundleCount()<2?'<div style="font-size:12.5px;line-height:1.6;color:#B39C88">Add one more treatment and '+window._bundlePcts.two+'% comes off both.</div>':''); }
+  box.innerHTML=head+rows+foot;
 }
 
 /* ─── Rendering: Calendar ─── */
@@ -89,7 +124,7 @@ async function renderCalendar(){
     (function(day){
       var d=new Date(v.getFullYear(),v.getMonth(),day);
       var key=d.getFullYear()+"-"+d.getMonth()+"-"+day;
-      var usable=d>=t&&dayOpen(d)&&dayFree(d, S.treatment);
+      var usable=d>=t&&dayOpen(d)&&dayFree(d, S.picked[0]);
       var b=el("button",{class:"day",style:"height:44px;font-family:Mulish,sans-serif;font-size:14.5px;background:transparent;color:#E8D5C4;border:1px solid rgba(232,213,196,.22);cursor:pointer","aria-pressed":String(S.dateKey===key)},String(day));
       if(!usable){b.setAttribute("disabled","disabled");b.style.color="rgba(232,213,196,.22)";b.style.borderColor="transparent";b.style.cursor="default";}
       else b.onclick=function(){S.dateKey=key;S.time="";renderCalendar();renderSlots();if(typeof renderTracker==='function')renderTracker();syncNext();};
@@ -104,7 +139,7 @@ function renderSlots(){
   var d=chosenDate(),box=$("slots");if(!box)return;box.innerHTML="";
   if($("slots-label"))$("slots-label").textContent=d?"Times on "+longDate(d):"Choose a day to see times";
   if(!d)return;
-  calcSlots(d, S.treatment).forEach(function(sl){
+  calcSlots(d, S.picked[0]).forEach(function(sl){
     var b=el("button",{class:"chip","aria-pressed":String(S.time===sl.label)},sl.label);
     if(!sl.open)b.setAttribute("disabled","disabled");
     else b.onclick=function(){S.time=sl.label;renderSlots();if(typeof renderTracker==='function')renderTracker();syncNext();};
@@ -116,7 +151,7 @@ function renderSlots(){
 function renderTracker(){
   if(!$("tracker"))return;
   var titles=["Treatment","Date & time","You & your account","Deposit"];
-  var vals=[S.treatment,whenLabel(),
+  var vals=[treatLabel()+(pct()?' \u00b7 '+pct()+'% off':''),whenLabel(),
     ($("f-name")&&$("f-name").value.trim()?$("f-name").value.trim()+(wantsAccount()?(S.returning?" \u00b7 signing in":" \u00b7 account included"):""):"Mobile number and name"),
     "\u00a310, refundable"];
   var t=$("tracker");t.innerHTML="";
@@ -152,23 +187,13 @@ function syncNext(){
 
 function showStep(){
   [1,2,3,4].forEach(function(n){var e=$("step"+n);if(e)e.className=S.step===n?"":"hide";});
-  if(S.step===3){if($("s3-treat"))$("s3-treat").textContent=S.treatment;if($("s3-when"))$("s3-when").textContent=whenLabel();}
+  if(S.step===3){
+    if($("s3-treat"))$("s3-treat").textContent=treatLabel();
+    if($("s3-list"))$("s3-list").innerHTML=S.picked.join('<br>');
+    if($("s3-when"))$("s3-when").textContent=whenLabel()+' \u00b7 '+totalMins()+' min';
+  }
   if(S.step===4){
-    if($("s4-treat"))$("s4-treat").textContent=S.treatment;
-    if($("s4-price"))$("s4-price").textContent=priceOf(S.treatment);
-    if($("s4-when"))$("s4-when").textContent=whenLabel();
-    if($("s4-name"))$("s4-name").textContent=$("f-name")?$("f-name").value.trim():"";
-    var p=priceNum(S.treatment),bal=p-10;
-    if(S.promo){
-      if($("s4-promo-row"))$("s4-promo-row").className="";
-      if($("s4-promo-code"))$("s4-promo-code").textContent="Promo: "+S.promo.code;
-      if($("s4-promo-discount"))$("s4-promo-discount").textContent="\u2212\u00a3"+S.promo.discount.toFixed(2);
-      bal=p-S.promo.discount-10;
-    } else {
-      if($("s4-promo-row"))$("s4-promo-row").className="hide";
-    }
-    var prefix=String(priceOf(S.treatment)).indexOf("from")===0?"from \u00a3":"\u00a3";
-    if($("s4-bal"))$("s4-bal").textContent=prefix+Math.max(0,bal).toFixed(2);
+    renderS4();
   }
   /* mobile-specific: update progress bars inline */
   var bars=$("bars");
@@ -187,7 +212,7 @@ function showStep(){
 }
 
 function ready(){
-  if(S.step===1)return!!S.treatment;
+  if(S.step===1)return S.picked.length>0;
   if(S.step===2)return!!(S.dateKey&&S.time);
   if(S.step===3){
     var contactInput=$("f-contact");
@@ -196,6 +221,16 @@ function ready(){
     return true;
   }
   return true;/* cardValid — real validation when Stripe is added */
+}
+
+function renderS4(){
+  var sum=$("s4-sum"); if(!sum) return;
+  var rows=S.picked.map(function(n){ return '<div style="display:flex;justify-content:space-between;gap:20px"><span style="color:#CBB49E">'+n+'</span><span>'+priceOf(n)+'</span></div>'; }).join("");
+  var disc=pct()?'<div style="display:flex;justify-content:space-between;gap:20px"><span style="color:#CBB49E">Bundle \u00b7 '+pct()+'% off</span><span>\u2212\u00a3'+discount()+'</span></div>':'';
+  var promoRow=''; var finalTotal=total();
+  if(S.promo){ promoRow='<div style="display:flex;justify-content:space-between;gap:20px"><span style="color:#CBB49E">Promo: '+S.promo.code+'</span><span style="color:#4ADE80">\u2212\u00a3'+S.promo.discount.toFixed(2)+'</span></div>'; finalTotal=Math.max(0,total()-S.promo.discount); }
+  var bal=Math.max(0,finalTotal-10);
+  sum.innerHTML=rows+disc+promoRow+'<div style="display:flex;justify-content:space-between;gap:20px;padding-top:10px;border-top:1px solid rgba(232,213,196,.18)"><span style="color:#CBB49E">Total</span><span style="font-weight:600">'+money(finalTotal)+'</span></div><div style="display:flex;justify-content:space-between;gap:20px"><span style="color:#CBB49E">'+whenLabel()+'</span><span style="color:#CBB49E">'+($("f-name")?$("f-name").value.trim():"")+'</span></div><div style="display:flex;justify-content:space-between;gap:20px;padding-top:10px;border-top:1px solid rgba(232,213,196,.18)"><span style="color:#CBB49E">Deposit today</span><span style="font-weight:600">\u00a310</span></div><div style="display:flex;justify-content:space-between;gap:20px"><span style="color:#CBB49E">Balance in studio</span><span>'+(bal>0?money(bal):'Nothing to pay')+'</span></div>';
 }
 
 async function checkKnown(){
@@ -231,7 +266,7 @@ async function checkKnown(){
 function saveToHub(){
   try{
     var raw=localStorage.getItem(HUB_KEY),h=raw?JSON.parse(raw):null;
-    var visit={id:Date.now(),treat:S.treatment,dateKey:S.dateKey,time:S.time,price:priceNum(S.treatment),deposit:10};
+    var visit={id:Date.now(),treat:S.picked.join(' + '),dateKey:S.dateKey,time:S.time,price:total(),deposit:10};
     if(h&&h.upcoming){h.upcoming.push(visit);h.name=$("f-name")?$("f-name").value.trim():h.name;h.email=$("f-contact")?$("f-contact").value.trim():h.email;h.signedIn=true;}
     else{h={signedIn:true,name:$("f-name")?$("f-name").value.trim():"",email:$("f-contact")?$("f-contact").value.trim().toLowerCase():"",upcoming:[visit],pendingFromWeb:true};}
     localStorage.setItem(HUB_KEY,JSON.stringify(h));
@@ -268,7 +303,7 @@ async function confirm(how){
     var email=$("f-contact")?$("f-contact").value.trim().toLowerCase():"";
     $("v-title").textContent=name+", you\u2019re booked in.";
     $("v-sub").textContent=S.returning?"One code and you\u2019re back in your account.":"One code and your account is open.";
-    $("v-treat").textContent=S.treatment;
+    $("v-treat").textContent=treatLabel();
     $("v-when").textContent=whenLabel();
     if($("v-code-label"))$("v-code-label").textContent="Sending code to "+email+"\u2026";
     if($("verify-side"))$("verify-side").className="";
@@ -308,19 +343,19 @@ async function showDone(how,acct){
       if(clientId){
          var bkRes = await sb.from('bookings').insert([{
            client_id:clientId,
-           treatment_name:S.treatment,
+           treatment_name:S.picked.join(' + '),
            appointment_date:dayKeyToDate(S.dateKey),appointment_time:S.time.replace('.',':'),
-           price:priceNum(S.treatment),deposit_amount:10,
-           duration_minutes:getDuration(S.treatment),status:'confirmed',
+           price:total(),deposit_amount:10,
+           duration_minutes:totalMins(),status:'confirmed',
            notes:notes,
            promo_code:S.promo?S.promo.code:null,
-           discount_amount:S.promo?S.promo.discount:0
+           discount_amount:discount() + (S.promo ? S.promo.discount : 0)
          }]).select().single();
          /* Push to Google Calendar (non-blocking) */
          if(bkRes.data){
            fetch('/.netlify/functions/gcal-push',{method:'POST',headers:{'Content-Type':'application/json'},
-             body:JSON.stringify({bookingId:bkRes.data.id,treatmentName:S.treatment,date:dayKeyToDate(S.dateKey),
-               time:S.time,duration:getDuration(S.treatment),clientName:name})
+             body:JSON.stringify({bookingId:bkRes.data.id,treatmentName:treatLabel(),date:dayKeyToDate(S.dateKey),
+               time:S.time,duration:totalMins(),clientName:name})
            }).catch(function(e){console.warn('gcal push error',e);});
          }
        }
@@ -329,10 +364,12 @@ async function showDone(how,acct){
 
   /* update done UI */
   if($("d-title"))$("d-title").textContent=acct?(S.returning?name+", you\u2019re booked and signed in.":name+", your account is ready."):name+", you\u2019re booked in.";
-  if($("d-treat"))$("d-treat").textContent=S.treatment;
+  if($("d-treat"))$("d-treat").textContent=treatLabel();
   if($("d-when"))$("d-when").textContent=whenLabel();
   if($("d-paid"))$("d-paid").textContent=how==="apple"?"\u00a310 paid \u00b7 Apple Pay":"\u00a310 deposit to be paid later";
-  if($("d-bal"))$("d-bal").textContent=balanceOf(S.treatment)+" in the studio";
+  var finalTotal=S.promo?Math.max(0,total()-S.promo.discount):total();
+  var bal=Math.max(0,finalTotal-10);
+  if($("d-bal"))$("d-bal").textContent=(bal>0?money(bal):'Nothing to pay')+" in the studio";
   var hasHub = acct;
   try { var h=JSON.parse(localStorage.getItem(HUB_KEY)||'{}'); if(h&&h.signedIn) hasHub=true; } catch(e){}
   if($("d-hub"))$("d-hub").className=hasHub?"btn":"hide";
@@ -349,6 +386,7 @@ async function showDone(how,acct){
 /* ─── Event bindings ─── */
 function bindBookingEvents(){
   if($("q"))$("q").oninput=function(){S.query=this.value;renderPicker();};
+  if($("info-btn")) $("info-btn").onclick=function(){ var p=$("info-panel"); if(p){p.className=p.className==="hide"?"":"hide"; this.setAttribute("aria-expanded",String(p.className!=="hide"));} };
   if($("prev"))$("prev").onclick=function(){if(S.monthOffset>0){S.monthOffset--;renderCalendar();}};
   if($("next-m"))$("next-m").onclick=function(){S.monthOffset++;renderCalendar();};
   if($("f-contact")){
@@ -378,7 +416,7 @@ function bindBookingEvents(){
   };
   if($("v-skip"))$("v-skip").onclick=function(){showDone(S.how,false);};
   if($("again"))$("again").onclick=function(){
-    S={group:S.group,step:1,treatment:(BOOKABLE.length?BOOKABLE[0].name:""),monthOffset:0,dateKey:"",time:"",query:"",paid:"",how:"",sent:false,returning:false,promo:null};
+    S={group:S.group,step:1,picked:[],monthOffset:0,dateKey:"",time:"",query:"",paid:"",how:"",sent:false,returning:false,promo:null};
     ["f-name","f-phone","f-promo","f-contact","f-note","c-num","c-exp","c-cvc","q","v-code"].forEach(function(id){if($(id))$(id).value="";});
     if($("promo-result"))$("promo-result").innerHTML="";
     if($("f-name"))$("f-name").closest("label").style.display="";
@@ -389,7 +427,7 @@ function bindBookingEvents(){
     if($("verify-side"))$("verify-side").className="hide";
     if($("form-side"))$("form-side").className="";
     if($("navrow"))$("navrow").className="";
-    renderPicker();renderCalendar();renderSlots();showStep();
+    renderPicker();renderBasket();renderCalendar();renderSlots();showStep();
   };
   /* promo code (desktop-only for now) */
   if($("apply-promo")){
@@ -401,11 +439,15 @@ function bindBookingEvents(){
       if(!r.data){if(res)res.innerHTML='<span style="color:#ef4444">Invalid or expired promo code.</span>';S.promo=null;showStep();return;}
       if(r.data.cap>0&&r.data.uses>=r.data.cap){if(res)res.innerHTML='<span style="color:#ef4444">This promo code has reached its usage limit.</span>';S.promo=null;showStep();return;}
       if(r.data.until&&new Date(r.data.until)<today()){if(res)res.innerHTML='<span style="color:#ef4444">This promo code has expired.</span>';S.promo=null;showStep();return;}
-      var p=priceNum(S.treatment),discount=0;
-      if(r.data.kind==='%')discount=p*(r.data.value/100);
-      else if(r.data.kind==='\u00a3')discount=r.data.value;
-      S.promo={code:code,discount:discount};
-      if(res)res.innerHTML='<span style="color:#4ade80">'+code+' applied \u2014 '+(r.data.kind==='%'?r.data.value+'% off':'\u00a3'+r.data.value+' off')+' (\u2212\u00a3'+discount.toFixed(2)+')</span>';
+      if(r.data.stackable===false && bundleCount()>=2){
+        if(res) res.innerHTML='<span style="color:#ef4444">This code can\'t be combined with a bundle discount.</span>';
+        S.promo=null; renderS4(); return;
+      }
+      var p=total(),discVal=0;
+      if(r.data.kind==='%')discVal=p*(r.data.value/100);
+      else if(r.data.kind==='\u00a3')discVal=r.data.value;
+      S.promo={code:code,discount:discVal};
+      if(res)res.innerHTML='<span style="color:#4ade80">'+code+' applied \u2014 '+(r.data.kind==='%'?r.data.value+'% off':'\u00a3'+r.data.value+' off')+' (\u2212\u00a3'+discVal.toFixed(2)+')</span>';
       showStep();
     };
   }
@@ -423,6 +465,14 @@ function renderDOW(){
 async function initBooking(){
   await ensureSupabase();
   await loadServicesIntoGroups();
+  if(sb){
+    try{
+      var bsRes = await sb.from('settings').select('*').in('key',['bundle_2_pct','bundle_3_pct']);
+      if(bsRes.data) bsRes.data.forEach(function(r){ if(r.key==='bundle_2_pct') window._bundlePcts.two=Number(r.value)||10; if(r.key==='bundle_3_pct') window._bundlePcts.three=Number(r.value)||15; });
+      if($("info-2-pct")) $("info-2-pct").textContent=window._bundlePcts.two+'% off';
+      if($("info-3-pct")) $("info-3-pct").textContent=window._bundlePcts.three+'% off';
+    }catch(e){}
+  }
   /* load closed days */
   if(sb){
     try{var cd=await sb.from('closed_days').select('date_key');if(cd.data)cd.data.forEach(function(r){CLOSED_DAYS[r.date_key]=true;});}catch(e){}
@@ -465,7 +515,7 @@ async function initBooking(){
       }
     }catch(e){}
   }
-  if(BOOKABLE.length)S.treatment=BOOKABLE[0].name;
+  // S.treatment removed for multi-treatment
   renderDOW();
   bindBookingEvents();
   renderPicker();renderCalendar();renderSlots();checkKnown();showStep();

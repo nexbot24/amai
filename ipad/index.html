@@ -238,7 +238,8 @@ function seed(){
     requests:[],
     closed:{},
     promos:[],
-    services:DEFAULT_SERVICES.map(function(s,i){ return {id:i+1,n:s.n,d:s.d,p:s.p,on:true}; })
+    services:DEFAULT_SERVICES.map(function(s,i){ return {id:i+1,n:s.n,d:s.d,p:s.p,on:true}; }),
+    bundle2:10, bundle3:15
   };
 }
 var S=load()||seed();
@@ -305,7 +306,10 @@ async function loadAll(){
     }
     /* promos */
     var pr = await sb.from('promos').select('*');
-    if(pr.data) S.promos = pr.data.map(function(r){ return {id:r.id,code:r.code,kind:r.kind,val:Number(r.value),note:r.note||'',uses:r.uses||0,cap:r.cap||0,until:r.until||'',on:r.active!==false}; });
+    if(pr.data) S.promos = pr.data.map(function(r){ return {id:r.id,code:r.code,kind:r.kind,val:Number(r.value),note:r.note||'',uses:r.uses||0,cap:r.cap||0,until:r.until||'',on:r.active!==false,stackable:r.stackable!==false}; });
+    /* bundle discount settings */
+    var bs=await sb.from('settings').select('*').in('key',['bundle_2_pct','bundle_3_pct']);
+    if(bs.data) bs.data.forEach(function(r){ if(r.key==='bundle_2_pct') S.bundle2=Number(r.value)||10; if(r.key==='bundle_3_pct') S.bundle3=Number(r.value)||15; });
     /* opening hours */
     var sh=await sb.from('studio_settings').select('value').eq('key','opening_hours').single();
     if(sh.data && sh.data.value) S.hours=sh.data.value;
@@ -615,6 +619,10 @@ V.settings=function(){
         '<div class="card"><div class="lbl" style="margin-bottom:14px">Loyalty</div>'+
           '<div class="kv"><span style="color:#6E5B49">5 stamps</span><span>25% off a visit</span></div>'+
           '<div class="kv" style="border-bottom:1px solid #E0D2C2"><span style="color:#6E5B49">10 stamps</span><span>Visit free</span></div></div>'+
+        '<div class="card"><div class="lbl" style="margin-bottom:14px">Bundle discounts</div>'+
+          '<div class="kv"><span style="color:#6E5B49">2 treatments</span><span id="b2-val">'+(S.bundle2||10)+'% off</span></div>'+
+          '<div class="kv" style="border-bottom:1px solid #E0D2C2"><span style="color:#6E5B49">3+ treatments</span><span id="b3-val">'+(S.bundle3||15)+'% off</span></div>'+
+          '<button class="btn btn-o btn-sm" id="edit-bundle" style="margin-top:14px;width:100%">Edit</button></div>'+
       '</div></div>'+
     '<div class="card" style="margin-top:10px"><div class="lbl" style="margin-bottom:14px">Notifications</div>'+
       '<div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 0">'+
@@ -992,6 +1000,25 @@ function contactSheet(){
     save(); closeSheet(); render();
   };
 }
+function bundleSheet(){
+  sheet('<div class="lbl" style="margin-bottom:10px">Bundle discounts</div>'+
+    '<div class="serif" style="font-size:28px;margin-bottom:22px">Edit bundle rates</div>'+
+    '<div class="lbl" style="margin-bottom:10px">2 treatments discount (%)</div>'+
+    '<input class="field" id="b-2" inputmode="decimal" value="'+(S.bundle2||10)+'" style="margin-bottom:20px">'+
+    '<div class="lbl" style="margin-bottom:10px">3+ treatments discount (%)</div>'+
+    '<input class="field" id="b-3" inputmode="decimal" value="'+(S.bundle3||15)+'" style="margin-bottom:24px">'+
+    '<div style="display:flex;gap:10px">'+
+      '<button class="btn btn-o btn-sm" id="sclose">Cancel</button>'+
+      '<button class="btn btn-sm" id="b-save" style="flex:1">Save changes</button></div>');
+  $("sclose").onclick=closeSheet;
+  $("b-save").onclick=async function(){
+    S.bundle2=parseFloat($("b-2").value)||10;
+    S.bundle3=parseFloat($("b-3").value)||15;
+    await sb.from('settings').upsert({key:'bundle_2_pct',value:String(S.bundle2)},{onConflict:'key'});
+    await sb.from('settings').upsert({key:'bundle_3_pct',value:String(S.bundle3)},{onConflict:'key'});
+    save(); closeSheet(); render();
+  };
+}
 var svcDraft={d:30};
 function clientSheet(c){
   var hist=S.appts.filter(function(a){ return a.c===c.id; });
@@ -1211,7 +1238,7 @@ function rangeSheet(){
   };
 }
 function promoSheet(id){
-  var p = id? S.promos.filter(function(x){ return x.id===id; })[0] : {code:"",kind:"%",val:10,note:"",uses:0,cap:0,until:"",on:true};
+  var p = id? S.promos.filter(function(x){ return x.id===id; })[0] : {code:"",kind:"%",val:10,note:"",uses:0,cap:0,until:"",on:true,stackable:true};
   var isNew=!id;
   promoDraft={kind:p.kind,until:p.until||""};
   sheet('<div class="lbl" style="margin-bottom:10px">'+(isNew?"New promo code":"Edit code")+'</div>'+
@@ -1230,7 +1257,11 @@ function promoSheet(id){
     '<div class="lbl" style="margin-bottom:10px">Last day it works</div>'+
     '<input class="field" type="date" id="p-until" value="'+(p.until?inputDate(parseKey(p.until)):"")+'" style="margin-bottom:20px">'+
     '<div class="lbl" style="margin-bottom:10px">Note to yourself</div>'+
-    '<input class="field" id="p-note" placeholder="Quiet weeks in August" value="'+String(p.note||"").replace(/"/g,"&quot;")+'" style="margin-bottom:24px">'+
+    '<input class="field" id="p-note" placeholder="Quiet weeks in August" value="'+String(p.note||"").replace(/"/g,"&quot;")+'" style="margin-bottom:20px">'+
+    '<div class="lbl" style="margin-bottom:10px">Stacking</div>'+
+    '<label style="display:flex;align-items:center;gap:12px;margin-bottom:24px;cursor:pointer;font-size:14.5px;color:#5C5148">'+
+      '<input type="checkbox" id="p-stackable"'+(p.stackable!==false?' checked':'')+' style="width:20px;height:20px;accent-color:#3A322E">'+
+      'Allow stacking with bundle discounts</label>'+
     '<div style="display:flex;gap:10px;flex-wrap:wrap">'+
       '<button class="btn btn-o btn-sm" id="sclose">Cancel</button>'+
       (isNew?"":'<button class="btn btn-o btn-sm" data-promodel="'+p.id+'">Delete</button>')+
@@ -1247,14 +1278,15 @@ function promoSheet(id){
     if(!code) { $("p-code").focus(); return; }
     var val=parseFloat($("p-val").value)||0, cap=parseInt($("p-cap").value,10)||0;
     var u=$("p-until").value? iso(fromInput($("p-until").value)) : null;
-    var payload={code:code, kind:promoDraft.kind, value:val, note:$("p-note").value.trim(), uses: (isNew?0:p.uses), cap:cap, until:u, active:true};
+    var stackable=$("p-stackable")?$("p-stackable").checked:true;
+    var payload={code:code, kind:promoDraft.kind, value:val, note:$("p-note").value.trim(), uses: (isNew?0:p.uses), cap:cap, until:u, active:true, stackable:stackable};
     if(!isNew) payload.id=p.id;
     var res = await sb.from('promos').upsert(payload).select().single();
     if (res.data) {
       if(isNew){
-        S.promos.push({id:res.data.id,code:code,kind:promoDraft.kind,val:val,note:$("p-note").value.trim(),uses:0,cap:cap,until:u,on:true});
+        S.promos.push({id:res.data.id,code:code,kind:promoDraft.kind,val:val,note:$("p-note").value.trim(),uses:0,cap:cap,until:u,on:true,stackable:stackable});
       } else {
-        S.promos.forEach(function(x){ if(x.id===p.id){ x.id=res.data.id; x.code=code; x.kind=promoDraft.kind; x.val=val; x.cap=cap; x.until=u; x.note=$("p-note").value.trim(); } });
+        S.promos.forEach(function(x){ if(x.id===p.id){ x.id=res.data.id; x.code=code; x.kind=promoDraft.kind; x.val=val; x.cap=cap; x.until=u; x.note=$("p-note").value.trim(); x.stackable=stackable; } });
       }
     }
     save(); closeSheet(); render();
@@ -1324,6 +1356,7 @@ function wire(scope){
   }; });
   q("[data-editday]").forEach(function(b){ b.onclick=function(){ hoursSheet(b.dataset.editday); }; });
   if($("edit-contact")) $("edit-contact").onclick=function(){ contactSheet(); };
+  if($("edit-bundle")) $("edit-bundle").onclick=function(){ bundleSheet(); };
   q("[data-stamp]").forEach(function(b){ b.onclick=async function(){ var c=client(b.dataset.stamp); c.stamps=Math.min(10,c.stamps+1); if(c.id) await sb.from('clients').update({stamps: c.stamps}).eq('id', c.id); save(); clientSheet(c); }; });
   q("[data-bookfor]").forEach(function(b){ b.onclick=function(){ closeSheet(); newSheet(S.dayKey,""); setTimeout(function(){ $("n-client").value=b.dataset.bookfor; },0); }; });
   q("[data-msgclient]").forEach(function(b){ b.onclick=async function(){
